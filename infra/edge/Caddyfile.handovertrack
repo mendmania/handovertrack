@@ -1,4 +1,5 @@
-# Append only after DNS, private upstream and origin TLS prerequisites are ready.
+# Append after origin ownership, DNS and private upstream checks pass.
+# Caddy obtains the first certificate after this route is activated; verify TLS then.
 # No import of shared logging snippets: auth/cookie/query data stays out of logs.
 handovertrack.com {
   header {
