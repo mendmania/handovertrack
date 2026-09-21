@@ -21,7 +21,7 @@ older sections remain as historical evidence.
    reports `dns_direct_origin=false` locally. Re-run after cache expiry;
    do not bypass that guard. Receipts: `.local/task05-dns-receipt.json` and
    `.local/task05-dns-preflight.json`. All other preflight checks pass.
-2. **SSH access restored; privileged import still blocked:** both recorded
+2. **SSH access restored; transfer/manual import pending:** both recorded
    private keys are passphrase-protected and the SSH agent has no loaded
    identities. Explicit macOS `UseKeychain=yes` successfully unlocks the saved
    netcup key and authenticates as `mendim` to `netcupmaniaserver`:
@@ -32,17 +32,25 @@ older sections remain as historical evidence.
    and a root profile for this IP. Both available keys still fail for root.
    `sudo -n -l` shows mendim may use sudo with authentication; its temporary
    password-free grant expired at `2026-08-25T14:58:17Z`. `sudo -n true` requires
-   a password. No matching VPS login/sudo password was found in the scoped
-   Keychain lookup, and the owner was asked for its saved location, not its value.
+   a password in the agent session. The owner subsequently demonstrated successful
+   `sudo -v` in their own VPS terminal as mendim. That authentication is scoped
+   to their terminal; no password was shared. The owner will run the guarded
+   import there after the transfer/checksum gate. No matching saved VPS sudo
+   password was found in the scoped Keychain lookup.
    Do not bypass this via Docker privileges, host mounts or privileged pods.
    The selected path is **SSH OCI import** of the exact rebuilt artifact.
    Staging started in new mode-0700 directory
    `/home/mendim/handovertrack-task05-ba2ecc8d8040-20260921`; slow transfer was
-   stopped pending sudo access and retained as mode-0600 `release.oci.tar.partial`.
-   It is **incomplete and must not be imported**. Complete/resume, verify SHA-256
+   initially stopped and retained as mode-0600 `release.oci.tar.partial`.
+   After the owner verified sudo, transfer was resumed over SSH under
+   `transfer.lock`, after verifying the existing 13,578,240-byte prefix hash.
+   Transfer is ongoing and slow; **never import incomplete bytes**. The guarded
+   owner command waits for the transfer lock and verifies SHA-256
    `ab27fa249c2bb2916fc45f6ed5d589c0a292244724836f1ad9bcf12db07660bf`
-   and length **381,444,096 bytes**, then import with authenticated sudo and verify
-   the manifest identity. No k3s image import or workload mutation occurred.
+   and length **381,444,096 bytes**, then imports with authenticated sudo and
+   verifies the manifest identity. The script also accepts the full `.partial`
+   archive if an unavailable fresh Keychain/SSH session prevents the final rename;
+   the complete-byte checksum remains mandatory. No k3s image import or workload mutation occurred.
    GHCR remains unavailable (403 requiring `read:packages`); no registry path
    was used and no shared credentials or visibility settings were changed.
 3. **Independent recovery NOT RUN:** FileVault remains On; workstation free
@@ -74,8 +82,10 @@ and 29,424,299 free inodes.
 **No existing HandoverTrack certificate is required to create its first route.**
 The runbook and Caddy comment now explicitly order origin/DNS and internal
 service checks → guarded additive route → first certificate issuance → verified
-HTTPS. Missing sudo authentication for OCI import (plus the workstation DNS cache until expiry),
-rather than missing first-use TLS, stops this bootstrap. Full (strict) and proxy/cache configuration remain NOT RUN.
+HTTPS. Completion of the SSH archive transfer and owner-authenticated import,
+rather than missing first-use TLS, gates this bootstrap. A fresh preflight at
+16:09 CEST passed **every check**, including the now-refreshed local DNS resolver
+(`.local/task05-before-import-preflight.json`). Recheck before bootstrap. Full (strict) and proxy/cache configuration remain NOT RUN.
 
 ## Reviewed committed source and rebuilt artifact
 
