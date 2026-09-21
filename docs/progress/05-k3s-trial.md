@@ -8,7 +8,29 @@ apex DNS-only A record was subsequently added after the owner signed in.
 Task 06 has not started. The observations below supersede the original blockers;
 older sections remain as historical evidence.
 
-## Owner shutdown checkpoint
+## Completed upload after owner return
+
+The owner requested resumption. Reverified the entire local archive and the
+saved 136,589,312-byte remote prefix, then resumed under the same transfer lock.
+The Mac now used `en0` through gateway `192.168.18.1`; no network settings were
+changed by the agent. The remaining 244,854,784 bytes completed in approximately
+39 seconds. Full server-side size and SHA-256 verification ran inside the same
+SSH session/lock before the atomic rename, avoiding dependency on a fresh
+Keychain connection at completion.
+
+**Transfer COMPLETE; owner sudo import still PENDING.** Remote archive:
+`/home/mendim/handovertrack-task05-ba2ecc8d8040-20260921/release.oci.tar`,
+mode 0600, **381,444,096 bytes**, SHA-256
+`ab27fa249c2bb2916fc45f6ed5d589c0a292244724836f1ad9bcf12db07660bf`.
+Verified `2026-09-21T18:30:51Z`. The reviewed source and image manifest digest
+remain `ba2ecc8d8040eda6e5d57bf73d6d17e90a4d2337` and
+`sha256:125cd8a42f0bb92bf87251d40c4cc14c561ab27e0f00911205e000856d66d7cc`.
+No image import or live deployment has been claimed. Evidence:
+`.local/task05-ssh-delivery.json`, `task05-resume-upload.log` and the retained
+`task05-resume-upload.py` operator script. The former paused checkpoint below
+is historical; do not resume the now-complete archive again.
+
+## Owner shutdown checkpoint (historical)
 
 The owner requested a ten-minute Mac shutdown. The owned SSH upload was stopped
 and the server transfer lock was released. **136,589,312 of 381,444,096 bytes
@@ -45,7 +67,7 @@ can be tested after restart, but faster transfer is not guaranteed.
    reports `dns_direct_origin=false` locally. Re-run after cache expiry;
    do not bypass that guard. Receipts: `.local/task05-dns-receipt.json` and
    `.local/task05-dns-preflight.json`. All other preflight checks pass.
-2. **SSH access restored; transfer/manual import pending:** both recorded
+2. **SSH access restored; verified archive/manual import pending:** both recorded
    private keys are passphrase-protected and the SSH agent has no loaded
    identities. Explicit macOS `UseKeychain=yes` successfully unlocks the saved
    netcup key and authenticates as `mendim` to `netcupmaniaserver`:
@@ -68,8 +90,8 @@ can be tested after restart, but faster transfer is not guaranteed.
    initially stopped and retained as mode-0600 `release.oci.tar.partial`.
    After the owner verified sudo, transfer was resumed over SSH under
    `transfer.lock`, after verifying the existing 13,578,240-byte prefix hash.
-   Transfer is now paused for owner shutdown (see checkpoint above);
-   **never import incomplete bytes**. The guarded
+   The post-shutdown resumption is now complete and fully checksum-verified
+   (see completed-upload receipt above); only owner sudo import is pending. The guarded
    owner command waits for the transfer lock and verifies SHA-256
    `ab27fa249c2bb2916fc45f6ed5d589c0a292244724836f1ad9bcf12db07660bf`
    and length **381,444,096 bytes**, then imports with authenticated sudo and
@@ -107,7 +129,7 @@ and 29,424,299 free inodes.
 **No existing HandoverTrack certificate is required to create its first route.**
 The runbook and Caddy comment now explicitly order origin/DNS and internal
 service checks → guarded additive route → first certificate issuance → verified
-HTTPS. Completion of the SSH archive transfer and owner-authenticated import,
+HTTPS. The owner-authenticated import of the completed SSH archive,
 rather than missing first-use TLS, gates this bootstrap. A fresh preflight at
 16:09 CEST passed **every check**, including the now-refreshed local DNS resolver
 (`.local/task05-before-import-preflight.json`). Recheck before bootstrap. Full (strict) and proxy/cache configuration remain NOT RUN.
