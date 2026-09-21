@@ -6,7 +6,7 @@ SQLite and incremental pull sync, and a database-connected worker. Managers crea
 and update projects and worker assignments online. The native app adds local camera capture, private originals, durable queue intent
 and a local gallery. Authenticated streamed uploads, immutable server originals,
 PostgreSQL processing jobs, derivatives and a manager gallery are implemented
-locally. Physical camera/native-upload validation remains open; nothing is deployed.
+locally. Physical camera/native-upload validation remains open. Task 05 deployment preparation is implemented; rollout is blocked by DNS/TLS and artifact access, and nothing is deployed.
 
 ## Install and configure
 
@@ -142,7 +142,7 @@ uploads now stream directly to Fastify; the local Next media bridge is GET-only.
 The BFF cannot accept an upload; its
 application routes allow only the documented small JSON commands and reads;
 auth forwarding streams the request body.
-No Caddy, DNS or deployment changes have been made.
+An additive Caddy candidate and restricted deployment manifests are prepared. No live Caddy, DNS or deployment changes have been applied; see [trial operations](infra/kubernetes/README.md).
 
 ## iOS and offline access
 
@@ -267,8 +267,7 @@ examples are in `.env.example`; your existing `.env` is preserved.
 JPEG uploads are bounded to 50 MiB, 50 million pixels and two concurrent streams
 per API, with streamed hash/length checks and full decoder validation. A durable
 no-replace original plus a committed database receipt is required for acceptance.
-The default disk reserve is 256 MiB. API/worker production capacity and independent
-backup/restore remain future validation work.
+The default disk reserve is 256 MiB. Local bounded container decoding was measured during Task 05. API/worker capacity on the actual cluster volume and independent backup/restore remain unverified.
 
 ```sh
 pnpm media:maintenance status
@@ -318,3 +317,7 @@ See [Task 01 evidence](docs/progress/01-foundation.md),
 [Task 03 handoff](docs/progress/03-offline-capture.md), and
 [Task 04 handoff](docs/progress/04-upload-and-preview.md), and
 [the prepared Task 05 prompt](docs/prompts/05-trial-deployment.md).
+
+## Existing-k3s trial preparation
+
+See [Task 05 evidence and blockers](docs/progress/05-k3s-trial.md), [deployment operations](infra/kubernetes/README.md), and [isolated recovery](infra/kubernetes/RECOVERY.md). The deployment is dedicated to disposable test data until physical camera/native upload and independent encrypted restore are verified. No live rollout occurred. The [Task 06 prompt](docs/prompts/06-checklists.md) is prepared; Task 06 has not started.

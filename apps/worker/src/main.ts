@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto';
+import { writeFileSync } from 'node:fs';
 import { createDatabase } from '@handovertrack/platform/database';
 import { createMediaJobs, MediaFiles, sweepMediaScratch } from '@handovertrack/platform/media';
 import { readServerConfig } from '@handovertrack/config/server';
@@ -11,6 +12,10 @@ const report = (event: string, extra = {}) => console.log(JSON.stringify({ servi
 await pool.query('SELECT 1');
 await sweepMediaScratch(pool,new MediaFiles(config.MEDIA_ROOT,0));
 report('ready', { profile: 'selfhosted-trial', handlers: ['image-v1'] });
+const markHeartbeat = () => {
+  if (process.env.WORKER_HEARTBEAT_FILE) writeFileSync(process.env.WORKER_HEARTBEAT_FILE, String(Date.now()), { mode: 0o600 });
+};
+markHeartbeat();
 let closing = false; let running: Promise<void> | undefined;
 async function tick() {
   if (closing || running) return;
@@ -25,7 +30,7 @@ async function tick() {
   await running;
 }
 const timer = setInterval(() => void tick(), config.WORKER_POLL_MS);
-const heartbeat = setInterval(() => report('heartbeat'), config.WORKER_HEARTBEAT_MS);
+const heartbeat = setInterval(() => { markHeartbeat(); report('heartbeat'); }, config.WORKER_HEARTBEAT_MS);
 void tick();
 for (const signal of ['SIGINT', 'SIGTERM']) process.once(signal, async () => {
   if (closing) return;
