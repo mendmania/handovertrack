@@ -1,0 +1,33 @@
+# Append only after DNS, private upstream and origin TLS prerequisites are ready.
+# No import of shared logging snippets: auth/cookie/query data stays out of logs.
+handovertrack.com {
+  header {
+    -Server
+    >Cache-Control "private, no-store"
+    X-Content-Type-Options nosniff
+    X-Robots-Tag "noindex, nofollow"
+    Referrer-Policy no-referrer
+  }
+  request_body {
+    max_size 52428800
+  }
+  @private_admin path /health/* /metrics /metrics/* /debug/*
+  respond @private_admin 404
+  @api path /api/auth/* /v1/* /media/*
+  handle @api {
+    reverse_proxy api.handovertrack.svc.cluster.local:3301 {
+      # Default streaming; do not add request_buffers or rewrite upload paths.
+      flush_interval -1
+      header_up -CF-Connecting-IP
+      header_up -True-Client-IP
+      header_up -Forwarded
+      transport http {
+        dial_timeout 5s
+        response_header_timeout 130s
+      }
+    }
+  }
+  handle {
+    reverse_proxy web.handovertrack.svc.cluster.local:3300
+  }
+}

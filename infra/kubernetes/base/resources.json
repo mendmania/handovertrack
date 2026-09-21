@@ -1,0 +1,1484 @@
+{
+  "apiVersion": "v1",
+  "kind": "List",
+  "items": [
+    {
+      "apiVersion": "v1",
+      "kind": "Namespace",
+      "metadata": {
+        "name": "handovertrack",
+        "labels": {
+          "app.kubernetes.io/part-of": "handovertrack",
+          "pod-security.kubernetes.io/enforce": "restricted",
+          "pod-security.kubernetes.io/enforce-version": "v1.35",
+          "handovertrack.com/data-policy": "disposable-only"
+        }
+      }
+    },
+    {
+      "apiVersion": "storage.k8s.io/v1",
+      "kind": "StorageClass",
+      "metadata": {
+        "name": "handovertrack-local-retain",
+        "labels": {
+          "app.kubernetes.io/part-of": "handovertrack"
+        }
+      },
+      "provisioner": "rancher.io/local-path",
+      "reclaimPolicy": "Retain",
+      "volumeBindingMode": "WaitForFirstConsumer"
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "ServiceAccount",
+      "metadata": {
+        "name": "runtime",
+        "labels": {
+          "app.kubernetes.io/part-of": "handovertrack"
+        },
+        "namespace": "handovertrack"
+      },
+      "automountServiceAccountToken": false
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "ResourceQuota",
+      "metadata": {
+        "name": "trial-budget",
+        "labels": {
+          "app.kubernetes.io/part-of": "handovertrack"
+        },
+        "namespace": "handovertrack"
+      },
+      "spec": {
+        "hard": {
+          "requests.cpu": "1500m",
+          "limits.cpu": "4",
+          "requests.memory": "2Gi",
+          "limits.memory": "4Gi",
+          "requests.storage": "16Gi",
+          "persistentvolumeclaims": "4",
+          "pods": "8",
+          "requests.ephemeral-storage": "2Gi",
+          "limits.ephemeral-storage": "4Gi"
+        }
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "PersistentVolumeClaim",
+      "metadata": {
+        "name": "database",
+        "labels": {
+          "app.kubernetes.io/part-of": "handovertrack"
+        },
+        "namespace": "handovertrack"
+      },
+      "spec": {
+        "accessModes": [
+          "ReadWriteOnce"
+        ],
+        "storageClassName": "handovertrack-local-retain",
+        "resources": {
+          "requests": {
+            "storage": "4Gi"
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "PersistentVolumeClaim",
+      "metadata": {
+        "name": "media",
+        "labels": {
+          "app.kubernetes.io/part-of": "handovertrack"
+        },
+        "namespace": "handovertrack"
+      },
+      "spec": {
+        "accessModes": [
+          "ReadWriteOnce"
+        ],
+        "storageClassName": "handovertrack-local-retain",
+        "resources": {
+          "requests": {
+            "storage": "4Gi"
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "ConfigMap",
+      "metadata": {
+        "name": "runtime",
+        "labels": {
+          "app.kubernetes.io/part-of": "handovertrack"
+        },
+        "namespace": "handovertrack"
+      },
+      "data": {
+        "NODE_ENV": "production",
+        "AUTH_BASE_URL": "https://handovertrack.com",
+        "WEB_ORIGIN": "https://handovertrack.com",
+        "NEXT_PUBLIC_WEB_ORIGIN": "https://handovertrack.com",
+        "API_HOST": "0.0.0.0",
+        "API_PORT": "3301",
+        "WEB_PORT": "3300",
+        "API_INTERNAL_URL": "http://api:3301",
+        "MEDIA_ROOT": "/media",
+        "MEDIA_RESERVE_BYTES": "21474836480",
+        "WORKER_POLL_MS": "2000",
+        "WORKER_LEASE_MS": "60000",
+        "WORKER_HEARTBEAT_MS": "30000",
+        "WORKER_HEARTBEAT_FILE": "/tmp/worker-heartbeat",
+        "NODE_OPTIONS": "--max-old-space-size=256",
+        "UV_THREADPOOL_SIZE": "2",
+        "MALLOC_ARENA_MAX": "2"
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "ConfigMap",
+      "metadata": {
+        "name": "database-init",
+        "labels": {
+          "app.kubernetes.io/part-of": "handovertrack"
+        },
+        "namespace": "handovertrack"
+      },
+      "data": {
+        "init-db.sh": "#!/bin/sh\n# Runs only in this application's dedicated, empty PostgreSQL data directory.\nset -eu\npsql -v ON_ERROR_STOP=1 --username \"$POSTGRES_USER\" --dbname postgres \\\n  --set=migrator_password=\"$MIGRATOR_PASSWORD\" --set=runtime_password=\"$RUNTIME_PASSWORD\" <<'SQL'\nCREATE ROLE htrack_migrator LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE PASSWORD :'migrator_password';\nCREATE ROLE htrack_runtime LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE PASSWORD :'runtime_password';\nCREATE DATABASE handovertrack OWNER htrack_migrator;\nREVOKE ALL ON DATABASE handovertrack FROM PUBLIC;\nGRANT CONNECT ON DATABASE handovertrack TO htrack_runtime;\nSQL\n"
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "name": "database",
+        "labels": {
+          "app.kubernetes.io/part-of": "handovertrack"
+        },
+        "namespace": "handovertrack"
+      },
+      "spec": {
+        "type": "ClusterIP",
+        "selector": {
+          "app.kubernetes.io/part-of": "handovertrack",
+          "app.kubernetes.io/component": "database"
+        },
+        "ports": [
+          {
+            "name": "tcp",
+            "port": 5432,
+            "targetPort": 5432
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "name": "api",
+        "labels": {
+          "app.kubernetes.io/part-of": "handovertrack"
+        },
+        "namespace": "handovertrack"
+      },
+      "spec": {
+        "type": "ClusterIP",
+        "selector": {
+          "app.kubernetes.io/part-of": "handovertrack",
+          "app.kubernetes.io/component": "api"
+        },
+        "ports": [
+          {
+            "name": "tcp",
+            "port": 3301,
+            "targetPort": 3301
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "name": "web",
+        "labels": {
+          "app.kubernetes.io/part-of": "handovertrack"
+        },
+        "namespace": "handovertrack"
+      },
+      "spec": {
+        "type": "ClusterIP",
+        "selector": {
+          "app.kubernetes.io/part-of": "handovertrack",
+          "app.kubernetes.io/component": "web"
+        },
+        "ports": [
+          {
+            "name": "tcp",
+            "port": 3300,
+            "targetPort": 3300
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "apps/v1",
+      "kind": "StatefulSet",
+      "metadata": {
+        "name": "database",
+        "labels": {
+          "app.kubernetes.io/part-of": "handovertrack"
+        },
+        "namespace": "handovertrack"
+      },
+      "spec": {
+        "serviceName": "database",
+        "replicas": 1,
+        "selector": {
+          "matchLabels": {
+            "app.kubernetes.io/part-of": "handovertrack",
+            "app.kubernetes.io/component": "database"
+          }
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/part-of": "handovertrack",
+              "app.kubernetes.io/component": "database"
+            }
+          },
+          "spec": {
+            "automountServiceAccountToken": false,
+            "serviceAccountName": "runtime",
+            "securityContext": {
+              "runAsNonRoot": true,
+              "runAsUser": 999,
+              "runAsGroup": 999,
+              "fsGroup": 999,
+              "seccompProfile": {
+                "type": "RuntimeDefault"
+              }
+            },
+            "nodeSelector": {
+              "kubernetes.io/hostname": "netcupmaniaserver"
+            },
+            "terminationGracePeriodSeconds": 150,
+            "containers": [
+              {
+                "name": "database",
+                "image": "postgres:18.3@sha256:7e32e9833a6fb1c92c32552794cb6ed569d51b445a54907d35fc112ef39684db",
+                "imagePullPolicy": "IfNotPresent",
+                "command": [
+                  "docker-entrypoint.sh",
+                  "postgres",
+                  "-c",
+                  "shared_buffers=128MB",
+                  "-c",
+                  "max_connections=40"
+                ],
+                "securityContext": {
+                  "allowPrivilegeEscalation": false,
+                  "readOnlyRootFilesystem": true,
+                  "capabilities": {
+                    "drop": [
+                      "ALL"
+                    ]
+                  }
+                },
+                "resources": {
+                  "requests": {
+                    "cpu": "100m",
+                    "memory": "256Mi",
+                    "ephemeral-storage": "128Mi"
+                  },
+                  "limits": {
+                    "cpu": "500m",
+                    "memory": "512Mi",
+                    "ephemeral-storage": "512Mi"
+                  }
+                },
+                "volumeMounts": [
+                  {
+                    "name": "tmp",
+                    "mountPath": "/tmp"
+                  },
+                  {
+                    "name": "database",
+                    "mountPath": "/var/lib/postgresql"
+                  },
+                  {
+                    "name": "init",
+                    "mountPath": "/docker-entrypoint-initdb.d",
+                    "readOnly": true
+                  },
+                  {
+                    "name": "socket",
+                    "mountPath": "/var/run/postgresql"
+                  }
+                ],
+                "envFrom": [
+                  {
+                    "secretRef": {
+                      "name": "database-admin"
+                    }
+                  }
+                ],
+                "env": [
+                  {
+                    "name": "PGDATA",
+                    "value": "/var/lib/postgresql/18/docker"
+                  },
+                  {
+                    "name": "POSTGRES_USER",
+                    "value": "postgres"
+                  }
+                ],
+                "readinessProbe": {
+                  "exec": {
+                    "command": [
+                      "pg_isready",
+                      "-U",
+                      "postgres"
+                    ]
+                  },
+                  "periodSeconds": 5
+                },
+                "startupProbe": {
+                  "exec": {
+                    "command": [
+                      "pg_isready",
+                      "-U",
+                      "postgres"
+                    ]
+                  },
+                  "periodSeconds": 5,
+                  "failureThreshold": 60
+                }
+              }
+            ],
+            "volumes": [
+              {
+                "name": "tmp",
+                "emptyDir": {
+                  "sizeLimit": "128Mi"
+                }
+              },
+              {
+                "name": "database",
+                "persistentVolumeClaim": {
+                  "claimName": "database"
+                }
+              },
+              {
+                "name": "init",
+                "configMap": {
+                  "name": "database-init",
+                  "defaultMode": 365
+                }
+              },
+              {
+                "name": "socket",
+                "emptyDir": {
+                  "sizeLimit": "16Mi"
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "apps/v1",
+      "kind": "Deployment",
+      "metadata": {
+        "name": "api",
+        "labels": {
+          "app.kubernetes.io/part-of": "handovertrack"
+        },
+        "namespace": "handovertrack"
+      },
+      "spec": {
+        "replicas": 1,
+        "strategy": {
+          "type": "Recreate"
+        },
+        "selector": {
+          "matchLabels": {
+            "app.kubernetes.io/part-of": "handovertrack",
+            "app.kubernetes.io/component": "api"
+          }
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/part-of": "handovertrack",
+              "app.kubernetes.io/component": "api"
+            }
+          },
+          "spec": {
+            "automountServiceAccountToken": false,
+            "serviceAccountName": "runtime",
+            "securityContext": {
+              "runAsNonRoot": true,
+              "runAsUser": 1000,
+              "runAsGroup": 1000,
+              "fsGroup": 1000,
+              "seccompProfile": {
+                "type": "RuntimeDefault"
+              }
+            },
+            "nodeSelector": {
+              "kubernetes.io/hostname": "netcupmaniaserver"
+            },
+            "terminationGracePeriodSeconds": 150,
+            "containers": [
+              {
+                "name": "api",
+                "image": "handovertrack-runtime:render-only",
+                "imagePullPolicy": "IfNotPresent",
+                "command": [
+                  "node",
+                  "apps/api/dist/main.js"
+                ],
+                "securityContext": {
+                  "allowPrivilegeEscalation": false,
+                  "readOnlyRootFilesystem": true,
+                  "capabilities": {
+                    "drop": [
+                      "ALL"
+                    ]
+                  }
+                },
+                "resources": {
+                  "requests": {
+                    "cpu": "100m",
+                    "memory": "256Mi",
+                    "ephemeral-storage": "128Mi"
+                  },
+                  "limits": {
+                    "cpu": "1000m",
+                    "memory": "768Mi",
+                    "ephemeral-storage": "512Mi"
+                  }
+                },
+                "volumeMounts": [
+                  {
+                    "name": "tmp",
+                    "mountPath": "/tmp"
+                  },
+                  {
+                    "name": "media",
+                    "mountPath": "/media"
+                  }
+                ],
+                "envFrom": [
+                  {
+                    "configMapRef": {
+                      "name": "runtime"
+                    }
+                  }
+                ],
+                "env": [
+                  {
+                    "name": "DATABASE_URL",
+                    "valueFrom": {
+                      "secretKeyRef": {
+                        "name": "runtime",
+                        "key": "DATABASE_URL"
+                      }
+                    }
+                  },
+                  {
+                    "name": "AUTH_SECRET",
+                    "valueFrom": {
+                      "secretKeyRef": {
+                        "name": "auth",
+                        "key": "AUTH_SECRET"
+                      }
+                    }
+                  }
+                ],
+                "readinessProbe": {
+                  "httpGet": {
+                    "path": "/health/ready",
+                    "port": 3301
+                  },
+                  "periodSeconds": 5
+                },
+                "startupProbe": {
+                  "httpGet": {
+                    "path": "/health/ready",
+                    "port": 3301
+                  },
+                  "periodSeconds": 5,
+                  "failureThreshold": 60
+                },
+                "livenessProbe": {
+                  "httpGet": {
+                    "path": "/health/live",
+                    "port": 3301
+                  },
+                  "periodSeconds": 20,
+                  "failureThreshold": 6
+                }
+              }
+            ],
+            "volumes": [
+              {
+                "name": "tmp",
+                "emptyDir": {
+                  "sizeLimit": "128Mi"
+                }
+              },
+              {
+                "name": "media",
+                "persistentVolumeClaim": {
+                  "claimName": "media"
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "apps/v1",
+      "kind": "Deployment",
+      "metadata": {
+        "name": "worker",
+        "labels": {
+          "app.kubernetes.io/part-of": "handovertrack"
+        },
+        "namespace": "handovertrack"
+      },
+      "spec": {
+        "replicas": 1,
+        "strategy": {
+          "type": "Recreate"
+        },
+        "selector": {
+          "matchLabels": {
+            "app.kubernetes.io/part-of": "handovertrack",
+            "app.kubernetes.io/component": "worker"
+          }
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/part-of": "handovertrack",
+              "app.kubernetes.io/component": "worker"
+            }
+          },
+          "spec": {
+            "automountServiceAccountToken": false,
+            "serviceAccountName": "runtime",
+            "securityContext": {
+              "runAsNonRoot": true,
+              "runAsUser": 1000,
+              "runAsGroup": 1000,
+              "fsGroup": 1000,
+              "seccompProfile": {
+                "type": "RuntimeDefault"
+              }
+            },
+            "nodeSelector": {
+              "kubernetes.io/hostname": "netcupmaniaserver"
+            },
+            "terminationGracePeriodSeconds": 150,
+            "containers": [
+              {
+                "name": "worker",
+                "image": "handovertrack-runtime:render-only",
+                "imagePullPolicy": "IfNotPresent",
+                "command": [
+                  "node",
+                  "apps/worker/dist/main.js"
+                ],
+                "securityContext": {
+                  "allowPrivilegeEscalation": false,
+                  "readOnlyRootFilesystem": true,
+                  "capabilities": {
+                    "drop": [
+                      "ALL"
+                    ]
+                  }
+                },
+                "resources": {
+                  "requests": {
+                    "cpu": "100m",
+                    "memory": "256Mi",
+                    "ephemeral-storage": "128Mi"
+                  },
+                  "limits": {
+                    "cpu": "1000m",
+                    "memory": "768Mi",
+                    "ephemeral-storage": "512Mi"
+                  }
+                },
+                "volumeMounts": [
+                  {
+                    "name": "tmp",
+                    "mountPath": "/tmp"
+                  },
+                  {
+                    "name": "media",
+                    "mountPath": "/media"
+                  }
+                ],
+                "envFrom": [
+                  {
+                    "configMapRef": {
+                      "name": "runtime"
+                    }
+                  }
+                ],
+                "env": [
+                  {
+                    "name": "DATABASE_URL",
+                    "valueFrom": {
+                      "secretKeyRef": {
+                        "name": "runtime",
+                        "key": "DATABASE_URL"
+                      }
+                    }
+                  },
+                  {
+                    "name": "AUTH_SECRET",
+                    "valueFrom": {
+                      "secretKeyRef": {
+                        "name": "auth",
+                        "key": "AUTH_SECRET"
+                      }
+                    }
+                  }
+                ],
+                "livenessProbe": {
+                  "exec": {
+                    "command": [
+                      "node",
+                      "-e",
+                      "process.exit(Date.now()-Number(require('fs').readFileSync('/tmp/worker-heartbeat','utf8'))<120000?0:1)"
+                    ]
+                  },
+                  "periodSeconds": 30,
+                  "failureThreshold": 3
+                },
+                "readinessProbe": {
+                  "exec": {
+                    "command": [
+                      "node",
+                      "-e",
+                      "process.exit(Date.now()-Number(require('fs').readFileSync('/tmp/worker-heartbeat','utf8'))<120000?0:1)"
+                    ]
+                  },
+                  "periodSeconds": 30,
+                  "failureThreshold": 3
+                },
+                "startupProbe": {
+                  "exec": {
+                    "command": [
+                      "node",
+                      "-e",
+                      "process.exit(Date.now()-Number(require('fs').readFileSync('/tmp/worker-heartbeat','utf8'))<120000?0:1)"
+                    ]
+                  },
+                  "periodSeconds": 5,
+                  "failureThreshold": 30
+                }
+              }
+            ],
+            "volumes": [
+              {
+                "name": "tmp",
+                "emptyDir": {
+                  "sizeLimit": "128Mi"
+                }
+              },
+              {
+                "name": "media",
+                "persistentVolumeClaim": {
+                  "claimName": "media"
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "apps/v1",
+      "kind": "Deployment",
+      "metadata": {
+        "name": "web",
+        "labels": {
+          "app.kubernetes.io/part-of": "handovertrack"
+        },
+        "namespace": "handovertrack"
+      },
+      "spec": {
+        "replicas": 1,
+        "strategy": {
+          "type": "Recreate"
+        },
+        "selector": {
+          "matchLabels": {
+            "app.kubernetes.io/part-of": "handovertrack",
+            "app.kubernetes.io/component": "web"
+          }
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/part-of": "handovertrack",
+              "app.kubernetes.io/component": "web"
+            }
+          },
+          "spec": {
+            "automountServiceAccountToken": false,
+            "serviceAccountName": "runtime",
+            "securityContext": {
+              "runAsNonRoot": true,
+              "runAsUser": 1000,
+              "runAsGroup": 1000,
+              "fsGroup": 1000,
+              "seccompProfile": {
+                "type": "RuntimeDefault"
+              }
+            },
+            "nodeSelector": {
+              "kubernetes.io/hostname": "netcupmaniaserver"
+            },
+            "terminationGracePeriodSeconds": 150,
+            "containers": [
+              {
+                "name": "web",
+                "image": "handovertrack-runtime:render-only",
+                "imagePullPolicy": "IfNotPresent",
+                "command": [
+                  "node",
+                  "apps/web/node_modules/next/dist/bin/next",
+                  "start",
+                  "apps/web",
+                  "--hostname",
+                  "0.0.0.0",
+                  "--port",
+                  "3300"
+                ],
+                "securityContext": {
+                  "allowPrivilegeEscalation": false,
+                  "readOnlyRootFilesystem": true,
+                  "capabilities": {
+                    "drop": [
+                      "ALL"
+                    ]
+                  }
+                },
+                "resources": {
+                  "requests": {
+                    "cpu": "100m",
+                    "memory": "256Mi",
+                    "ephemeral-storage": "128Mi"
+                  },
+                  "limits": {
+                    "cpu": "500m",
+                    "memory": "512Mi",
+                    "ephemeral-storage": "512Mi"
+                  }
+                },
+                "volumeMounts": [
+                  {
+                    "name": "tmp",
+                    "mountPath": "/tmp"
+                  },
+                  {
+                    "name": "next-cache",
+                    "mountPath": "/app/apps/web/.next/cache"
+                  }
+                ],
+                "envFrom": [
+                  {
+                    "configMapRef": {
+                      "name": "runtime"
+                    }
+                  }
+                ],
+                "readinessProbe": {
+                  "httpGet": {
+                    "path": "/sign-in",
+                    "port": 3300
+                  },
+                  "periodSeconds": 5
+                },
+                "startupProbe": {
+                  "httpGet": {
+                    "path": "/sign-in",
+                    "port": 3300
+                  },
+                  "periodSeconds": 5,
+                  "failureThreshold": 60
+                },
+                "livenessProbe": {
+                  "httpGet": {
+                    "path": "/sign-in",
+                    "port": 3300
+                  },
+                  "periodSeconds": 20,
+                  "failureThreshold": 6
+                }
+              }
+            ],
+            "volumes": [
+              {
+                "name": "tmp",
+                "emptyDir": {
+                  "sizeLimit": "128Mi"
+                }
+              },
+              {
+                "name": "next-cache",
+                "emptyDir": {
+                  "sizeLimit": "64Mi"
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "batch/v1",
+      "kind": "Job",
+      "metadata": {
+        "name": "migrate",
+        "labels": {
+          "app.kubernetes.io/part-of": "handovertrack"
+        },
+        "namespace": "handovertrack"
+      },
+      "spec": {
+        "backoffLimit": 0,
+        "activeDeadlineSeconds": 300,
+        "template": {
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/part-of": "handovertrack",
+              "app.kubernetes.io/component": "migrate"
+            }
+          },
+          "spec": {
+            "automountServiceAccountToken": false,
+            "serviceAccountName": "runtime",
+            "securityContext": {
+              "runAsNonRoot": true,
+              "runAsUser": 1000,
+              "runAsGroup": 1000,
+              "fsGroup": 1000,
+              "seccompProfile": {
+                "type": "RuntimeDefault"
+              }
+            },
+            "nodeSelector": {
+              "kubernetes.io/hostname": "netcupmaniaserver"
+            },
+            "terminationGracePeriodSeconds": 150,
+            "containers": [
+              {
+                "name": "migrate",
+                "image": "handovertrack-runtime:render-only",
+                "imagePullPolicy": "IfNotPresent",
+                "command": [
+                  "node",
+                  "node_modules/tsx/dist/cli.mjs",
+                  "packages/db/src/migrate.ts"
+                ],
+                "securityContext": {
+                  "allowPrivilegeEscalation": false,
+                  "readOnlyRootFilesystem": true,
+                  "capabilities": {
+                    "drop": [
+                      "ALL"
+                    ]
+                  }
+                },
+                "resources": {
+                  "requests": {
+                    "cpu": "100m",
+                    "memory": "256Mi",
+                    "ephemeral-storage": "128Mi"
+                  },
+                  "limits": {
+                    "cpu": "500m",
+                    "memory": "512Mi",
+                    "ephemeral-storage": "512Mi"
+                  }
+                },
+                "volumeMounts": [
+                  {
+                    "name": "tmp",
+                    "mountPath": "/tmp"
+                  }
+                ],
+                "envFrom": [
+                  {
+                    "configMapRef": {
+                      "name": "runtime"
+                    }
+                  }
+                ],
+                "env": [
+                  {
+                    "name": "MIGRATION_DATABASE_URL",
+                    "valueFrom": {
+                      "secretKeyRef": {
+                        "name": "migration",
+                        "key": "MIGRATION_DATABASE_URL"
+                      }
+                    }
+                  }
+                ]
+              }
+            ],
+            "volumes": [
+              {
+                "name": "tmp",
+                "emptyDir": {
+                  "sizeLimit": "128Mi"
+                }
+              }
+            ],
+            "restartPolicy": "Never"
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "networking.k8s.io/v1",
+      "kind": "NetworkPolicy",
+      "metadata": {
+        "name": "default-deny",
+        "labels": {
+          "app.kubernetes.io/part-of": "handovertrack"
+        },
+        "namespace": "handovertrack"
+      },
+      "spec": {
+        "podSelector": {
+          "matchLabels": {}
+        },
+        "policyTypes": [
+          "Ingress",
+          "Egress"
+        ],
+        "ingress": [],
+        "egress": []
+      }
+    },
+    {
+      "apiVersion": "networking.k8s.io/v1",
+      "kind": "NetworkPolicy",
+      "metadata": {
+        "name": "dns",
+        "labels": {
+          "app.kubernetes.io/part-of": "handovertrack"
+        },
+        "namespace": "handovertrack"
+      },
+      "spec": {
+        "podSelector": {},
+        "policyTypes": [
+          "Egress"
+        ],
+        "egress": [
+          {
+            "to": [
+              {
+                "namespaceSelector": {
+                  "matchLabels": {
+                    "kubernetes.io/metadata.name": "kube-system"
+                  }
+                },
+                "podSelector": {
+                  "matchLabels": {
+                    "k8s-app": "kube-dns"
+                  }
+                }
+              }
+            ],
+            "ports": [
+              {
+                "port": 53,
+                "protocol": "UDP"
+              },
+              {
+                "port": 53,
+                "protocol": "TCP"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "networking.k8s.io/v1",
+      "kind": "NetworkPolicy",
+      "metadata": {
+        "name": "database",
+        "labels": {
+          "app.kubernetes.io/part-of": "handovertrack"
+        },
+        "namespace": "handovertrack"
+      },
+      "spec": {
+        "podSelector": {
+          "matchLabels": {
+            "app.kubernetes.io/part-of": "handovertrack",
+            "app.kubernetes.io/component": "database"
+          }
+        },
+        "policyTypes": [
+          "Ingress",
+          "Egress"
+        ],
+        "ingress": [
+          {
+            "from": [
+              {
+                "namespaceSelector": {
+                  "matchLabels": {
+                    "kubernetes.io/metadata.name": "handovertrack"
+                  }
+                },
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "handovertrack",
+                    "app.kubernetes.io/component": "api"
+                  }
+                }
+              },
+              {
+                "namespaceSelector": {
+                  "matchLabels": {
+                    "kubernetes.io/metadata.name": "handovertrack"
+                  }
+                },
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "handovertrack",
+                    "app.kubernetes.io/component": "worker"
+                  }
+                }
+              },
+              {
+                "namespaceSelector": {
+                  "matchLabels": {
+                    "kubernetes.io/metadata.name": "handovertrack"
+                  }
+                },
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "handovertrack",
+                    "app.kubernetes.io/component": "migrate"
+                  }
+                }
+              },
+              {
+                "namespaceSelector": {
+                  "matchLabels": {
+                    "kubernetes.io/metadata.name": "handovertrack"
+                  }
+                },
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "handovertrack",
+                    "app.kubernetes.io/component": "provision"
+                  }
+                }
+              },
+              {
+                "namespaceSelector": {
+                  "matchLabels": {
+                    "kubernetes.io/metadata.name": "handovertrack"
+                  }
+                },
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "handovertrack",
+                    "app.kubernetes.io/component": "backup"
+                  }
+                }
+              }
+            ],
+            "ports": [
+              {
+                "protocol": "TCP",
+                "port": 5432
+              }
+            ]
+          }
+        ],
+        "egress": []
+      }
+    },
+    {
+      "apiVersion": "networking.k8s.io/v1",
+      "kind": "NetworkPolicy",
+      "metadata": {
+        "name": "api",
+        "labels": {
+          "app.kubernetes.io/part-of": "handovertrack"
+        },
+        "namespace": "handovertrack"
+      },
+      "spec": {
+        "podSelector": {
+          "matchLabels": {
+            "app.kubernetes.io/part-of": "handovertrack",
+            "app.kubernetes.io/component": "api"
+          }
+        },
+        "policyTypes": [
+          "Ingress",
+          "Egress"
+        ],
+        "ingress": [
+          {
+            "from": [
+              {
+                "namespaceSelector": {
+                  "matchLabels": {
+                    "kubernetes.io/metadata.name": "edge-caddy"
+                  }
+                },
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/name": "edge-caddy",
+                    "app.kubernetes.io/component": "edge"
+                  }
+                }
+              },
+              {
+                "namespaceSelector": {
+                  "matchLabels": {
+                    "kubernetes.io/metadata.name": "handovertrack"
+                  }
+                },
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "handovertrack",
+                    "app.kubernetes.io/component": "web"
+                  }
+                }
+              }
+            ],
+            "ports": [
+              {
+                "protocol": "TCP",
+                "port": 3301
+              }
+            ]
+          }
+        ],
+        "egress": [
+          {
+            "to": [
+              {
+                "namespaceSelector": {
+                  "matchLabels": {
+                    "kubernetes.io/metadata.name": "handovertrack"
+                  }
+                },
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "handovertrack",
+                    "app.kubernetes.io/component": "database"
+                  }
+                }
+              }
+            ],
+            "ports": [
+              {
+                "protocol": "TCP",
+                "port": 5432
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "networking.k8s.io/v1",
+      "kind": "NetworkPolicy",
+      "metadata": {
+        "name": "web",
+        "labels": {
+          "app.kubernetes.io/part-of": "handovertrack"
+        },
+        "namespace": "handovertrack"
+      },
+      "spec": {
+        "podSelector": {
+          "matchLabels": {
+            "app.kubernetes.io/part-of": "handovertrack",
+            "app.kubernetes.io/component": "web"
+          }
+        },
+        "policyTypes": [
+          "Ingress",
+          "Egress"
+        ],
+        "ingress": [
+          {
+            "from": [
+              {
+                "namespaceSelector": {
+                  "matchLabels": {
+                    "kubernetes.io/metadata.name": "edge-caddy"
+                  }
+                },
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/name": "edge-caddy",
+                    "app.kubernetes.io/component": "edge"
+                  }
+                }
+              }
+            ],
+            "ports": [
+              {
+                "protocol": "TCP",
+                "port": 3300
+              }
+            ]
+          }
+        ],
+        "egress": [
+          {
+            "to": [
+              {
+                "namespaceSelector": {
+                  "matchLabels": {
+                    "kubernetes.io/metadata.name": "handovertrack"
+                  }
+                },
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "handovertrack",
+                    "app.kubernetes.io/component": "api"
+                  }
+                }
+              }
+            ],
+            "ports": [
+              {
+                "protocol": "TCP",
+                "port": 3301
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "networking.k8s.io/v1",
+      "kind": "NetworkPolicy",
+      "metadata": {
+        "name": "worker",
+        "labels": {
+          "app.kubernetes.io/part-of": "handovertrack"
+        },
+        "namespace": "handovertrack"
+      },
+      "spec": {
+        "podSelector": {
+          "matchLabels": {
+            "app.kubernetes.io/part-of": "handovertrack",
+            "app.kubernetes.io/component": "worker"
+          }
+        },
+        "policyTypes": [
+          "Ingress",
+          "Egress"
+        ],
+        "ingress": [],
+        "egress": [
+          {
+            "to": [
+              {
+                "namespaceSelector": {
+                  "matchLabels": {
+                    "kubernetes.io/metadata.name": "handovertrack"
+                  }
+                },
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "handovertrack",
+                    "app.kubernetes.io/component": "database"
+                  }
+                }
+              }
+            ],
+            "ports": [
+              {
+                "protocol": "TCP",
+                "port": 5432
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "networking.k8s.io/v1",
+      "kind": "NetworkPolicy",
+      "metadata": {
+        "name": "migrate",
+        "labels": {
+          "app.kubernetes.io/part-of": "handovertrack"
+        },
+        "namespace": "handovertrack"
+      },
+      "spec": {
+        "podSelector": {
+          "matchLabels": {
+            "app.kubernetes.io/part-of": "handovertrack",
+            "app.kubernetes.io/component": "migrate"
+          }
+        },
+        "policyTypes": [
+          "Ingress",
+          "Egress"
+        ],
+        "ingress": [],
+        "egress": [
+          {
+            "to": [
+              {
+                "namespaceSelector": {
+                  "matchLabels": {
+                    "kubernetes.io/metadata.name": "handovertrack"
+                  }
+                },
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "handovertrack",
+                    "app.kubernetes.io/component": "database"
+                  }
+                }
+              }
+            ],
+            "ports": [
+              {
+                "protocol": "TCP",
+                "port": 5432
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "networking.k8s.io/v1",
+      "kind": "NetworkPolicy",
+      "metadata": {
+        "name": "provision",
+        "labels": {
+          "app.kubernetes.io/part-of": "handovertrack"
+        },
+        "namespace": "handovertrack"
+      },
+      "spec": {
+        "podSelector": {
+          "matchLabels": {
+            "app.kubernetes.io/part-of": "handovertrack",
+            "app.kubernetes.io/component": "provision"
+          }
+        },
+        "policyTypes": [
+          "Ingress",
+          "Egress"
+        ],
+        "ingress": [],
+        "egress": [
+          {
+            "to": [
+              {
+                "namespaceSelector": {
+                  "matchLabels": {
+                    "kubernetes.io/metadata.name": "handovertrack"
+                  }
+                },
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "handovertrack",
+                    "app.kubernetes.io/component": "database"
+                  }
+                }
+              }
+            ],
+            "ports": [
+              {
+                "protocol": "TCP",
+                "port": 5432
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "networking.k8s.io/v1",
+      "kind": "NetworkPolicy",
+      "metadata": {
+        "name": "backup",
+        "labels": {
+          "app.kubernetes.io/part-of": "handovertrack"
+        },
+        "namespace": "handovertrack"
+      },
+      "spec": {
+        "podSelector": {
+          "matchLabels": {
+            "app.kubernetes.io/part-of": "handovertrack",
+            "app.kubernetes.io/component": "backup"
+          }
+        },
+        "policyTypes": [
+          "Ingress",
+          "Egress"
+        ],
+        "ingress": [],
+        "egress": [
+          {
+            "to": [
+              {
+                "namespaceSelector": {
+                  "matchLabels": {
+                    "kubernetes.io/metadata.name": "handovertrack"
+                  }
+                },
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "handovertrack",
+                    "app.kubernetes.io/component": "database"
+                  }
+                }
+              }
+            ],
+            "ports": [
+              {
+                "protocol": "TCP",
+                "port": 5432
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

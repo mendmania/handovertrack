@@ -15,3 +15,4 @@ apps/mobile/android/
 .local/
 .DS_Store
 *.tsbuildinfo
+__pycache__/

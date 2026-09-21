@@ -1,0 +1,70 @@
+{
+  "apiVersion": "networking.k8s.io/v1",
+  "kind": "NetworkPolicy",
+  "metadata": {
+    "name": "handovertrack-egress",
+    "namespace": "edge-caddy",
+    "labels": {
+      "app.kubernetes.io/part-of": "handovertrack"
+    }
+  },
+  "spec": {
+    "podSelector": {
+      "matchLabels": {
+        "app.kubernetes.io/name": "edge-caddy",
+        "app.kubernetes.io/component": "edge"
+      }
+    },
+    "policyTypes": [
+      "Egress"
+    ],
+    "egress": [
+      {
+        "to": [
+          {
+            "namespaceSelector": {
+              "matchLabels": {
+                "kubernetes.io/metadata.name": "handovertrack"
+              }
+            },
+            "podSelector": {
+              "matchLabels": {
+                "app.kubernetes.io/part-of": "handovertrack",
+                "app.kubernetes.io/component": "api"
+              }
+            }
+          }
+        ],
+        "ports": [
+          {
+            "protocol": "TCP",
+            "port": 3301
+          }
+        ]
+      },
+      {
+        "to": [
+          {
+            "namespaceSelector": {
+              "matchLabels": {
+                "kubernetes.io/metadata.name": "handovertrack"
+              }
+            },
+            "podSelector": {
+              "matchLabels": {
+                "app.kubernetes.io/part-of": "handovertrack",
+                "app.kubernetes.io/component": "web"
+              }
+            }
+          }
+        ],
+        "ports": [
+          {
+            "protocol": "TCP",
+            "port": 3300
+          }
+        ]
+      }
+    ]
+  }
+}
