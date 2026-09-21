@@ -6,7 +6,7 @@ SQLite and incremental pull sync, and a database-connected worker. Managers crea
 and update projects and worker assignments online. The native app adds local camera capture, private originals, durable queue intent
 and a local gallery. Authenticated streamed uploads, immutable server originals,
 PostgreSQL processing jobs, derivatives and a manager gallery are implemented
-locally. Physical camera/native-upload validation remains open. Task 05 deployment preparation is implemented; the apex DNS record is configured, while artifact delivery remains blocked and nothing is deployed.
+locally. Physical camera/native-upload validation remains open. Task 05 deployment preparation is implemented; the apex DNS record is configured, while sudo authentication for SSH image import remains blocked and nothing is deployed.
 
 ## Install and configure
 

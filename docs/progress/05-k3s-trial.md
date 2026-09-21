@@ -21,13 +21,30 @@ older sections remain as historical evidence.
    reports `dns_direct_origin=false` locally. Re-run after cache expiry;
    do not bypass that guard. Receipts: `.local/task05-dns-receipt.json` and
    `.local/task05-dns-preflight.json`. All other preflight checks pass.
-2. **Image delivery blocked:** SSH to the recorded `mendim@159.195.30.113`
-   rejects both `~/.ssh/netcup-k3s-client` and `~/.ssh/id_ed25519` with
-   `Permission denied (publickey)`. GHCR package inventory still returns HTTP
-   403, explicitly requiring `read:packages`. No import/publication, registry
-   visibility change, shared pull-secret access or privileged pod was attempted.
-   Continue with one authorized private-registry or SSH OCI-import path when
-   access is supplied; do not promote the older working-tree artifact.
+2. **SSH access restored; privileged import still blocked:** both recorded
+   private keys are passphrase-protected and the SSH agent has no loaded
+   identities. Explicit macOS `UseKeychain=yes` successfully unlocks the saved
+   netcup key and authenticates as `mendim` to `netcupmaniaserver`:
+   `ssh -o UseKeychain=yes -o BatchMode=yes -o IdentitiesOnly=yes -i
+   ~/.ssh/netcup-k3s-client mendim@159.195.30.113` (join as one command).
+   Earlier `Permission denied (publickey)` results were not proof of a revoked
+   key; they omitted Keychain access. Termius also contains two mendim profiles
+   and a root profile for this IP. Both available keys still fail for root.
+   `sudo -n -l` shows mendim may use sudo with authentication; its temporary
+   password-free grant expired at `2026-08-25T14:58:17Z`. `sudo -n true` requires
+   a password. No matching VPS login/sudo password was found in the scoped
+   Keychain lookup, and the owner was asked for its saved location, not its value.
+   Do not bypass this via Docker privileges, host mounts or privileged pods.
+   The selected path is **SSH OCI import** of the exact rebuilt artifact.
+   Staging started in new mode-0700 directory
+   `/home/mendim/handovertrack-task05-ba2ecc8d8040-20260921`; slow transfer was
+   stopped pending sudo access and retained as mode-0600 `release.oci.tar.partial`.
+   It is **incomplete and must not be imported**. Complete/resume, verify SHA-256
+   `ab27fa249c2bb2916fc45f6ed5d589c0a292244724836f1ad9bcf12db07660bf`
+   and length **381,444,096 bytes**, then import with authenticated sudo and verify
+   the manifest identity. No k3s image import or workload mutation occurred.
+   GHCR remains unavailable (403 requiring `read:packages`); no registry path
+   was used and no shared credentials or visibility settings were changed.
 3. **Independent recovery NOT RUN:** FileVault remains On; workstation free
    space was 28,869,484,544 bytes (~26.89 GiB) before the new build. It is a
    physically independent candidate relative to the server. Final post-build
@@ -57,7 +74,7 @@ and 29,424,299 free inodes.
 **No existing HandoverTrack certificate is required to create its first route.**
 The runbook and Caddy comment now explicitly order origin/DNS and internal
 service checks → guarded additive route → first certificate issuance → verified
-HTTPS. Missing artifact access (plus the workstation DNS cache until expiry),
+HTTPS. Missing sudo authentication for OCI import (plus the workstation DNS cache until expiry),
 rather than missing first-use TLS, stops this bootstrap. Full (strict) and proxy/cache configuration remain NOT RUN.
 
 ## Reviewed committed source and rebuilt artifact
@@ -150,7 +167,7 @@ Rrugë pod names/restart counts remain unchanged. Existing-host checks for
 `tregubio.com` pass. Final reports are `.local/task05-resume-preflight-final.json`
 and `.local/task05-resume-final-preservation.json`.
 
-Resume when authorized image delivery access is available and local DNS has refreshed; recheck capacity
+Resume when sudo authentication is available for the authorized SSH OCI import and local DNS has refreshed; recheck capacity
 and current edge resourceVersion, then follow the ordered bootstrap, internal
 validation and guarded edge procedure. The current candidate patch is a saved
 review artifact, not permission to ignore a future concurrency conflict. Verify
