@@ -1,0 +1,50 @@
+{
+  "name": "handovertrack",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.32.1",
+  "engines": {
+    "node": "24.21.0"
+  },
+  "scripts": {
+    "setup:local": "node scripts/setup-local.mjs",
+    "dev": "node scripts/run.mjs pnpm exec turbo run dev --parallel",
+    "dev:api": "node scripts/run.mjs pnpm --filter @handovertrack/api dev",
+    "dev:web": "node scripts/run.mjs pnpm --filter @handovertrack/web dev",
+    "dev:mobile": "node scripts/run.mjs pnpm --filter @handovertrack/mobile dev",
+    "dev:worker": "node scripts/run.mjs pnpm --filter @handovertrack/worker dev",
+    "db:up": "docker compose --env-file .env -f infra/docker/compose.local.yml up -d --wait && node scripts/run.mjs tsx packages/db/src/bootstrap-local.ts",
+    "db:stop": "docker compose --env-file .env -f infra/docker/compose.local.yml stop",
+    "db:migrate": "node scripts/run.mjs tsx packages/db/src/migrate.ts",
+    "db:seed": "node scripts/run.mjs tsx packages/db/src/seed.ts",
+    "lint": "eslint . && node scripts/check-boundaries.mjs",
+    "typecheck": "turbo run typecheck && tsc --project tsconfig.tools.json",
+    "test": "node scripts/run.mjs vitest run",
+    "test:integration": "node scripts/run.mjs tsx scripts/integration.ts",
+    "test:web": "node scripts/run.mjs playwright test",
+    "build": "node scripts/run.mjs env NODE_ENV=production turbo run build --filter=!@handovertrack/mobile",
+    "mobile:check": "node scripts/run.mjs pnpm --filter @handovertrack/mobile check",
+    "mobile:export": "node scripts/run.mjs pnpm --filter @handovertrack/mobile build",
+    "contracts:generate": "tsx packages/contracts/generate.ts",
+    "contracts:check": "tsx packages/contracts/generate.ts --check",
+    "test:worker": "node scripts/run.mjs node scripts/worker-smoke.mjs",
+    "test:api-build": "node scripts/run.mjs node scripts/api-smoke.mjs",
+    "check:client-bundles": "node scripts/run.mjs node scripts/check-client-bundles.mjs",
+    "test:sync": "node scripts/run.mjs tsx scripts/sync-integration.ts"
+  },
+  "devDependencies": {
+    "@types/node": "24.13.6",
+    "@types/pg": "8.23.1",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "@playwright/test": "1.63.0",
+    "eslint": "10.11.0",
+    "typescript-eslint": "8.70.0",
+    "turbo": "2.11.2",
+    "typescript": "5.9.3",
+    "tsx": "4.23.15",
+    "tsup": "8.5.1",
+    "vitest": "5.0.1",
+    "pg": "8.23.0"
+  }
+}
