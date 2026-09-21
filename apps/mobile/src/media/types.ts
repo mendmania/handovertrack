@@ -1,5 +1,6 @@
 import type { Scope } from '@handovertrack/contracts';
 
+export type QueueState = 'pending' | 'blocked' | 'uploading' | 'server_accepted' | 'completed' | 'failed';
 export type CaptureState = 'staging' | 'saved_local' | 'interrupted' | 'missing_original' | 'quarantined';
 export interface CaptureTicket extends Scope {
   readonly id: string;
@@ -17,7 +18,8 @@ export interface CaptureRecord extends CaptureTicket {
   width: number | null;
   height: number | null;
   reason: string | null;
-  queueState: 'pending' | 'blocked';
+  queueState: QueueState;
+  uploadId: string | null; attempts: number; nextAttemptAt: number; bytesSent: number; acceptedAt: string | null;
   queueReason: string | null;
   projectAvailable: boolean;
   originalPath: string | null;

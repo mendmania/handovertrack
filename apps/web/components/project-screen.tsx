@@ -6,6 +6,7 @@ import type { Me, Scope } from '@handovertrack/contracts';
 import { clearProtectedQueries, projectListOptions, projectDetailOptions } from '@handovertrack/query';
 import { api, authClient, fence, fenced } from '../lib/browser';
 import { announceAuthChange } from '../lib/auth-change';
+import { ManagerGallery } from './manager-gallery';
 import { Assignments, ProjectEditor } from './project-commands';
 
 export function ProjectScreen({ me, scope, projectId }: { me: Me; scope: Scope; projectId?: string }) {
@@ -43,5 +44,5 @@ function Detail({ scope, id, manager }: { scope: Scope; id: string; manager: boo
   if (query.error) return <Failure error={query.error} retry={() => void query.refetch()} />;
   if (!query.data) return <p role="status">Loading project…</p>;
   const project = query.data;
-  return <><Link href={`/org/${scope.organizationId}/projects`}>← All projects</Link>{saved && <p role="status" className="success">Project saved.</p>}<article className="card detail"><div className="section-title"><span className="status">{project.status}</span>{manager && !editing && <button className="secondary" onClick={() => { setSaved(false); setEditing(true); }}>Edit project</button>}</div><h2>{project.name}</h2><p className="address">{project.address}</p><hr /><h3>Project overview</h3><p>{project.description}</p><p className="footnote">Updated {new Date(project.updatedAt).toISOString().slice(0, 10)} · Version {project.version}</p></article>{manager && editing && <ProjectEditor scope={scope} project={project} onCancel={() => setEditing(false)} onSaved={() => { setEditing(false); setSaved(true); }} />}{manager && <Assignments scope={scope} projectId={id} />}</>;
+  return <><Link href={`/org/${scope.organizationId}/projects`}>← All projects</Link>{saved && <p role="status" className="success">Project saved.</p>}<article className="card detail"><div className="section-title"><span className="status">{project.status}</span>{manager && !editing && <button className="secondary" onClick={() => { setSaved(false); setEditing(true); }}>Edit project</button>}</div><h2>{project.name}</h2><p className="address">{project.address}</p><hr /><h3>Project overview</h3><p>{project.description}</p><p className="footnote">Updated {new Date(project.updatedAt).toISOString().slice(0, 10)} · Version {project.version}</p></article>{manager && editing && <ProjectEditor scope={scope} project={project} onCancel={() => setEditing(false)} onSaved={() => { setEditing(false); setSaved(true); }} />}{manager && <><Assignments scope={scope} projectId={id} /><ManagerGallery scope={scope} projectId={id} /></>}</>;
 }

@@ -12,10 +12,12 @@
     "better-auth": "1.7.5",
     "@better-auth/expo": "1.7.5",
     "pg": "8.23.0",
-    "kysely": "0.29.6"
+    "kysely": "0.29.6",
+    "sharp": "0.35.4"
   },
   "exports": {
     ".": "./src/index.ts",
-    "./database": "./src/database.ts"
+    "./database": "./src/database.ts",
+    "./media": "./src/media/index.ts"
   }
 }

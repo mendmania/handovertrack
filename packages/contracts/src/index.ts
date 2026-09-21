@@ -10,6 +10,9 @@ export type Worker = components['schemas']['Worker'];
 export type SyncBootstrap = components['schemas']['SyncBootstrap'];
 export type SyncPage = components['schemas']['SyncPage'];
 export type SyncChange = components['schemas']['SyncChange'];
+export type Upload = components['schemas']['Upload'];
+export type UploadInput = components['schemas']['UploadInput'];
+export type Media = components['schemas']['Media'];
 export type Me = components['schemas']['Me'];
 export type ApiFailure = components['schemas']['Error'];
 export interface Scope { accountId: string; organizationId: string }
@@ -24,6 +27,18 @@ export function createApi(options: { baseUrl: string; fetch?: typeof fetch; head
     return result.data;
   }
   return {
+    async createUpload(scope: Scope, projectId: string, input: UploadInput, signal?: AbortSignal) {
+      return unwrap(await client.POST('/v1/organizations/{organizationId}/projects/{projectId}/uploads', { params: { path: { ...scope, projectId } }, body: input, signal }));
+    },
+    async uploadStatus(scope: Scope, uploadId: string, signal?: AbortSignal) {
+      return unwrap(await client.GET('/v1/organizations/{organizationId}/uploads/{uploadId}', { params: { path: { ...scope, uploadId } }, signal }));
+    },
+    async completeUpload(scope: Scope, uploadId: string, signal?: AbortSignal) {
+      return unwrap(await client.POST('/v1/organizations/{organizationId}/uploads/{uploadId}/complete', { params: { path: { ...scope, uploadId } }, signal }));
+    },
+    async media(scope: Scope, projectId: string, signal?: AbortSignal, after?: string) {
+      return unwrap(await client.GET('/v1/organizations/{organizationId}/projects/{projectId}/media', { params: { path: { ...scope, projectId }, query: after ? { after } : {} }, signal }));
+    },
     async createProject(scope: Scope, input: ProjectInput, key: string) {
       return unwrap(await client.POST('/v1/organizations/{organizationId}/projects', { params: { path: scope, header: { 'Idempotency-Key': key } }, body: input }));
     },

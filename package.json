@@ -30,7 +30,9 @@
     "test:worker": "node scripts/run.mjs node scripts/worker-smoke.mjs",
     "test:api-build": "node scripts/run.mjs node scripts/api-smoke.mjs",
     "check:client-bundles": "node scripts/run.mjs node scripts/check-client-bundles.mjs",
-    "test:sync": "node scripts/run.mjs tsx scripts/sync-integration.ts"
+    "test:sync": "node scripts/run.mjs tsx scripts/sync-integration.ts",
+    "test:media": "node scripts/run.mjs tsx scripts/media-integration.ts",
+    "media:maintenance": "node scripts/run.mjs tsx scripts/media-maintenance.ts"
   },
   "devDependencies": {
     "@types/node": "24.13.6",
@@ -45,6 +47,8 @@
     "tsx": "4.23.15",
     "tsup": "8.5.1",
     "vitest": "5.0.1",
-    "pg": "8.23.0"
+    "pg": "8.23.0",
+    "sharp": "0.35.4",
+    "@tanstack/react-query": "5.103.1"
   }
 }

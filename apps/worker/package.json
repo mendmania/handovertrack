@@ -14,6 +14,7 @@
     "@handovertrack/config": "workspace:*",
     "kysely": "0.29.6",
     "pg": "8.23.0",
-    "zod": "4.6.5"
+    "zod": "4.6.5",
+    "sharp": "0.35.4"
   }
 }

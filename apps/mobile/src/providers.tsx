@@ -7,6 +7,8 @@ import { QueryClient, QueryClientProvider, onlineManager, focusManager } from '@
 import type { Me, Scope } from '@handovertrack/contracts';
 import { api, authClient, clearLocalCredentials, LOCAL_SCOPE_KEY, OFFLINE_ACCESS_MS } from './auth/client';
 import { SnapshotStore } from './db/store';
+import { UploadExecutor } from './media/upload';
+import { nativeUploadTransport } from './capture/native-upload';
 import { CaptureService } from './media/service';
 import { nativeCaptureFiles } from './capture/native-files';
 import { capturesCommitted } from './capture/query';
@@ -16,6 +18,7 @@ export type LocalIdentity = { scope: Scope; name: string; organizationName: stri
 interface SessionContext {
   ready: boolean; busy: boolean; identity: LocalIdentity | null; memberships: Me['memberships']; online: boolean;
   status: SnapshotState; error: string; coordinator?: SnapshotCoordinator; captures?: CaptureService; mediaWarning: string;
+  retryUploads(): Promise<void>;
   reconcileCaptures(): Promise<void>;
   signIn(email: string, password: string): Promise<void>; logout(): Promise<void>;
   selectOrganization(id: string): Promise<void>; refresh(): Promise<void>;
@@ -32,7 +35,8 @@ export function Providers({ children }: { children: ReactNode }) {
   const [mediaWarning, setMediaWarning] = useState('');
   const [busy, setBusy] = useState(false); const busyRef = useRef(false);
   const transition = useRef(0);
-  function setLocal(value: LocalIdentity | null) { identityRef.current = value; setIdentity(value); }
+  const uploadAbort = useRef<AbortController | null>(null);
+  function setLocal(value: LocalIdentity | null) { if (!value || value.scope.accountId !== identityRef.current?.scope.accountId || value.scope.organizationId !== identityRef.current?.scope.organizationId) uploadAbort.current?.abort(); identityRef.current = value; setIdentity(value); }
   useEffect(() => {
     let alive = true;
     void (async () => {
@@ -110,6 +114,33 @@ export function Providers({ children }: { children: ReactNode }) {
     }, Math.max(0, OFFLINE_ACCESS_MS - (Date.now() - active.validatedAt)));
     return () => clearTimeout(timer);
   }, [coordinator, identity]);
+  useEffect(() => {
+    if (!captures || !coordinator || !identity || !online) return;
+    const scope = identity.scope; const epoch = transition.current;
+    const executor = new UploadExecutor(captures, (owner) => capturesCommitted(client,owner));
+    let alive = true;
+    const current = () => {
+      const active = identityRef.current;
+      if (!alive || epoch !== transition.current || !active || active.scope.accountId !== scope.accountId || active.scope.organizationId !== scope.organizationId) throw new Error('Scope changed');
+    };
+    const tick = async () => {
+      if (!alive || AppState.currentState !== 'active' || uploadAbort.current) return;
+      const controller = new AbortController(); uploadAbort.current = controller;
+      try { current(); const transport = await nativeUploadTransport(); current(); await executor.run(scope,transport,controller.signal,current); }
+      catch { if (alive && !controller.signal.aborted) void coordinator.refresh(); }
+      finally { if (uploadAbort.current === controller) uploadAbort.current = null; }
+    };
+    const timer = setInterval(() => void tick(),5000);
+    const state = AppState.addEventListener('change',(value) => { if (value !== 'active') uploadAbort.current?.abort(); else void tick(); });
+    void tick();
+    return () => { alive = false; clearInterval(timer); state.remove(); uploadAbort.current?.abort(); };
+  }, [captures,coordinator,client,online,identity?.scope.accountId,identity?.scope.organizationId]);
+  async function retryUploads() {
+    const active = identityRef.current;
+    if (!active || !captures || !coordinator) return;
+    const current = coordinator.fence.capture();
+    await captures.repository.retry(active.scope,current); await capturesCommitted(client,active.scope);
+  }
   async function signIn(email: string, password: string) {
     if (!coordinator) throw new Error('Local database not ready');
     if (busyRef.current) return;
@@ -175,5 +206,5 @@ export function Providers({ children }: { children: ReactNode }) {
       await capturesCommitted(client);
     } catch { setMediaWarning('Photo recovery could not finish. Free storage if needed and try again.'); }
   }
-  return <QueryClientProvider client={client}><Context.Provider value={{ ready, busy, identity, memberships, status, error, online, coordinator, captures, mediaWarning, reconcileCaptures, signIn, logout, selectOrganization, refresh: () => coordinator?.refresh() ?? Promise.resolve() }}>{children}</Context.Provider></QueryClientProvider>;
+  return <QueryClientProvider client={client}><Context.Provider value={{ ready, busy, identity, memberships, status, error, online, coordinator, captures, mediaWarning, retryUploads, reconcileCaptures, signIn, logout, selectOrganization, refresh: () => coordinator?.refresh() ?? Promise.resolve() }}>{children}</Context.Provider></QueryClientProvider>;
 }

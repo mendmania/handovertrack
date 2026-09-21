@@ -8,6 +8,10 @@ export const serverConfigSchema = z.object({
   WEB_ORIGIN: z.string().url().default('https://handovertrack.com'),
   API_HOST: z.string().default('127.0.0.1'),
   API_PORT: z.coerce.number().int().min(1).max(65535).default(3301),
+  MEDIA_ROOT: z.string().default('.local/media'),
+  MEDIA_RESERVE_BYTES: z.coerce.number().int().min(0).default(268435456),
+  WORKER_POLL_MS: z.coerce.number().int().min(100).default(2000),
+  WORKER_LEASE_MS: z.coerce.number().int().min(1000).default(60000),
   WORKER_HEARTBEAT_MS: z.coerce.number().int().min(1000).default(30000),
 }).superRefine((config, ctx) => {
   if (config.NODE_ENV === 'production') {

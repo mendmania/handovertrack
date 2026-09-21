@@ -1,3 +1,5 @@
+import { UploadExecutor, type UploadTransport } from './upload';
+import { ApiError } from '@handovertrack/contracts';
 import { afterEach, describe, expect, it } from 'vitest';
 import { DatabaseSync } from 'node:sqlite';
 import { createHash, randomUUID } from 'node:crypto';
@@ -91,7 +93,7 @@ async function fixture(legacy = false) {
 }
 describe('durable local capture, real SQLite and filesystem boundary', () => {
   it('upgrades Task02 in place and reserves owner + blocked intent before camera use', async () => {
-    const f = await fixture(true); expect(f.db().prepare('PRAGMA user_version').get()?.user_version).toBe(3);
+    const f = await fixture(true); expect(f.db().prepare('PRAGMA user_version').get()?.user_version).toBe(4);
     expect((await f.store.metadata(a))?.cursor).toBe('durable-task02-cursor'); expect((await f.store.list(a))[0]?.version).toBe(3);
     const ticket = await f.service.reserve(a, projectId, () => {});
     expect(f.db().prepare('SELECT state FROM media_local').get()?.state).toBe('staging');
@@ -119,6 +121,55 @@ describe('durable local capture, real SQLite and filesystem boundary', () => {
     expect(await client.fetchQuery(query)).toEqual(before); client.clear();
     expect((await f.service.list(a))[0]?.id).toBe(ticket.id); expect(f.db().prepare('SELECT COUNT(*) AS n FROM media_queue').get()?.n).toBe(1);
     const revision = await f.service.revision(a); await f.service.list(a); await f.service.reconcile(); expect(await f.service.revision(a)).toBe(revision);
+  });
+  it.each(['uploading','server_accepted','completed','failed'])('verification and restart preserve %s queue state and receipt', async (state) => {
+    const f = await fixture(); const { ticket } = await f.capture();
+    f.db().prepare("UPDATE media_queue SET state=?,upload_id=?,bytes_sent=?,accepted_at=?,reason=? WHERE media_id=?").run(state,randomUUID(),f.bytes.length,'2026-09-21T12:00:00.000Z','NETWORK_STATE',ticket.id);
+    const before = f.db().prepare('SELECT * FROM media_queue').get();
+    await f.reopen(); await f.service.reconcile(); await f.service.list(a);
+    expect(f.db().prepare('SELECT * FROM media_queue').get()).toEqual(before);
+  });
+  it('upload replay aborts after account switch and cannot publish a late accepted receipt', async () => {
+    const f = await fixture(); const { saved } = await f.capture(); let current = true; let completions = 0;
+    const entered = deferred<void>(); const gate = deferred<void>();
+    const response = { mediaId:saved.id,uploadId:randomUUID(),accountId:a.accountId,organizationId:a.organizationId,projectId,
+      size:saved.size!,sha256:saved.sha256!,width:saved.width!,height:saved.height!,state:'pending' as const,acceptedAt:null };
+    const transport: UploadTransport = {
+      api: {
+        async me() { return { accountId:a.accountId,name:'Worker',memberships:[{ organizationId:a.organizationId,organizationName:'Org',role:'field_worker',capabilities:[] }] }; },
+        async createUpload() { entered.resolve(); await gate.promise; return response; },
+        async uploadStatus() { throw new Error('Unexpected status'); },
+        async completeUpload() { completions++; return { ...response,state:'accepted',acceptedAt:new Date().toISOString() }; },
+      },
+      async content() { throw new Error('Must never upload after switch'); },
+    };
+    const run = new UploadExecutor(f.service,async () => {}).run(a,transport,new AbortController().signal,() => { if (!current) throw new Error('Scope changed'); });
+    await entered.promise; current = false; await f.store.removeAccount(a.accountId); await f.store.bootstrap(b,bootstrap(b),() => {}); gate.resolve();
+    await expect(run).rejects.toThrow('Scope changed'); expect(completions).toBe(0);
+    expect(f.db().prepare('SELECT account_id,state,accepted_at FROM media_queue').get()).toMatchObject({ account_id:a.accountId,state:'uploading',accepted_at:null });
+    expect(await f.service.list(b)).toEqual([]); expect(await f.files.exists(saved.originalPath!)).toBe(true);
+  });
+  it('expired authentication blocks only the original owner and leaves bytes/intent for reauthentication', async () => {
+    const f = await fixture(); const { saved } = await f.capture();
+    const denied = async (): Promise<never> => { throw new ApiError(401,'UNAUTHENTICATED'); };
+    const transport: UploadTransport = {
+      api: {
+        async me() { return { accountId:a.accountId,name:'Worker',memberships:[{ organizationId:a.organizationId,organizationName:'Org',role:'field_worker',capabilities:[] }] }; },
+        createUpload:denied,uploadStatus:denied,completeUpload:denied,
+      }, content:denied,
+    };
+    await expect(new UploadExecutor(f.service,async () => {}).run(a,transport,new AbortController().signal,() => {})).rejects.toMatchObject({ status:401 });
+    await f.reopen(); await f.service.reconcile();
+    expect(f.db().prepare('SELECT account_id,state,reason FROM media_queue').get()).toMatchObject({ account_id:a.accountId,state:'blocked',reason:'UNAUTHENTICATED' });
+    expect(await f.files.exists(saved.originalPath!)).toBe(true);
+    await f.service.repository.retry(a,() => {}); expect((await f.service.list(a))[0]?.queueState).toBe('pending');
+  });
+  it('missing accepted local original cannot erase acceptance receipt or claim local saved status', async () => {
+    const f = await fixture(); const { saved } = await f.capture();
+    f.db().prepare("UPDATE media_queue SET state='server_accepted',accepted_at=?").run('2026-09-21T12:00:00.000Z');
+    await rm(f.full(saved.originalPath!)); await f.reopen(); await f.service.reconcile();
+    expect((await f.service.list(a))[0]).toMatchObject({ state:'missing_original',queueState:'blocked',originalPath:null });
+    expect(f.db().prepare('SELECT state,accepted_at FROM media_queue').get()).toMatchObject({ state:'server_accepted',accepted_at:'2026-09-21T12:00:00.000Z' });
   });
   it('preserves original owner after logout during camera callback and through rebootstrap', async () => {
     const f = await fixture(); const ticket = await f.service.reserve(a, projectId, () => {});

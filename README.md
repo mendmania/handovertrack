@@ -1,10 +1,12 @@
 # HandoverTrack
 
 Local project management and offline project access for contractor crews. Tasks
-01–03 provide a Fastify API, Next.js manager workspace, Expo field app with durable
+01–04 provide a Fastify API, Next.js manager workspace, Expo field app with durable
 SQLite and incremental pull sync, and a database-connected worker. Managers create
 and update projects and worker assignments online. The native app adds local camera capture, private originals, durable queue intent
-and a local gallery. Uploads and deployment remain outside the implemented scope.
+and a local gallery. Authenticated streamed uploads, immutable server originals,
+PostgreSQL processing jobs, derivatives and a manager gallery are implemented
+locally. Physical camera/native-upload validation remains open; nothing is deployed.
 
 ## Install and configure
 
@@ -97,9 +99,9 @@ node scripts/run.mjs pnpm --filter @handovertrack/web start
 node scripts/run.mjs pnpm --filter @handovertrack/worker start
 ```
 
-Those three start commands each stay running; use separate terminals. The worker
-reports DB connectivity, periodically checks it, and drains its DB pool on
-SIGTERM/SIGINT. It has **no leased jobs or media handlers**.
+Those three start commands each stay running; use separate terminals. The worker runs the image-v1 PostgreSQL lease executor, generates private image
+derivatives, renews/fences leases, reports failures and drains active work on
+SIGTERM/SIGINT. Start it for previews to become ready.
 
 ## API and session routes
 
@@ -135,8 +137,9 @@ receipt and feed publication commit together.
 
 The canonical future origin is `https://handovertrack.com`. A future gateway
 must send browser app/BFF traffic to Next, native `/v1/*` and `/api/auth/*` to
-Fastify, and reserve `/media/*` for direct streamed API media transport. No
-media route exists yet. The BFF cannot accidentally accept an upload; its
+Fastify, and reserve `/media/*` for direct streamed API media transport. Media
+uploads now stream directly to Fastify; the local Next media bridge is GET-only.
+The BFF cannot accept an upload; its
 application routes allow only the documented small JSON commands and reads;
 auth forwarding streams the request body.
 No Caddy, DNS or deployment changes have been made.
@@ -193,7 +196,7 @@ account switches, assignment/membership revocation and rebootstrap preserve
 originals and queue intent under the original owner. Signed-out screens expose
 none of this evidence; another account/org cannot read it. A revoked project's
 photos remain visible only in its authenticated owner's organization gallery,
-with access blocked. There is no upload executor in this version.
+with access blocked. The foreground uploader reauthorizes the original owner on every replay.
 
 ## Local photo capture
 
@@ -203,7 +206,8 @@ show explicit guidance. The app requests no microphone or photo-library access.
 After the shutter, wait for **Saved on device · Queued locally**. That message
 appears only after the original is copied into private app-owned document storage,
 its size/SHA-256 verified, and the original record plus queue intent committed.
-This version never marks a capture uploaded.
+The gallery says **Uploaded · Server verified the original** only after a
+matching committed server receipt is persisted in SQLite. Originals stay local.
 
 **Saved photos** is available from the workspace, including for retained photos
 whose project is no longer in the current project cache. **Check saved photos**
@@ -213,7 +217,7 @@ needing attention. Partial files are retained; recovery cannot recreate missing
 bytes, so an incomplete photo may need to be taken again. No automatic media
 cleanup or deletion is implemented.
 
-SQLite migration 3 upgrades the same existing database file in place. Originals
+SQLite migrations 3 and 4 upgrade the same existing database file in place. Originals
 use relative paths in `Paths.document/captures/<account>/<organization>/<mediaId>`;
 app sandbox path changes do not change ownership. Immutable reservation and
 manifest files let startup recover valid orphan originals without assigning them
@@ -238,6 +242,46 @@ Use temporary process/build overrides for device validation; do not overwrite th
 saved `.env`, invent signing identities or change Apple account settings.
 See [Task 03 evidence and remaining native gate](docs/progress/03-offline-capture.md).
 
+## Uploads and manager gallery
+
+Run the API, worker and web app. Leave the native app open and connected to
+upload eligible local photos. **Saved photos** shows queue progress, verified
+server acceptance and retained originals. **Retry blocked uploads** retries
+eligible network/access failures after authentication or access is restored.
+Invalid/missing originals need investigation; they never become uploaded merely
+because a retry ran. Logout and organization/account changes cancel the current
+transport and retain evidence under its original owner.
+
+Open a project as a manager to see **Project photos**. Accepted originals appear
+once; previews update as jobs finish. Refresh photos invalidates the scoped
+Query; the gallery also polls committed results. Worker accounts cannot read
+manager gallery/download routes. No public media directory is served.
+
+The private API and worker share `MEDIA_ROOT`. The standard runner resolves
+its default `.local/media` to an absolute repository path before changing child
+working directories. Supply the same absolute path to both processes if starting
+them without the runner. Never point it at native capture storage or another app's
+volume. Every ancestor must be a real directory, not a symlink. Configuration
+examples are in `.env.example`; your existing `.env` is preserved.
+
+JPEG uploads are bounded to 50 MiB, 50 million pixels and two concurrent streams
+per API, with streamed hash/length checks and full decoder validation. A durable
+no-replace original plus a committed database receipt is required for acceptance.
+The default disk reserve is 256 MiB. API/worker production capacity and independent
+backup/restore remain future validation work.
+
+```sh
+pnpm media:maintenance status
+pnpm media:maintenance redrive <failed-media-UUID>
+pnpm media:maintenance sweep-scratch
+```
+
+Redrive affects failed image jobs only. Scratch cleanup removes only fenced server
+request temporary files older than 24 hours. It never deletes originals, staging
+files, native evidence or pending reservation records. Reservations that remain
+incomplete stay visible and can pause intake; investigate before making a
+retention decision. See [Task 04's upload/state/lease and recovery rules](docs/progress/04-upload-and-preview.md).
+
 ## Validate
 
 ```sh
@@ -251,6 +295,7 @@ pnpm test:sync
 pnpm build
 pnpm test:api-build
 pnpm test:worker
+pnpm test:media
 pnpm exec playwright install chromium
 pnpm test:web
 pnpm mobile:check
@@ -271,4 +316,5 @@ See [Task 01 evidence](docs/progress/01-foundation.md),
 [Task 02 handoff](docs/progress/02-projects-and-sync.md),
 [runtime decisions](docs/architecture/runtime-baseline.md), and
 [Task 03 handoff](docs/progress/03-offline-capture.md), and
-[the prepared Task 04 prompt](docs/prompts/04-upload-and-preview.md).
+[Task 04 handoff](docs/progress/04-upload-and-preview.md), and
+[the prepared Task 05 prompt](docs/prompts/05-trial-deployment.md).
