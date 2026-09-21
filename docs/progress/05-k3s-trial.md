@@ -8,6 +8,30 @@ apex DNS-only A record was subsequently added after the owner signed in.
 Task 06 has not started. The observations below supersede the original blockers;
 older sections remain as historical evidence.
 
+## Owner shutdown checkpoint
+
+The owner requested a ten-minute Mac shutdown. The owned SSH upload was stopped
+and the server transfer lock was released. **136,589,312 of 381,444,096 bytes
+(35.8%)** are retained in `release.oci.tar.partial`; their SHA-256 was compared
+against the exact same-length local archive prefix and matches. The waiting
+owner import shell exited at its incomplete-size guard; no import ran. Its
+`verified-import.oci.tar` hardlink may remain and must pass the full checksum
+before any later import. No source, database, original, live workload or shared
+edge configuration was changed.
+
+Resume only when the owner returns and asks to continue. Unlock the Mac so
+Keychain-backed SSH can work, reverify the saved remote prefix, and append the
+remaining archive bytes under `transfer.lock`. Do not restart from zero, replace
+saved credentials, or bypass checksum/size gates. The private resumable receipt
+is `.local/task05-ssh-delivery.json` (`paused-for-owner-shutdown`). The owner's
+waiting import command must be run again once resumption is arranged.
+
+The network diagnosis measured substantial SSH retransmissions (~9.9 MB resent
+of ~120 MB sent), low VPS load and ample memory; the Mac's USB Ethernet adapter
+reported a 1-Gbps link. This points to a network-path problem, not a known exact
+router/ISP/adapter cause. No network settings were changed. A more reliable path
+can be tested after restart, but faster transfer is not guaranteed.
+
 ## Rechecked blockers and origin
 
 1. **DNS configured and publicly verified (follow-up):** after the owner signed
@@ -44,7 +68,8 @@ older sections remain as historical evidence.
    initially stopped and retained as mode-0600 `release.oci.tar.partial`.
    After the owner verified sudo, transfer was resumed over SSH under
    `transfer.lock`, after verifying the existing 13,578,240-byte prefix hash.
-   Transfer is ongoing and slow; **never import incomplete bytes**. The guarded
+   Transfer is now paused for owner shutdown (see checkpoint above);
+   **never import incomplete bytes**. The guarded
    owner command waits for the transfer lock and verifies SHA-256
    `ab27fa249c2bb2916fc45f6ed5d589c0a292244724836f1ad9bcf12db07660bf`
    and length **381,444,096 bytes**, then imports with authenticated sudo and
