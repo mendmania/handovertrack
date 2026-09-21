@@ -132,12 +132,18 @@ handoff; until then disaster recovery remains NOT RUN.
 
 ## Resumed Task 05 recovery status
 
-No trial exists on the server yet because authorized image delivery remains
-blocked. Apex DNS is now configured and publicly verified; local resolver cache
-expiry still needs to be observed. No live consistent backup or isolated application restore
-was performed; both remain **NOT RUN**. FileVault On and available local space
-establish only a candidate target. Independent recovery-key custody and scheduled
-availability have not been demonstrated. Exact resumed image/physical evidence
-and blockers are in [Task 05](../../docs/progress/05-k3s-trial.md). Local container
-smoke and private phone-file copies must not be reported as an independent server
-restore. Retain the disposable-only gate.
+The dedicated namespace and healthy database now exist, but application startup
+is blocked on the imported image's missing repository@digest reference. No
+application migration or seed has run. Apex DNS and current preflight pass.
+The private bootstrap credential recovery file is saved outside the repository
+on the existing FileVault-encrypted workstation; this is not a consistent
+application backup. Current measured free space is 30,029,816 KiB (~28.64 GiB);
+remeasure and retain the size/headroom guards before downloading.
+
+No live consistent backup or isolated application restore was performed; both
+remain **NOT RUN**. Independent recovery-key custody and scheduled availability
+have not been demonstrated. Exact resources, source/image and next steps are in
+[Task 05](../../docs/progress/05-k3s-trial.md). Preserve the existing database,
+Secrets and recovery file; do not regenerate credentials or start bootstrap again.
+Local smoke, diagnostic image execution and phone-file copies must not be reported
+as an independent server restore. Retain the disposable-only gate.

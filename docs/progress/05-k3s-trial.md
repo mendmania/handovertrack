@@ -1,12 +1,99 @@
-# Task 05 — k3s preflight and disposable trial preparation
+# Task 05 — k3s disposable trial
 
-**Status: blocked-rollout; disposable-only.** Resumed 2026-09-21 on
-`codex/k3s-trial`. Reviewed source is committed and its new immutable image is
-locally verified. **Nothing was deployed.** No HandoverTrack namespace, PVC,
-Secret, Job, Deployment, Service or live edge route was created. The authorized
-apex DNS-only A record was subsequently added after the owner signed in.
-Task 06 has not started. The observations below supersede the original blockers;
-older sections remain as historical evidence.
+**Status: partial bootstrap; blocked on immutable image reference; disposable-only.**
+Updated 2026-09-21 after the owner imported the verified OCI archive. The dedicated
+namespace/database now exist. API, worker, web, migrations, provisioning and the
+public route have **not** started. Task 06 has not started. This checkpoint
+supersedes the historical “nothing deployed/import pending” entries below.
+
+## Live bootstrap checkpoint — 2026-09-21 18:45 UTC
+
+The owner reported `k3s ctr -n k8s.io images import` saving the expected manifest
+`sha256:125cd8a42f0bb92bf87251d40c4cc14c561ab27e0f00911205e000856d66d7cc`.
+A restricted diagnostic Pod successfully ran the full source tag
+`handovertrack.local/runtime:ba2ecc8d8040eda6e5d57bf73d6d17e90a4d2337`
+with `imagePullPolicy: Never`. Its runtime image ID is the exact previously
+verified config digest
+`sha256:1dea15fee1d5be927dc3fe3af69af694806fbda37e08dd82b3f77d22b17b9a6d`;
+architecture x64, UID 1000, API bundle SHA-256
+`535dbdde7ba98f1308134f7e58f88c95b55132feaa54644ab46c8925a41e72a4`.
+This proves the correct bytes can execute; it is not application promotion.
+
+**Blocking result:** the separate probe using the required repository@manifest
+reference still reports `ErrImageNeverPull`. Kubernetes node inventory exposes
+only the source tag. Await the owner's final `sudo k3s ctr -n k8s.io images list |
+grep handovertrack` output to inspect the registered references. Repair only the
+verified image's missing digest reference through the owner's authorized sudo
+session, then repeat the digest probe. Do not switch application manifests to
+a tag, re-upload the complete archive, use the old working-tree image, or bypass
+access with privileged pods. Source remains
+`ba2ecc8d8040eda6e5d57bf73d6d17e90a4d2337`.
+
+The Mac's post-restart network times out on the direct API port 6443. The saved
+Kubernetes credentials work over an authenticated SSH forward
+`127.0.0.1:16443 → VPS 127.0.0.1:6443`, using a new private
+`.local/task05-tunnel-kubeconfig.json` with TLS verification against
+`159.195.30.113`. The original kubeconfig/default context/firewall are unchanged.
+The fresh preflight passes every check, including apex DNS and five existing
+healthy sites. Only this task's server `runtime/release.lock` was acquired;
+no shared controller was changed. The bounded four-hour lock holder remains
+active while awaiting the owner (started around 18:38 UTC; SSH exec session
+61362). A fresh SSH session later failed public-key authentication while the
+established tunnel continued working. At resumption, restore Keychain-backed
+SSH access, identify/release only this owned lock holder, and reacquire the same
+lock before further mutation. Do not remove a lock file to evade a live holder.
+
+Created resources (all namespaced resources below are in `handovertrack`):
+
+- Restricted disposable-only Namespace `handovertrack`; StorageClass
+  `handovertrack-local-retain` (Retain / WaitForFirstConsumer).
+- Secrets `auth`, `database-admin`, `migration`, `runtime`, `trial-accounts`,
+  generated independently using create-only tooling. Recovery credentials are
+  mode 0600 outside the repository under the FileVault-encrypted
+  `~/Library/Application Support/HandoverTrack/recovery/task05-ba2ecc8d8040-bootstrap.json`.
+  **Do not rerun credential bootstrap** or overwrite this recovery file.
+- ServiceAccount `runtime`, ResourceQuota `trial-budget`, ConfigMaps `runtime`
+  and `database-init`; Services `database:5432`, `api:3301`, `web:3300` (ClusterIP).
+- NetworkPolicies `default-deny`, `dns`, `database`, `api`, `web`, `worker`,
+  `migrate`, `provision`, `backup`.
+- PVC `database`, 4 GiB, Bound to
+  `pvc-24606a50-0d12-4379-b3b4-f183b8802106`, verified Retain and affinity to
+  `netcupmaniaserver`. PVC `media`, 4 GiB, Pending its first consumer.
+- StatefulSet `database`, one healthy `database-0`, zero restarts, pinned
+  PostgreSQL 18.3 digest `7e32e9833a6fb1c92c32552794cb6ed569d51b445a54907d35fc112ef39684db`.
+  Only empty database/roles initialized; no application migrations or seed run.
+- Diagnostic Pods `image-verify-ba2ecc8d8040` (digest lookup failure) and
+  `image-tag-diagnostic-ba2ecc8d8040` (exit 0); no credentials or media mounted.
+  Both owned diagnostic Pods were removed after retaining their complete
+  receipts. The only remaining trial Pod is healthy `database-0`.
+- Kubernetes additionally generated the namespace's default ServiceAccount
+  and `kube-root-ca.crt` ConfigMap. **No application Deployment, Job, Ingress,
+  NodePort, shared edge ConfigMap or edge policy was created.**
+
+The fresh complete edge candidate `handovertrack-edge-1da2a23b2acc` validates
+against the live pinned Caddy image and passes ConfigMap/policy server dry-runs.
+Docker Desktop needed restarting after the owner's shutdown; the first attempt
+failed because the daemon was stopped, then validation passed. This is still
+preparation only: do not apply the saved patch without rechecking its guarded
+resourceVersion and completing internal checks and the edge-state backup.
+No preexisting HandoverTrack certificate is required for its first route.
+
+The shared edge Deployment spec and all Rrugë Pod identities/restart counts
+match the fresh baseline. FileVault is On; current workstation free space is
+30,029,816 KiB (~28.64 GiB), subject to remeasurement and backup size/headroom
+guards. Independent key custody and scheduled availability remain unverified.
+Consistent server backup and isolated application restore remain **NOT RUN**
+until the application can be bootstrapped. The paired iPhone is now reported
+**unavailable**; no additional physical camera/upload check was demonstrated.
+All earlier native NOT RUN entries remain. No real evidence/customer intake.
+
+Evidence: `.local/task05-live-{preflight,bootstrap-state,database-pv}.json`,
+`task05-live-{edge,rruge}-before.json`, `task05-image-{probe,tag-diagnostic}-result.json`,
+phase manifests and `task05-live-edge-candidate/`. Preserve the existing partial
+bootstrap and continue from the failed digest gate; do not replay first-bootstrap
+absence/credential creation over these resources.
+
+## Earlier checkpoint history
 
 ## Completed upload after owner return
 
