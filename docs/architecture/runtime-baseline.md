@@ -150,3 +150,25 @@ Release build; actual camera/offline restart evidence remains NOT RUN. No Apple
 team is committed to app configuration. See [Task 03's state machine, validation
 and remaining native gate](../progress/03-offline-capture.md). No server media or
 upload/job runtime exists yet.
+
+## Task 04 extension (2026-09-21)
+
+The historical baselines above are superseded for media by
+[Task 04](../progress/04-upload-and-preview.md). Sharp 0.35.4 is pinned as a
+server runtime dependency. Its documented [input limits and failOn behavior](https://sharp.pixelplumbing.com/api-constructor/) inform bounded JPEG verification;
+[Expo FileSystem](https://docs.expo.dev/versions/latest/sdk/filesystem/) and the
+installed legacy UploadTask definitions inform the cancellable native binary
+upload adapter. Physical native upload remains NOT RUN.
+
+PostgreSQL migration 004 adds immutable upload identity/acceptance, durable
+image-v1 jobs, fenced leases, variant metadata and accepted/ready events. Local
+API and worker share an absolute private filesystem root; streamed originals use
+fsync and no-replace hard links. Native SQLite migration 4 preserves all evidence
+and adds network progress/receipts independently of local file integrity.
+The manager gallery uses private authorized media reads and scoped Query polling.
+Original retention is unchanged: no automatic local-original deletion.
+
+Automated twenty-image failures, compiled worker kill/restart, browser gallery
+and native simulator migration/reopen pass. Actual camera permissions, captured
+photo cold restart/isolation and native uploads remain explicit physical gates.
+No deployment or Task 05 cluster inspection was performed.

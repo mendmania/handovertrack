@@ -67,6 +67,22 @@ CREATE TABLE media_scopes (
 );
 PRAGMA user_version = 3;
 `;
+export const migrationV4 = `
+ALTER TABLE media_queue RENAME TO media_queue_v3;
+CREATE TABLE media_queue (
+  media_id TEXT NOT NULL UNIQUE, account_id TEXT NOT NULL, organization_id TEXT NOT NULL,
+  state TEXT NOT NULL CHECK(state IN ('pending','blocked','uploading','server_accepted','completed','failed')),
+  reason TEXT, created_at TEXT NOT NULL, updated_at TEXT NOT NULL,
+  upload_id TEXT, attempts INTEGER NOT NULL DEFAULT 0, next_attempt_at INTEGER NOT NULL DEFAULT 0,
+  bytes_sent INTEGER NOT NULL DEFAULT 0, accepted_at TEXT,
+  PRIMARY KEY(account_id,organization_id,media_id),
+  FOREIGN KEY(account_id,organization_id,media_id) REFERENCES media_local(account_id,organization_id,id)
+);
+INSERT INTO media_queue(media_id,account_id,organization_id,state,reason,created_at,updated_at)
+  SELECT media_id,account_id,organization_id,state,reason,created_at,updated_at FROM media_queue_v3;
+DROP TABLE media_queue_v3;
+PRAGMA user_version = 4;
+`;
 export class SnapshotStore {
   private writes: Promise<unknown> = Promise.resolve();
   constructor(private db: SqlDatabase) {}
@@ -86,10 +102,11 @@ export class SnapshotStore {
   async migrate() {
     await this.db.execAsync('PRAGMA journal_mode=WAL; PRAGMA foreign_keys=ON; PRAGMA busy_timeout=5000;');
     const version = await this.db.getFirstAsync<{ user_version: number }>('PRAGMA user_version');
-    if ((version?.user_version ?? 0) > 3) throw new Error('Local database is newer than this app');
+    if ((version?.user_version ?? 0) > 4) throw new Error('Local database is newer than this app');
     if (!version?.user_version) await this.db.withExclusiveTransactionAsync((tx) => tx.execAsync(migrationV1));
     if ((version?.user_version ?? 0) < 2) await this.db.withExclusiveTransactionAsync((tx) => tx.execAsync(migrationV2));
     if ((version?.user_version ?? 0) < 3) await this.db.withExclusiveTransactionAsync((tx) => tx.execAsync(migrationV3));
+    if ((version?.user_version ?? 0) < 4) await this.db.withExclusiveTransactionAsync((tx) => tx.execAsync(migrationV4));
   }
   async replace(scope: Scope, snapshot: ProjectSnapshot, assertCurrent: () => void) {
     assertCompleteSnapshot(snapshot, scope);

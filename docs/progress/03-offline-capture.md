@@ -240,3 +240,22 @@ Preserved local PostgreSQL, loopback API on 3301 and production web on 3300 supp
 continued validation. No upload worker is running. Task 04's
 [prepared prompt](../prompts/04-upload-and-preview.md) is the next handoff; wait for
 explicit assignment. Stop here.
+
+## Task 04 follow-up — 2026-09-21
+
+The next assignment verified a clean main checkout at
+eb38130d9f719c68f2a5250c4bf8a57d14c48791. The earlier no-commit description above
+records Task 03's history, not current repository state.
+
+The paired iPhone 17 Pro Max was available again (Task 04 device-availability log).
+Direct phone interaction/results were requested but unavailable. Permission
+allow/deny/Settings-return, actual offline captures/captured-photo cold restart,
+and captured-photo account/org/revocation isolation remain **NOT RUN**. No
+physical result was inferred from device availability.
+
+Independent Task 04 work was explicitly authorized and implemented. Its recovery
+fix preserves network/terminal queue state, and its Release simulator upgraded the
+same retained DB to version 4 with the North worker session/project intact.
+Read-only native inspection still showed zero local media and queue records;
+no fake camera images were installed. Automated generated-image scenarios do not
+close this Task 03 gate. See [Task 04's actual evidence](04-upload-and-preview.md).

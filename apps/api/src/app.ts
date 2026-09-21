@@ -5,6 +5,8 @@ import { resolveAccount, projectReads, projectManagement, AccessError, capabilit
 import type { ServerConfig } from '@handovertrack/config/server';
 import type { Me, ProjectSnapshot, ProjectInput, ProjectUpdate, AssignmentInput } from '@handovertrack/contracts';
 
+import { registerMedia } from './media';
+
 const uuid = { type: 'string', format: 'uuid' };
 export function createApp(config: ServerConfig, logging = true) {
   const { db, pool } = createDatabase(config.DATABASE_URL);
@@ -108,5 +110,6 @@ export function createApp(config: ServerConfig, logging = true) {
   }, async (req) => {
     const account = await accountFor(req.headers); return management.pull(account.id, req.params.organizationId, req.query.cursor, req.query.limit ?? 100);
   });
+  app.register(async (instance) => registerMedia(instance, pool, config, accountFor));
   return app;
 }

@@ -1,6 +1,8 @@
 # HandoverTrack — Task 04: verified uploads, durable processing and manager gallery
 
-Prepared next-agent prompt only. Wait for the owner's explicit Task 04 assignment.
+Historical prepared prompt, explicitly assigned and implemented on 2026-09-21.
+See docs/progress/04-upload-and-preview.md for actual results and remaining gates.
+The following preserves the original assignment requirements.
 Do not begin from a handoff alone. Use the existing HandoverTrack checkout and
 preserve configuration, databases, original files and unrelated changes.
 
@@ -9,8 +11,8 @@ preserve configuration, databases, original files and unrelated changes.
 Read applicable AGENTS.md, git status, README.md, docs/implementation-status.md,
 docs/progress/03-offline-capture.md, the Task 02 handoff, runtime baseline, and
 blueprint sections on verified upload finalization, local originals, leased jobs,
-private media authorization, Task 04 and handoffs. No commit existed before these
-tasks; inspect the actual source state rather than inventing a base SHA.
+private media authorization, Task 04 and handoffs. Task 04 verified starting commit eb38130d9f719c68f2a5250c4bf8a57d14c48791 on main;
+inspect the actual source state rather than assuming an unborn checkout.
 
 First attempt every inherited native capture validation gap. Task 02's actual
 Release native UI grant/edit/revoke, offline cold reopen, reconnect and scope

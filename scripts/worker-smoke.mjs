@@ -9,5 +9,5 @@ worker.stdout.on('data', (data) => {
 });
 worker.stderr.on('data', (data) => { output += data.toString(); });
 const code = await new Promise((resolve) => worker.on('exit', resolve)); clearTimeout(timeout);
-assert.equal(code, 0, output); assert(output.includes('"event":"ready"')); assert(output.includes('"event":"stopped"'));
-console.log('PASS built worker starts, connects to PostgreSQL, reports no handlers and gracefully stops on SIGTERM.');
+assert.equal(code, 0, output); assert(output.includes('"event":"ready"')); assert(output.includes('"event":"stopped"')); assert(output.includes('image-v1'));
+console.log('PASS built worker starts, connects to PostgreSQL, registers image-v1 processing and gracefully stops on SIGTERM.');
