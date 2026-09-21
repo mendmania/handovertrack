@@ -1,44 +1,160 @@
 # Task 05 — k3s preflight and disposable trial preparation
 
-**Status: blocked-rollout.** Updated 2026-09-21. Preparation is implemented and
-locally validated. **Nothing was deployed.** No HandoverTrack namespace/PVC,
-Secret, migration Job, application pod, DNS record or live edge route was created.
-Task 06 is prepared, not started. Physical and disaster-recovery gates remain open.
+**Status: blocked-rollout; disposable-only.** Resumed 2026-09-21 on
+`codex/k3s-trial`. Reviewed source is committed and its new immutable image is
+locally verified. **Nothing was deployed.** No HandoverTrack namespace, PVC,
+Secret, Job, Deployment, Service, DNS record or live edge route was created.
+Task 06 has not started. The observations below supersede the original blockers;
+older sections remain as historical evidence.
 
-## Exact rollout blockers
+## Rechecked blockers and origin
 
-1. **Routing/TLS prerequisite FAIL:** authoritative Cloudflare DNS and 1.1.1.1
-   return NOERROR with zero apex A answers; no resolving AAAA was found.
-   `https://handovertrack.com` fails DNS resolution. A direct origin request with
-   `--resolve handovertrack.com:443:159.195.30.113` fails TLS with an internal
-   alert; there is no live hostname route/certificate. Nameservers are
-   `donna.ns.cloudflare.com` and `ganz.ns.cloudflare.com`. The Cloudflare browser
-   is signed out and stopped at its login page; no zone-scoped credential was
-   available. No DNS/proxy-mode change was attempted. The proposed first record
-   is DNS-only apex A → `159.195.30.113`. Full (strict)/cache settings are NOT RUN.
-2. **Artifact delivery prerequisite FAIL / unverified:** the existing GitHub
-   token returns HTTP 403 for package inventory and explicitly lacks
-   `read:packages`. No HandoverTrack package/pull grant or remaining CI/registry
-   allowance could be verified. Both the existing netcup SSH key and default
-   SSH identity were rejected for `mendim@159.195.30.113` with `Permission denied
-   (publickey)`. Therefore the alternative server-side k3s OCI import and fixed
-   controller installation could not run. No Rrugë pull credential was read,
-   copied or changed; no privileged import pod or new registry was introduced.
-3. **Independent recovery NOT RUN:** SSH also prevented checking the server's
-   existing independent backup allowance/target. The workstation has FileVault
-   enabled and approximately 36 GiB free at initial inspection, an existing
-   independent candidate for a small encrypted download. Recovery-key custody,
-   target selection, scheduled availability and a live isolated restore remain
-   unverified. No existing Rrugë/R2 allowance or key is assumed available.
-4. **Physical validation NOT RUN:** phone upgrade/launch and SQLite v4 succeeded,
-   but no direct camera/native-upload results were received. The Mac was later
-   locked when native UI access was checked. This does not prevent preparation,
-   but it cannot close inherited Tasks 03/04 or authorize real evidence.
+1. **DNS access blocked:** both authoritative `donna.ns.cloudflare.com` and
+   public `1.1.1.1` still return NOERROR with zero apex A answers. Cloudflare's
+   dashboard redirects to sign-in; no Cloudflare credential variable is present
+   in the current environment. The sign-in tab is left for the owner because
+   continuing explicitly accepts Cloudflare terms. Authorized proposed change
+   remains **DNS-only apex A → `159.195.30.113`**; no other hostname is in scope.
+2. **Image delivery blocked:** SSH to the recorded `mendim@159.195.30.113`
+   rejects both `~/.ssh/netcup-k3s-client` and `~/.ssh/id_ed25519` with
+   `Permission denied (publickey)`. GHCR package inventory still returns HTTP
+   403, explicitly requiring `read:packages`. No import/publication, registry
+   visibility change, shared pull-secret access or privileged pod was attempted.
+   Continue with one authorized private-registry or SSH OCI-import path when
+   access is supplied; do not promote the older working-tree artifact.
+3. **Independent recovery NOT RUN:** FileVault remains On; workstation free
+   space was 28,869,484,544 bytes (~26.89 GiB) before the new build. It is a
+   physically independent candidate relative to the server. Final post-build
+   free space is 24,022,310,912 bytes (~22.37 GiB), only ~2.37 GiB above the
+   20-GiB reserve; require the runbook size/headroom check before any download. Independent key custody and scheduled availability
+   remain unverified. There is no deployed trial or server backup to restore.
+   An isolated application restore was therefore **NOT RUN**; local image
+   smoke and phone-file copies are not a disaster-recovery claim.
+4. **Remaining physical checks blocked:** read-only device access works and
+   revealed a real persisted original plus a matching local HTTP upload receipt
+   (details below). Native UI access reported the Mac locked; the subsequent
+   phone relaunch was explicitly denied because the **iPhone was locked**.
+   Permission branches, twenty offline photos, successful termination/reopen,
+   account-isolation scenarios, interruption/retry and public HTTPS/gallery
+   checks remain **NOT RUN**. Unlock was requested; no result was invented.
 
-The user's explicit disposable-only fallback applies if backup/native gates are
-missing. It does not resolve missing DNS/TLS/artifact prerequisites, so no partial
-public or internal installation was made. After access/routing are resolved,
-re-run preflight and follow the ordered runbooks; do not apply the base blindly.
+**Kubernetes access works.** Only explicit kubeconfig
+`~/.kube/netcup-k3s-admin-direct.yaml`, context `netcup-k3s-direct`, was used.
+The node reports `159.195.30.113`; direct-origin verified HTTPS for `rruge.com`
+returns 200, and new-host HTTP reaches the edge (308). These establish the
+existing origin, not HandoverTrack application readiness. Capacity/pressure
+checks and the five existing-host health checks pass; DNS is the sole failing
+preflight check. Initial resumed measurements: 5,935m CPU requested,
+6,562,332,672 bytes memory available, 313,389,043,712 bytes filesystem free,
+and 29,424,299 free inodes.
+
+**No existing HandoverTrack certificate is required to create its first route.**
+The runbook and Caddy comment now explicitly order origin/DNS and internal
+service checks → guarded additive route → first certificate issuance → verified
+HTTPS. Missing DNS/artifact access, rather than missing first-use TLS, stops
+this bootstrap. Full (strict) and proxy/cache configuration remain NOT RUN.
+
+## Reviewed committed source and rebuilt artifact
+
+- Starting checkout was clean at `b71e8b5` (Task 05 preparation already committed).
+- Reviewed release source commit:
+  `ba2ecc8d8040eda6e5d57bf73d6d17e90a4d2337`.
+- `release.py` already imported `time` in the starting commit. The reviewed
+  version makes that import explicit and tests the full guarded apply branch,
+  including calls to `time.time()`. It also refuses Python `-O` and a policy
+  not owned by the operator or accessible to other users.
+- Build input was `git archive` of that exact commit, with its full SHA as the
+  OCI revision label. No working-tree files, credentials or originals were used.
+- Immutable image identity:
+  `handovertrack.local/runtime@sha256:125cd8a42f0bb92bf87251d40c4cc14c561ab27e0f00911205e000856d66d7cc`.
+- OCI config digest:
+  `sha256:1dea15fee1d5be927dc3fe3af69af694806fbda37e08dd82b3f77d22b17b9a6d`.
+- Platform `linux/amd64`, runtime UID/GID `1000:1000`; manifest, config and every
+  layer hash verified. Docker RepoDigest and exact revision label verified.
+- Archive `.local/task05-release-ba2ecc8d8040.oci.tar`; build, smoke, metadata and
+  verification receipts share that prefix. This is **local only**, not imported
+  or published. The old `task05-candidate` image/archive is retained, unused.
+- Exact immutable release rendered to `.local/task05-resume-release.json` and
+  accompanying `.release.json`; client schema dry-run passed for 25 resources.
+  These are proposed resources, **not deployed resources**.
+
+Review covered Docker build/context, rendering/invariants, credential bootstrap,
+preflight, release patch guards, backup/writer resumption, network/storage bounds
+and additive edge preparation. No release controller/timer was installed.
+Seven release-controller tests pass, covering timestamp freshness/future values,
+check-only behavior, guarded image changes, failed gates, partial rollout
+receipts, policy permissions and disabled assertions. Lint/boundaries,
+typecheck, 45 unit tests and contract generation checks pass. New-image smoke
+passes isolated nonroot/read-only DB initialization, migrations twice, disposable
+provisioning, API/Next readiness, worker heartbeat and private unauthorized HTTP.
+This does not claim target-PVC or physical HTTPS validation.
+
+The new complete Caddy candidate is `handovertrack-edge-1da2a23b2acc`, prepared
+from the unchanged live `erdhairdesign-edge-497262a88fcc` config. Its complete
+validation passed with live pinned Caddy 2.11.4; candidate ConfigMap and additive
+network policy server dry-runs passed. No patch was applied. Initial local
+validation with every capability dropped failed to execute Caddy's file-capability
+binary; bounded local validation with `NET_BIND_SERVICE` succeeded, with no
+network/host ports. No cluster pod was used. An initial Docker verification
+assertion assumed the legacy config-based image ID; this Docker uses manifest
+IDs. Verified RepoDigest, OCI blob hashes and source label establish identity.
+
+## Newly observed physical evidence (local HTTP only)
+
+Read-only copies of the paired phone's Documents were taken into fresh private
+`.local/task05-resume-phone-*` directories. SQLite remains version 4 and passes
+`integrity_check`; it now contains one scope/project/assignment, one saved local
+original and one queue entry, with no orphan entries.
+
+- Original: **4,455,595 bytes**, SHA-256
+  `ba333a2172c3f2847ab92f7e2173fe564706b9d15d93ddd167cafa9448b1a545`.
+  Phone manifest, SQLite, copied JPEG and local server original hashes agree;
+  the JPEG decodes. The camera permission/shutter UI was not directly observed.
+- Phone queue: `server_accepted`, one attempt, 4,455,595 bytes sent; local server
+  accepted at `2026-09-21T13:30:46.649Z`. Matching account/media receipt and
+  original prove one phone-to-local-server acceptance, not HTTPS or retries.
+- The existing local job was pending. An owned compiled worker processed it
+  once to `ready`; the worker was then stopped gracefully. Three WebP outputs
+  (`thumb` 320×306, `preview` 768×737, `report` 2048×1965) match their database
+  hashes/dimensions and decode. Exactly one accepted and one ready event exist.
+  Original bytes and acceptance timestamp remain unchanged.
+- `devicectl --terminate-existing` relaunch failed with iOS `Locked` denial.
+  Post-attempt read-only copying still verifies the same original and healthy
+  SQLite v4. Successful reopen/queue recovery and visible gallery remain
+  **NOT RUN**; unlock and relaunch are required before continuing these checks.
+
+Evidence: `.local/task05-resume-{physical-evidence,local-server-receipt,
+local-processing}.json`, device logs, and private phone copies. No phone erase,
+uninstall, reinstall, SQLite downgrade or original deletion occurred. Existing
+LAN API configuration was retained; no public-origin phone build was installed.
+
+## Preservation and continuation
+
+`.env`, Compose configuration and migrations 001–004 retain their baseline
+hashes and modes. Existing databases and originals are preserved; the only
+intentional local business-data transition was processing the already accepted
+photo into its normal immutable derivatives/events. Disposable smoke containers
+used unique names and tmpfs; only their owned containers/networks were removed.
+
+The shared edge Deployment spec remains equal to the resumed baseline; its
+live Caddyfile hash remains
+`497262a88fcc6c097829f3eb3321e92286ca639a828cdfd404b77739b013fda8`.
+Rrugë pod names/restart counts remain unchanged. Existing-host checks for
+`rruge.com`, `mendmania.com`, `typechars.com`, `virtualboardzone.com` and
+`tregubio.com` pass. Final reports are `.local/task05-resume-preflight-final.json`
+and `.local/task05-resume-final-preservation.json`.
+
+Resume when authorized DNS/image delivery access is available; recheck capacity
+and current edge resourceVersion, then follow the ordered bootstrap, internal
+validation and guarded edge procedure. The current candidate patch is a saved
+review artifact, not permission to ignore a future concurrency conflict. Verify
+workstation recovery-key access, take a consistent independent backup and perform
+the isolated application restore. Preserve phone pending data and finish native
+checks. Keep **disposable-only** until recovery and native gates pass. No paid
+service was introduced, no source was pushed by this resume, and **stop before
+Task 06** remains in force.
+
+## Original preparation record (historical)
 
 ## Source and preservation
 

@@ -7,8 +7,12 @@ is part of this procedure. Never restore into the active database/PVCs.
 ## Target and consistent backup
 
 An independent target must survive loss of `netcupmaniaserver`. The workstation
-has FileVault enabled and approximately 36 GiB free at initial inspection, so it
-is a candidate for bounded encrypted downloads using existing hardware. This
+has FileVault enabled; the resumed 2026-09-21 inspection measured approximately
+26.89 GiB free before the committed-image rebuild (initial inspection: 36 GiB).
+After the build, 24,022,310,912 bytes (~22.37 GiB) remained, leaving only
+~2.37 GiB above the required reserve. Re-measure immediately before downloading
+and require the database/media size headroom check. It is a candidate for
+bounded encrypted downloads using existing hardware. This
 is not proof of independent recovery-key custody, ongoing availability or a
 successful restore. The server's existing Restic/R2 allowance and credentials
 were not accessible; do not reuse Rrugë's credentials or assume paid headroom.
@@ -125,3 +129,14 @@ PASS requires independent encrypted bytes, accessible separate recovery keys,
 an isolated application restore, original checksum/ownership/job/session checks
 and unchanged source/existing-site health. Record live evidence in the Task 05
 handoff; until then disaster recovery remains NOT RUN.
+
+## Resumed Task 05 recovery status
+
+No trial exists on the server yet because authorized image delivery and DNS
+access remain blocked. No live consistent backup or isolated application restore
+was performed; both remain **NOT RUN**. FileVault On and available local space
+establish only a candidate target. Independent recovery-key custody and scheduled
+availability have not been demonstrated. Exact resumed image/physical evidence
+and blockers are in [Task 05](../../docs/progress/05-k3s-trial.md). Local container
+smoke and private phone-file copies must not be reported as an independent server
+restore. Retain the disposable-only gate.
