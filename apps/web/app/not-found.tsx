@@ -1,0 +1,1 @@
+export default function NotFound() { return <main className="card"><h1>Resource unavailable</h1><p>This project or organization is unavailable for your account.</p><a href="/">Return to your projects</a></main>; }

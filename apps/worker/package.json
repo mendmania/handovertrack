@@ -1,0 +1,19 @@
+{
+  "name": "@handovertrack/worker",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "dev": "tsx src/main.ts",
+    "build": "tsup",
+    "start": "node dist/main.js"
+  },
+  "dependencies": {
+    "@handovertrack/platform": "workspace:*",
+    "@handovertrack/config": "workspace:*",
+    "kysely": "0.29.6",
+    "pg": "8.23.0",
+    "zod": "4.6.5"
+  }
+}

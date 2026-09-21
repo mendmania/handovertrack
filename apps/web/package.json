@@ -1,0 +1,23 @@
+{
+  "name": "@handovertrack/web",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "dev": "next dev --port ${WEB_PORT:-3300}",
+    "build": "next build",
+    "start": "NODE_ENV=production next start --port ${WEB_PORT:-3300}"
+  },
+  "dependencies": {
+    "@handovertrack/query": "workspace:*",
+    "@handovertrack/contracts": "workspace:*",
+    "@handovertrack/config": "workspace:*",
+    "next": "16.3.5",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "@tanstack/react-query": "5.103.1",
+    "better-auth": "1.7.5",
+    "server-only": "0.0.1"
+  }
+}

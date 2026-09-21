@@ -1,0 +1,11 @@
+packages:
+  - apps/*
+  - packages/*
+onlyBuiltDependencies:
+  - esbuild
+  - sharp
+  - unrs-resolver
+overrides:
+  '@react-native/metro-config': 0.86.3
+  react-native-worklets: 0.10.1
+  react-native-reanimated: 4.5.1
