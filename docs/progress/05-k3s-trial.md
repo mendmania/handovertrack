@@ -3,18 +3,24 @@
 **Status: blocked-rollout; disposable-only.** Resumed 2026-09-21 on
 `codex/k3s-trial`. Reviewed source is committed and its new immutable image is
 locally verified. **Nothing was deployed.** No HandoverTrack namespace, PVC,
-Secret, Job, Deployment, Service, DNS record or live edge route was created.
+Secret, Job, Deployment, Service or live edge route was created. The authorized
+apex DNS-only A record was subsequently added after the owner signed in.
 Task 06 has not started. The observations below supersede the original blockers;
 older sections remain as historical evidence.
 
 ## Rechecked blockers and origin
 
-1. **DNS access blocked:** both authoritative `donna.ns.cloudflare.com` and
-   public `1.1.1.1` still return NOERROR with zero apex A answers. Cloudflare's
-   dashboard redirects to sign-in; no Cloudflare credential variable is present
-   in the current environment. The sign-in tab is left for the owner because
-   continuing explicitly accepts Cloudflare terms. Authorized proposed change
-   remains **DNS-only apex A → `159.195.30.113`**; no other hostname is in scope.
+1. **DNS configured and publicly verified (follow-up):** after the owner signed
+   in, the Cloudflare `handovertrack.com` zone had zero records. Created its one
+   authorized record: **apex A → `159.195.30.113`, DNS-only, Auto TTL** (served
+   TTL 300). Both authoritative nameservers (`donna`, `ganz`) and public
+   resolvers `1.1.1.1` and `8.8.8.8` return that exact address. No www, AAAA,
+   mail, other-zone record, proxy, plan or SSL/cache setting was changed.
+   The workstation's resolver `10.10.1.1` still returned its earlier negative
+   cache entry (SOA TTL 770 at 15:52 CEST), so `preflight.py` still correctly
+   reports `dns_direct_origin=false` locally. Re-run after cache expiry;
+   do not bypass that guard. Receipts: `.local/task05-dns-receipt.json` and
+   `.local/task05-dns-preflight.json`. All other preflight checks pass.
 2. **Image delivery blocked:** SSH to the recorded `mendim@159.195.30.113`
    rejects both `~/.ssh/netcup-k3s-client` and `~/.ssh/id_ed25519` with
    `Permission denied (publickey)`. GHCR package inventory still returns HTTP
@@ -51,8 +57,8 @@ and 29,424,299 free inodes.
 **No existing HandoverTrack certificate is required to create its first route.**
 The runbook and Caddy comment now explicitly order origin/DNS and internal
 service checks → guarded additive route → first certificate issuance → verified
-HTTPS. Missing DNS/artifact access, rather than missing first-use TLS, stops
-this bootstrap. Full (strict) and proxy/cache configuration remain NOT RUN.
+HTTPS. Missing artifact access (plus the workstation DNS cache until expiry),
+rather than missing first-use TLS, stops this bootstrap. Full (strict) and proxy/cache configuration remain NOT RUN.
 
 ## Reviewed committed source and rebuilt artifact
 
@@ -144,7 +150,7 @@ Rrugë pod names/restart counts remain unchanged. Existing-host checks for
 `tregubio.com` pass. Final reports are `.local/task05-resume-preflight-final.json`
 and `.local/task05-resume-final-preservation.json`.
 
-Resume when authorized DNS/image delivery access is available; recheck capacity
+Resume when authorized image delivery access is available and local DNS has refreshed; recheck capacity
 and current edge resourceVersion, then follow the ordered bootstrap, internal
 validation and guarded edge procedure. The current candidate patch is a saved
 review artifact, not permission to ignore a future concurrency conflict. Verify

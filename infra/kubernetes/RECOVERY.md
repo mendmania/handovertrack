@@ -132,8 +132,9 @@ handoff; until then disaster recovery remains NOT RUN.
 
 ## Resumed Task 05 recovery status
 
-No trial exists on the server yet because authorized image delivery and DNS
-access remain blocked. No live consistent backup or isolated application restore
+No trial exists on the server yet because authorized image delivery remains
+blocked. Apex DNS is now configured and publicly verified; local resolver cache
+expiry still needs to be observed. No live consistent backup or isolated application restore
 was performed; both remain **NOT RUN**. FileVault On and available local space
 establish only a candidate target. Independent recovery-key custody and scheduled
 availability have not been demonstrated. Exact resumed image/physical evidence

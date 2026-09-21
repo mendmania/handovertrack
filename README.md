@@ -6,7 +6,7 @@ SQLite and incremental pull sync, and a database-connected worker. Managers crea
 and update projects and worker assignments online. The native app adds local camera capture, private originals, durable queue intent
 and a local gallery. Authenticated streamed uploads, immutable server originals,
 PostgreSQL processing jobs, derivatives and a manager gallery are implemented
-locally. Physical camera/native-upload validation remains open. Task 05 deployment preparation is implemented; rollout is blocked by DNS access and artifact delivery, and nothing is deployed.
+locally. Physical camera/native-upload validation remains open. Task 05 deployment preparation is implemented; the apex DNS record is configured, while artifact delivery remains blocked and nothing is deployed.
 
 ## Install and configure
 
@@ -142,7 +142,7 @@ uploads now stream directly to Fastify; the local Next media bridge is GET-only.
 The BFF cannot accept an upload; its
 application routes allow only the documented small JSON commands and reads;
 auth forwarding streams the request body.
-An additive Caddy candidate and restricted deployment manifests are prepared. No live Caddy, DNS or deployment changes have been applied; see [trial operations](infra/kubernetes/README.md).
+An additive Caddy candidate and restricted deployment manifests are prepared. The apex DNS-only A record is configured; no live Caddy or deployment changes have been applied; see [trial operations](infra/kubernetes/README.md).
 
 ## iOS and offline access
 
