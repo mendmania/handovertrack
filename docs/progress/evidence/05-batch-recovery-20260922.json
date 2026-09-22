@@ -1,0 +1,216 @@
+{
+  "checked_at": "2026-09-22T11:37:53Z",
+  "result": "PASS",
+  "backup": "handovertrack-20260922T112734Z-54ce2f",
+  "consistent": true,
+  "hashes_verified": true,
+  "media_transport": "verified-4MiB-ranges",
+  "files": {
+    "database.dump": {
+      "size": 57991,
+      "sha256": "0fb15c38e0eb68506c9594a8029689e89a836f5dcfeaadc7e4daadacba70cf77"
+    },
+    "media.tar.gz": {
+      "size": 198598027,
+      "sha256": "dc3d8816adac4dd77cc803bf39103d22fe1106d4d49b631eaeff367b9cc461af"
+    }
+  },
+  "originals": 25,
+  "variants": 75,
+  "media_paths": 125,
+  "all_public_tables": {
+    "tables": {
+      "account": {
+        "count": 5,
+        "sha256": "97e30eedcd35d6eed1d03bdd18a3d9baea0cd917b91544e3ad3cc2c6e1c9abf4"
+      },
+      "app_accounts": {
+        "count": 5,
+        "sha256": "4b3418658d3bbf4a678e6ac485cda59495eb207c1ccdd16c29b9be5e3449e93f"
+      },
+      "assignments": {
+        "count": 3,
+        "sha256": "3a0be82f368b7a47c47500af3f7578f560fc4c0599fd33ef6bce149999eecce6"
+      },
+      "audit_records": {
+        "count": 9,
+        "sha256": "49601b9f95758f827bb745fda3921d9ebf505e43bb3427d1beab8a716d833bb6"
+      },
+      "command_receipts": {
+        "count": 9,
+        "sha256": "dd17387163d0678bc83b18a8b27714af5ed0731a81f0ffc4c755f429fdbb94ab"
+      },
+      "media_events": {
+        "count": 50,
+        "sha256": "fa68ef20e9145fc28f46607fb94b9d205293093539f7d23207e96d3361995740"
+      },
+      "media_jobs": {
+        "count": 25,
+        "sha256": "fc2716d33aa0ef228bb8cbdf2ca44eb57eb498095db6af7e8bb87ae15077a5ad"
+      },
+      "media_uploads": {
+        "count": 25,
+        "sha256": "6d1aeeb3bd1085783b6a6e6decc79db4494002f369d62393db2cfd1f535e8cef"
+      },
+      "media_variants": {
+        "count": 75,
+        "sha256": "87132e38226e3b00a4e2fbfedf82d4ee30abc831fa580fc285ca6d5e9a3ed17c"
+      },
+      "memberships": {
+        "count": 6,
+        "sha256": "f8ba11b3f0d62bdf1056e4e49001216b2e4c9f0f663d9564686cf8c220e3cbfb"
+      },
+      "organization_sync_state": {
+        "count": 1,
+        "sha256": "b361e710db4dda38651543adfda01ecf6feb2af03ab41d5b9e1de19b68995dc5"
+      },
+      "organizations": {
+        "count": 2,
+        "sha256": "2ff974d6b2a6c8f35748297922a5c10bb83a7230c0f24dd7718d4f9ba99ccda2"
+      },
+      "projects": {
+        "count": 4,
+        "sha256": "adb98e620a6663835396407980a65e22b1760d1fad784baf0394e5cf078dd2a9"
+      },
+      "schema_migrations": {
+        "count": 4,
+        "sha256": "2c450189650cfa693a2fc8eeae2bd5d465fb843003b11a6a625dec4d0e84530e"
+      },
+      "session": {
+        "count": 6,
+        "sha256": "9ec04e34a2ec376d68a94c0f6a8c8ead2e4ec22df1a8128053883cf0323d7346"
+      },
+      "sync_changes": {
+        "count": 17,
+        "sha256": "f202a0f78e61235cbbfd74e8d42e68d8a885109d0f1b38fb54a9a8108acd8a8c"
+      },
+      "user": {
+        "count": 5,
+        "sha256": "a6b56f6fae38e717647998de2be962f4b9352d679e961a9b878b134a23df90b0"
+      },
+      "verification": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      }
+    },
+    "all_equal": true
+  },
+  "restore_namespace": "handovertrack-restore-20260922c",
+  "restore_pvs": {
+    "database": "pvc-7597e2a3-6af9-4a5e-84eb-fe48963a061a",
+    "media": "pvc-78bb3536-4850-4533-a260-2c2680d4cb43"
+  },
+  "root_metadata": {
+    "before": "0:0:777",
+    "after": "0:0:777",
+    "method": "regular files only; directory/root archive entries excluded"
+  },
+  "application_checks": {
+    "at_unix": 1790077008.51006,
+    "namespace": "handovertrack-restore-20260922c",
+    "seconds_since_restore_start": 266.7,
+    "seconds_since_backup_start": 553.7,
+    "accepted": 25,
+    "variants": 75,
+    "media_paths": 125,
+    "saved_sessions_valid": true,
+    "manager_original_hashes_match": true,
+    "worker_foreign_unauthenticated_denied": true,
+    "gallery_ready": true,
+    "source_tables_unchanged": true,
+    "restore_tables_equal": true,
+    "container_memory_peaks": {
+      "database-0": {
+        "result": "NOT RUN",
+        "reason": "cgroup memory.peak unavailable"
+      },
+      "deploy/api": {
+        "result": "NOT RUN",
+        "reason": "cgroup memory.peak unavailable"
+      },
+      "deploy/worker": {
+        "result": "NOT RUN",
+        "reason": "cgroup memory.peak unavailable"
+      },
+      "restore-media-20260922c": {
+        "result": "NOT RUN",
+        "reason": "cgroup memory.peak unavailable"
+      }
+    },
+    "fs": {
+      "free_bytes": 309492748288,
+      "free_inodes": 29339867,
+      "total_bytes": 539930480640
+    },
+    "new_expired_lease_test": "NOT RUN: snapshot has 25 ready jobs; previous technical lease-recovery PASS remains separate",
+    "key_custody": "NOT RUN: owner confirmation pending"
+  },
+  "preservation": {
+    "at_unix": 1790077073.796294,
+    "checks": {
+      "local_config_migrations_and_compose_unchanged": true,
+      "all_41_prior_recovery_files_unchanged": true,
+      "source_secret_config_identity_values_unchanged": true,
+      "edge_spec_unchanged": true,
+      "edge_bytes_unchanged": true,
+      "handovertrack_resources_preserved": true,
+      "rruge_resources_preserved": true,
+      "handovertrack-restore-20260922_unchanged": true,
+      "handovertrack-restore-20260922b_unchanged": true,
+      "source_writers_ready": true,
+      "all_25_originals_receipts_jobs_variants_unchanged": true,
+      "all_18_source_public_tables_unchanged": true,
+      "all_three_rehearsals_stopped_pvcs_retained": true,
+      "source_backup_helper_removed": true,
+      "operator_lock_free": true,
+      "assignment_worker_cleanup_journals_clear": true,
+      "assignment_active_v5": true,
+      "all_six_sites_https_200": true,
+      "failed_attempts_preserved_without_success_receipts": true,
+      "all_three_rehearsals_recovery_credentials_and_config_retained": true
+    },
+    "sites": {
+      "handovertrack.com": "200",
+      "rruge.com": "200",
+      "mendmania.com": "200",
+      "typechars.com": "200",
+      "virtualboardzone.com": "200",
+      "tregubio.com": "200"
+    },
+    "accepted": 25,
+    "variants": 75,
+    "prior_recovery_files": 41,
+    "target_free_bytes": 28008931328,
+    "failed_attempts": {
+      "handovertrack-20260922T111923Z-1599a8": {
+        "database.dump": {
+          "bytes": 57991,
+          "sha256": "2f08b522d9d6b533e1225754752f16635b7d88739fd7ad799700517fe48c2bf2"
+        },
+        "media.tar.gz": {
+          "bytes": 171573248,
+          "sha256": "a943b6b2fdbc8048106472b027084906d25926e51ea2db74abf31482f9c08522"
+        },
+        "media-sha256.json": {
+          "bytes": 14977,
+          "sha256": "7d9626a71db39cd36d5a02296d2559bb795431135249dc3d74fc39b149d68d22"
+        }
+      },
+      "handovertrack-20260922T112433Z-455f59": {
+        "database.dump": {
+          "bytes": 57991,
+          "sha256": "53c910a947157648dcafc0362bbb450917dc41b6852ebfe52a8bd6183339d330"
+        },
+        "media.tar.gz": {
+          "bytes": 42561869,
+          "sha256": "dcefca8b08795c1be3f4fe5d3148730ab9bff6c4913d74bbfaed27d4275ff36a"
+        },
+        "media-sha256.json": {
+          "bytes": 14977,
+          "sha256": "7d9626a71db39cd36d5a02296d2559bb795431135249dc3d74fc39b149d68d22"
+        }
+      }
+    }
+  },
+  "scope_limit": "Older local-HTTP phone original is preserved locally but is not a source-server asset. Mac-loss access/key custody and native interruption/retry remain unverified."
+}

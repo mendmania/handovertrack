@@ -1,0 +1,16 @@
+{
+  "recorded_at_unix": 1790073587.761345,
+  "separate_from_twenty_id_cohort": true,
+  "media": {
+    "id": "cebaab5a-6141-4084-83a4-c71bc6bcdfcc",
+    "account_id": "d6cc7b45-75f0-4f08-b87b-594152f780bd",
+    "organization_id": "11111111-1111-4111-8111-111111111111",
+    "project_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1",
+    "created_at": "2026-09-22T10:36:31.548Z",
+    "size": 4600817,
+    "sha256": "c6c46cb1a87693480bf52a6e258f3e66ee3af4b69c406189a48513e321ccd4f9"
+  },
+  "width": 3024,
+  "height": 2902,
+  "queue_state_at_recording": "pending"
+}

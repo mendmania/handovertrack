@@ -5,6 +5,7 @@ No remote repository initialization, purchases, pruning or original deletion.
 """
 import argparse,fcntl,hashlib,json,os,secrets,shutil,subprocess,time
 from pathlib import Path
+from backup_media import write_verified_archive
 p=argparse.ArgumentParser(); p.add_argument('--kubeconfig',required=True); p.add_argument('--target',required=True); p.add_argument('--runtime',required=True); a=p.parse_args()
 k=['kubectl','--kubeconfig',a.kubeconfig,'--context','netcup-k3s-direct','-n','handovertrack','--request-timeout=60s']
 def run(args,**kwargs): return subprocess.check_output(k+args,**kwargs)
@@ -35,13 +36,21 @@ with open(state/'release.lock','a') as lock:
         db_size=int(run(['exec','database-0','--','psql','-U','postgres','-d','handovertrack','-At','-c',"SELECT pg_database_size('handovertrack')"]))
         media_size=int(run(['exec',helper,'--','node','-e',"const fs=require('fs');let n=0;function walk(p){for(const e of fs.readdirSync(p,{withFileTypes:true})){let q=p+'/'+e.name;if(e.isDirectory())walk(q);else if(e.isFile())n+=fs.statSync(q).size;else throw Error('Unexpected media file type')}}walk('/media');console.log(n)"]))
         assert shutil.disk_usage(base).free>20*1024**3+db_size*2+media_size*2, 'Insufficient independent target headroom'
-        # Compress in the read-only helper before streaming. The archive still
-        # contains full regular files for hardlinks, and every downloaded byte
-        # is checked against the source inventory before a receipt is issued.
-        for name,args in [('database.dump',['exec','database-0','--','pg_dump','-U','postgres','-d','handovertrack','-Fc']),('media.tar.gz',['exec',helper,'--','tar','--hard-dereference','-C','/media','-czf','-','.'])]:
+        # Long exec streams can truncate even with a zero kubectl exit status.
+        # Keep the custom DB dump; media uses bounded transfers with exact
+        # lengths and full-file hashes before adding regular archive entries.
+        for name,args in [('database.dump',['exec','database-0','--','pg_dump','-U','postgres','-d','handovertrack','-Fc'])]:
             fd=os.open(folder/name,os.O_CREAT|os.O_EXCL|os.O_WRONLY,0o600)
             with os.fdopen(fd,'wb') as out: subprocess.run(k+args,stdout=out,stderr=subprocess.DEVNULL,check=True); out.flush(); os.fsync(out.fileno())
         write('media-sha256.json', run(['exec',helper,'--','env','MEDIA_ROOT=/media','node','scripts/ops/media-inventory.mjs']))
+        expected=json.loads((folder/'media-sha256.json').read_text())
+        size_script="const fs=require('fs'),out={};function walk(p,r=''){for(const e of fs.readdirSync(p,{withFileTypes:true})){const q=p+'/'+e.name,n=r+e.name;if(e.isDirectory())walk(q,n+'/');else if(e.isFile())out[n]=fs.statSync(q).size;else throw Error('Unexpected media file type')}}walk('/media');console.log(JSON.stringify(out))"
+        sizes=json.loads(run(['exec',helper,'--','node','-e',size_script]))
+        chunk_script="const fs=require('fs'),[name,start,count]=process.argv.slice(1),offset=Number(start),length=Number(count);if(name.startsWith('/')||name.split('/').some(x=>!x||x==='..'||x==='.')||!Number.isSafeInteger(offset)||offset<0||!Number.isSafeInteger(length)||length<1||length>4194304)throw Error('Invalid range');const path='/media/'+name;if(!fs.lstatSync(path).isFile())throw Error('Not a regular file');const fd=fs.openSync(path,'r'),b=Buffer.alloc(length);let n=0;while(n<length){const got=fs.readSync(fd,b,n,length-n,offset+n);if(!got)throw Error('Short file');n+=got}fs.closeSync(fd);process.stdout.write(b)"
+        def read_chunk(name,offset,length):
+            return run(['exec',helper,'--','node','-e',chunk_script,name,str(offset),str(length)])
+        write_verified_archive(folder/'media.tar.gz',expected,sizes,read_chunk)
+        assert json.loads(run(['exec',helper,'--','env','MEDIA_ROOT=/media','node','scripts/ops/media-inventory.mjs']))==expected, 'Source inventory changed during backup'
         import tarfile
         expected=json.loads((folder/'media-sha256.json').read_text()); actual={}
         with tarfile.open(folder/'media.tar.gz', 'r:gz') as archive:
@@ -63,7 +72,7 @@ with open(state/'release.lock','a') as lock:
             with f.open('rb') as src:
                 for chunk in iter(lambda:src.read(1024*1024),b''): h.update(chunk)
             hashes[f.name]=h.hexdigest()
-        receipt.update(consistent=True,hashes_verified=True,sha256=hashes)
+        receipt.update(consistent=True,hashes_verified=True,sha256=hashes,media_transport='verified-4MiB-ranges')
         write('receipt.json',json.dumps(receipt,indent=2).encode())
         print('Consistent owned backup downloaded. Independent restore remains NOT RUN. Receipt: '+str(folder/'receipt.json'))
     finally:

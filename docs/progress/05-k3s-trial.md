@@ -1,12 +1,517 @@
 # Task 05 — live disposable k3s trial
 
-**Status: deployed over verified HTTPS; technical backup/restore rehearsal PASS;
-one owner-observed physical HTTPS photo-to-web test PASS; extended native and
-independent recovery-key gates incomplete. Disposable-only.**
-Updated 2026-09-22. [handovertrack.com](https://handovertrack.com) is live on the
-existing VPS. Task 06 has **not** started. No customer/real-evidence intake is
-approved. This checkpoint supersedes all historical blocked/bootstrap entries
-below; preserve them as the investigation trail.
+**Status: HTTPS deployed; physical capture/isolation/upload and full-batch technical
+recovery PASS. Native failure/retry and operational recovery gates remain open.**
+
+## Current validation outcome — 2026-09-22
+
+**Tasks 03–05 remain `implemented-awaiting-validation`; disposable-only. Task 06
+has not started.** This section supersedes the historical in-progress checkpoints
+below. There is no outstanding assignment restoration or worker resumption:
+the owner restored North worker/Riverside through manager.both at 11:09:09 UTC
+(active v5, audit revision 7). The guard detected this concurrent change and did
+not overwrite it. Worker, API and web are back at one ready replica each.
+
+| Check | Result and actual evidence |
+|---|---|
+| Camera denial, allow/return from Settings, cancel/back | **PASS, owner observed.** Owner answered “done its okej” to the ordered permission test. The following USB copy has the same 23 originals and accepted receipts, no added photo; all JPEGs decode. |
+| Twenty new offline captures and saved intent | **PASS.** Owner reported 20 saves offline; read-only Documents/SQLite copies verify 20 distinct IDs/hashes, manifests and original-owner queues. Radio state is owner-reported, not independently measured. |
+| Offline terminate/reopen | **PASS.** Owner confirmed photos visible after requested app-switcher termination/reopen; before/after copies preserve all cohort originals, owners and pending records. Exact UI count/error wording was not separately reported. |
+| Revocation while pending | **PASS.** Manager API revoked only the test assignment (v3→v4); native project disappeared and owner observed “Blocked: project access is unavailable.” All originals/pending intent survived; no new-cohort asset uploaded while revoked. |
+| Logout, account/org switch and rebootstrap | **PASS.** Owner explicitly confirmed empty manager.both Saved photos in both North and South. Copied scopes/server membership corroborate identity; zero media/queue ownership transfer. Returning to worker rebuilt its cache and restored photo visibility, with all originals intact. |
+| Native upload and manager visibility | **PASS.** Owner sees uploaded photos on the web. Each of 21 new originals has matching phone/server ID, scope, size and SHA-256; one asset, one logical job, one accepted/ready event pair, three valid decoded derivatives. |
+| Owned worker restart | **PASS.** Only the trial worker was stopped; all 21 new jobs persisted pending at attempt 0. Its replacement processed each once. This does not exercise killing an active lease; earlier synthetic lease tests remain separate. |
+| Native stream interruption, app restart during upload, retry and lost completion response | **NOT RUN.** All new uploads completed on attempt 1 before controlled interruption. Successful upload/reopen and synthetic faults do not establish these native failure paths. |
+| Fresh full-batch backup/application restore | **PASS, agent observed.** `handovertrack-20260922T112734Z-54ce2f` restores 25 originals, 75 variants, 125 media paths and matching hashes/counts for all 18 public tables into `handovertrack-restore-20260922c`. Saved sessions, access denials, manager downloads and the ready gallery pass. |
+| Independent key/backup access after Mac loss and dependable operation | **NOT RUN/unconfirmed.** FileVault is On. Owner confirmation was requested without asking for secrets; restoring from this Mac’s backup does not prove access when this Mac is lost. See the proposed manual procedure in RECOVERY.md. No unattended schedule or alerts are installed. |
+
+Counts are deliberately different: the phone preserves **23 originals/accepted
+receipts** (22 current North-worker photos plus one older local-HTTP photo under
+a different owner). The server has **25 accepted originals, 25 ready jobs and
+75 variants**: four earlier assets plus the planned twenty and one additional
+capture. The extra capture is preserved, not removed to force a count. The
+older local-HTTP original is preserved on the phone and private USB copies but
+is not a live-server backup asset.
+
+Durable, nonsecret evidence: [twenty-ID cohort](evidence/05-native-batch-20260922.json),
+[additional capture](evidence/05-native-extra-20260922.json),
+[verification and all 25 server original hashes](evidence/05-native-validation-20260922.json)
+and [fresh backup/restore evidence](evidence/05-batch-recovery-20260922.json). Private USB snapshots, manifests/queue comparisons, decodes,
+assignment/worker journals and verification logs remain under
+`.local/task05-phone-validation-usb-20260922/`; recovery execution evidence is
+under `.local/task05-batch-recovery-20260922/`. Credentials, image bytes, auth
+sessions and secret-bearing backups remain outside Git.
+
+Fresh backup: `handovertrack-20260922T112734Z-54ce2f` on the FileVault Mac, below
+`~/Library/Application Support/HandoverTrack/recovery/`. It includes the earlier
+HTTPS owner photo, all twenty cohort IDs, the extra capture and three older
+synthetic fixtures. `database.dump`: **57,991 bytes**,
+SHA-256 `0fb15c38e0eb68506c9594a8029689e89a836f5dcfeaadc7e4daadacba70cf77`. `media.tar.gz`:
+**198,598,027 bytes**, SHA-256
+`dc3d8816adac4dd77cc803bf39103d22fe1106d4d49b631eaeff367b9cc461af`. All receipt file hashes match. The receipt's
+`independent_restore_verified: false` is its original backup-only field; separate
+restore evidence now establishes the application restore PASS without changing
+that retained receipt.
+
+The new isolated rehearsal `handovertrack-restore-20260922c` uses database PV
+`pvc-7597e2a3-6af9-4a5e-84eb-fe48963a061a` and media PV
+`pvc-78bb3536-4850-4533-a260-2c2680d4cb43`, both Retain and distinct from source and
+both older rehearsals. Verified regular-file groups bounded each restore transfer;
+all inventory paths/hashes and PVC-root ownership/mode match. API/worker/database
+are stopped, the owned helper and loopback forwarding are closed, and all three
+rehearsals' namespaces, credentials and PVCs are retained. Restore application
+verification took 266.7 seconds from preparation;
+this is one measured rehearsal on the existing VPS in an isolated namespace,
+not a replacement-node rebuild or an RTO guarantee. Container lifetime peak
+memory remains **NOT RUN** because the cgroup counters were unavailable.
+
+
+The first full-batch gzip stream was truncated at 171,573,248 bytes and rejected
+without a successful receipt (`handovertrack-20260922T111923Z-1599a8`); that partial
+attempt is preserved. A second attempt (`handovertrack-20260922T112433Z-455f59`)
+was rejected after a connection reset and is also retained without a receipt.
+Backup tooling now builds the gzip archive from verified 4-MiB media ranges,
+with at most three attempts for a failed read-only range. No source original is changed or removed by this repair.
+
+No runtime image, schema, phone install, credentials, shared edge/network policy
+or Rrugë resources changed. Local configuration, migrations, all 41 pre-existing
+recovery files, earlier rehearsal resource identities/PVCs and source originals
+were rechecked for preservation. Existing HTTPS sites remained healthy. The
+operator extraction fix excludes all archive directory entries, including the
+PVC root; twelve focused operator tests pass. Task 06 remains prepared only.
+
+The next smallest validation step is a coordinated disposable native upload with
+a deliberately interrupted binary stream and separately lost completion reply,
+recording durable retry/acceptance identity without deleting any existing photo.
+Also confirm independently accessible backup/key custody, an accountable manual
+backup operator and workstation availability/failed-backup response. Until those
+gates close, do not mark the tasks complete or accept customer evidence.
+
+## Historical checkpoints (preserved; not current operating instructions)
+
+## Offline reopen PASS; scoped revocation test active — 2026-09-22 10:38 UTC
+
+Worker return (11:06 UTC): the phone has a fresh North worker bootstrap scope,
+with manager cache scopes removed. All **23 original bytes/identities and queue
+records remain unchanged**, including 21 pending worker photos and two older
+accepted receipts; current-worker saved count is 22. SQLite integrity/foreign
+keys pass. The owner asked why no project is assigned; this was explained as the
+still-active temporary revocation. They have been directed to Saved photos and
+to disable Wi-Fi before guarded assignment restoration and native upload testing.
+Worker-return storage/rebootstrap preservation passes; owner gallery/offline-ready
+confirmation is pending. Evidence: `worker-return-verification.json` and
+`worker-return-result.json`. No worker pause/restart has been run yet.
+
+**PASS — manager account/org isolation:** the owner explicitly confirms Saved
+photos is empty in **both North Crew and South Crew** as manager.both. The copied
+manager scopes and server identity corroborate the login/switch, and all 23
+worker/older originals and queue records remain unchanged under their original
+owners, with zero manager-owned/inherited records. The owner is now returning to
+worker.north, checking that the 22 current-owner photos reappear, then disabling
+Wi-Fi again while retaining USB. Assignment v4 stays temporarily inactive to
+prevent early uploads. Return-to-owner/rebootstrap and native interruption are
+pending the next copied checkpoint; guarded restoration is still required.
+
+Manager login follow-up (11:02 UTC): owner reports successful sign-in with no
+photos visible. The fresh physical Documents copy has the confirmed
+`manager.both@example.test` account (`51d2aefb-e283-49f2-b40e-11b8e4ea2234`)
+bootstrapped in both South and North; server identity/memberships match. The
+previous worker cache scope is gone, but **all 23 original identities/bytes and
+queue records are unchanged**: 21 worker pending intents plus two older accepted
+receipts. The manager owns zero local media and inherited zero queue items.
+SQLite integrity/foreign keys pass. Separate owner confirmation that Saved photos
+was empty in **both** organizations has been requested; the narrow observed
+account-switch/data-preservation result passes, while the complete UI/isolation
+sequence remains in progress. No assignment restoration yet; v4 stays inactive
+until the worker-return/upload test is prepared. Evidence:
+`manager-isolation-verification.json` and `manager-isolation-result.json`.
+
+Latest clarification: the owner confirms the mobile message **“Blocked: project
+access is unavailable.”** Combined with zero new-batch server rows and unchanged
+originals/owner queue records in the recent copy, this supports revoked-pending
+blocking and preservation. The earlier ambiguous manager-side report is not a
+confirmed exposure; account/org isolation remains untested. The owner has now
+been given explicit **iPhone app** steps: worker sign-out → manager.both sign-in →
+Saved photos in North → Saved photos in South, then remain as manager for a copy.
+The assignment remains temporarily inactive v4; restore it through the documented
+manager API after this exercise. No data/configuration changes were made for
+this clarification.
+
+Owner subsequently reported “new photos are appearing on manager side.” This is
+**UNRESOLVED**, not a confirmed exposure or upload: a new live read finds only
+four earlier server assets and **zero rows for the 21 new captures**. A fresh
+phone copy verifies all 23 originals and owner/queue records unchanged, with
+21 still pending and only the original worker cached scope. The owner has been
+asked whether this means the website project gallery or the iPhone Saved photos
+screen and which account/org is visible. No isolation PASS/FAIL is inferred
+without that distinction. The test assignment remains inactive v4 and requires
+the documented guarded restoration. Evidence: `manager-photos-report-*.json`
+and its private Documents copy in the USB-validation directory.
+
+Follow-up: owner reports “Projects synced; no assigned project” after reconnect.
+A fresh phone copy verifies zero cached projects/assignments, all 23 originals
+and unchanged owner/queue records (21 pending, two accepted receipts), with no
+new server upload rows. Durable pending intent remains `pending`; effective access
+is blocked by the revoked project, as designed. The owner has been asked to
+inspect blocked gallery images, sign out, and check local-photo invisibility as
+`manager.both@example.test` in North and South before returning to the original
+owner. Assignment version 4 remains intentionally inactive during this exercise;
+restoration is still required. Evidence: `online-revoked-verification.json` and
+`revoked-preservation.json` in the private USB-validation evidence directory.
+
+**PASS — the recorded twenty-photo cohort and both older originals/receipts
+survived the owner-performed offline close/reopen.** The owner confirmed the
+photos are present after the requested app-switcher termination and reopen. The
+second physical Documents copy has all 22 baseline IDs with unchanged bytes,
+hashes, ownership, media state and queue records. Every JPEG decodes; SQLite v4
+integrity and foreign-key checks pass. Exact UI count/error wording was not
+separately supplied, so stored counts remain agent-observed.
+
+One additional valid pending capture appeared between copies:
+`cebaab5a-6141-4084-83a4-c71bc6bcdfcc`, **4,600,817 bytes**, SHA-256
+`c6c46cb1a87693480bf52a6e258f3e66ee3af4b69c406189a48513e321ccd4f9`,
+created `2026-09-22T10:36:31.548Z`. Its original/manifest/owner/queue match and it
+fully decodes. It is preserved separately in the
+[extra-capture manifest](evidence/05-native-extra-20260922.json); the original
+[twenty-ID cohort](evidence/05-native-batch-20260922.json) is unchanged. Current
+physical counts: **23 originals, 21 pending and two accepted receipts**, with
+**22 saved originals under the current trial account**. A first comparison
+asserted exact set equality and rejected the extra ID; corrected subset comparison
+verified every baseline record, with no missing/replaced/changed original.
+
+**Active test state — restoration required:** the real manager assignment API
+changed only North worker `d6cc7b45-75f0-4f08-b87b-594152f780bd` on project
+`aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1` from active version **3** to inactive
+version **4**. Optimistic version and idempotency guards were used, and the sync
+feed removal records were captured. The worker project endpoint now returns 404.
+No direct SQL write, membership mutation, seed or network-policy change occurred.
+The owner has been instructed to reconnect Wi-Fi, refresh projects and report
+blocked pending-photo state with originals still visible. Native revoked-work
+blocking and subsequent account/org isolation remain pending observation/copies.
+
+Before finishing/canceling this exercise, restore **only this test assignment**
+through the manager API using its current version; do not replay seed or edit
+SQL. The private journal records the exact original state and guards concurrent
+changes: `.local/task05-phone-validation-usb-20260922/assignment-exercise.json`.
+The scoped operator command is `python3
+.local/task05-phone-validation-usb-20260922/assignment-control.py restore`; it
+requires the recorded inactive version, publishes the restored assignment through
+the real sync feed and confirms worker access. Do not restore prematurely while
+the owner is testing blocked pending work. If another operator changes that
+assignment, inspect rather than overwrite. This temporary revocation is confined
+to the disposable trial; no other assignment or credentials changed.
+
+Evidence: `offline-twenty-after-reopen-verification.json`, its decode companion,
+`offline-reopen-result.json` and the assignment journal in the same private local
+directory. Recovery coverage is unchanged; none of the 21 new pending originals
+is in the 09:05 UTC server backup. If all upload, expected total server assets
+become **25**, with **75 variants**, including four baseline assets and the extra
+capture. Never delete the extra original to force a count of twenty. Task 06
+remains untouched.
+
+## Twenty new pending physical originals verified — 2026-09-22 10:35 UTC
+
+**PASS — owner-reported twenty offline saves, corroborated by physical-device
+SQLite/filesystem verification.** All **20 new IDs and 20 distinct hashes** are
+recorded in the [batch evidence manifest](evidence/05-native-batch-20260922.json).
+The originals total **87,744,507 bytes**. Each JPEG fully decodes, its hash/size
+and oriented dimensions match SQLite and the immutable manifest, and its
+reservation, canonical directory and queue agree on the original account,
+organization and project. All twenty queues are `pending`, attempts 0, bytes sent
+0, with no upload ID or accepted timestamp. A live read-only query finds **zero**
+server upload rows for these twenty IDs; the existing server remains at four
+accepted originals and twelve variants.
+
+The fresh Documents copy has **22 saved originals and 22 queue entries total**:
+twenty pending plus two preserved accepted receipts. **21 originals belong to the
+current trial account**; the older local-HTTP photo remains under its other
+original account. Both older byte hashes, immutable identities and queue receipts
+are unchanged. SQLite v4 integrity and foreign-key checks pass; no missing
+baseline original, orphan or extra queue record was found. Camera permission
+branches are still unconfirmed; radio state and saved UI messages are owner
+reports, while bytes/identities/counts are agent-verified.
+
+The owner was instructed to keep Airplane Mode on, Wi-Fi off and USB connected,
+swipe HandoverTrack away, reopen it and inspect Saved photos. Expected current
+scope count is 21 (twenty new plus its earlier accepted photo). **Offline cold
+reopen/visible-gallery recovery is pending** until the owner reports the result
+and a second copy is compared with this exact before-copy. No process termination
+was performed by the agent. Native interruption/retry/lost reply, worker restart
+with this batch and pending/accepted scope isolation remain NOT RUN. No assignment
+or source configuration was changed. Existing recovery data is preserved; this
+new batch is not in the 09:05 UTC server backup. After upload, expect at least
+24 total accepted server originals and 72 variants, including the four baseline
+assets; never delete older evidence to obtain a total of twenty. Task 06 remains
+untouched and Tasks 03–05 remain implemented-awaiting-validation.
+
+Private source evidence: `.local/task05-phone-validation-usb-20260922/`
+`offline-twenty-before-reopen-verification.json`, its `-decode.json` companion,
+`twenty-pending-baseline.json`, the copy receipt and retained Documents snapshot.
+The public manifest contains only scoped IDs/checksums/size/dimensions/timestamps,
+not image bytes or credentials.
+
+## First new offline original verified — 2026-09-22 10:33 UTC
+
+**PASS — USB access restored and one new locally saved original verified.** This
+supersedes the connection blockers below. The owner reported taking the requested
+photo while remaining offline. A fresh read-only Documents copy now contains
+SQLite v4 (`integrity_check=ok`, no foreign-key errors), three saved originals,
+two preserved accepted receipts and **one pending queue item**. Both older
+originals retain identical hashes, ownership and receipts. No orphans, missing
+baseline media or unmatched queue rows were found; all three JPEGs fully decode.
+Two saved originals belong to the current trial account; the third belongs to
+the earlier local-test account and remains retained under that owner.
+
+New media ID: `dc9155ff-16ff-4265-9b67-d0e62e1b9225`, created at
+`2026-09-22T10:27:33.329Z`; original **4,364,037 bytes**, SHA-256
+`bb775ddea4b48a100163c53fce8346f64fde3afb83226b170ac0622532b5c581`.
+SQLite, original bytes, immutable manifest/reservation, canonical owner directory
+and queue ownership match. Oriented dimensions are 3024×2902. Owner account
+`d6cc7b45-75f0-4f08-b87b-594152f780bd`, North organization, project
+`aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1`. Queue is `pending`, attempts 0, bytes sent 0,
+no upload ID or acceptance timestamp. A live read-only query finds zero server
+upload rows for this ID. This proves durable pending evidence and no acceptance;
+physical offline state is owner-reported, not inferred from those records.
+
+Next: capture **nineteen more** distinct disposable photos under the same account
+and project while offline, waiting for saved confirmation after each. Keep USB
+connected and stop before reconnecting/force-closing so the twenty-ID before-copy
+can be recorded. Then coordinate offline termination/reopen and subsequent native
+retry/isolation checks. The full twenty-photo, permission, cold-reopen and native
+failure/isolation gates remain incomplete. This new original is not included in
+the 09:05 UTC server backup. No phone/server mutation was performed by the agent;
+Task 06 remains untouched.
+
+Evidence: `.local/task05-phone-validation-usb-20260922/first-offline-photo.json`,
+`offline-usb-check-now-verification.json`, its `-decode.json` companion, the device
+copy receipt and private Documents copy. Earlier unsuccessful copies are retained.
+
+## Offline capture reported; USB verification pending — 2026-09-22
+
+Second owner-confirmed USB attempt also failed (CoreDevice 1011). A direct
+`IOUSBHostDevice` inventory sees USB hubs/peripherals but no iPhone; Xcode reports
+the cached phone unavailable with error -27 and is searching the network. This
+narrows the blocker to establishing a usable device connection; it is not evidence
+of lost originals. Keep the phone offline and try a different data-capable cable
+in a direct Mac port, unlocked, accepting any accessory/Trust prompt. The new
+photo's bytes/hash/queue still cannot be verified. Evidence:
+`.local/task05-phone-validation-usb-20260922/offline-usb-ready-attempt.json`.
+
+The owner reports completing the instructed new-photo step and remaining offline.
+The fresh Documents copy failed with CoreDevice 4000 / peer no longer reachable;
+CoreDevice lists the phone unavailable, and the USB inventory reports no Apple
+mobile device. No new original, hash, queue state or count was obtained. These
+checks remain **NOT RUN**, not a photo-loss or capture-failure finding. The last
+verified copy still has two preserved accepted originals and zero pending items.
+Keep the phone offline, unlock it and establish a data-capable USB connection to
+this Mac before retrying the copy. No phone/server data or configuration was
+changed, and Task 06 remains untouched. Evidence:
+`.local/task05-phone-validation-usb-20260922/offline-new-one-attempt.json` and
+`offline-new-one-copy.log`.
+
+## USB phone follow-up — 2026-09-22 10:19 UTC
+
+**PASS — read-only original/queue preservation; new offline batch NOT RUN.**
+The owner reconnected the phone by USB. The initial message said offline but its
+follow-up explicitly corrected the state to **connected to Wi-Fi**. Permission,
+saved-count and reopen fields were placeholders, not observations. No offline or
+UI PASS is inferred.
+
+A fresh Documents copy contains SQLite v4 (`integrity_check=ok`, no foreign-key
+errors), **two saved originals and two accepted queue receipts**, unchanged from
+the earlier phone baseline. There are **zero new media IDs and zero pending
+uploads**. One saved original belongs to the current trial account; the older
+local-HTTP original remains under its different original account. Both original
+hashes/sizes match SQLite and the immutable manifests/reservations; directory
+ownership, queue ownership and accepted receipts match. Both JPEGs fully decode
+with oriented dimensions 3024×2902. No orphan, missing-original or extra-queue
+records were found. This verifies stored data, not UI visibility or cold reopening.
+
+Live read-only checks still show four accepted originals, twelve valid variants,
+matching hashes/jobs/events and an active North worker assignment (version 3).
+No assignment, server configuration or phone data was changed. Evidence:
+`.local/task05-phone-validation-usb-20260922/offline-before-verification.json`,
+its `-decode.json` companion, `server-before.json` and the private Documents copy.
+
+Next ordered action supplied to the owner: keep USB connected, open the assigned
+North project online, enable Airplane Mode and explicitly disable Wi-Fi, capture
+**one** new disposable photo, and report the exact saved/error message while
+remaining offline. Verify that new ID/bytes/queue before extending to twenty and
+coordinating offline reopen. Native retry/isolation need pending evidence; do not
+try to manufacture retries from the two already accepted receipts. Keep existing
+photos and stop before Task 06. Recovery coverage remains the four baseline
+server originals from the 09:05 UTC backup; it covers no future test batch.
+
+## Validation continuation — 2026-09-22, 08:58–09:20 UTC
+
+**Task 05 remains `implemented-awaiting-validation`, disposable-only. Task 06
+has not started.** This follow-up supersedes the older backup-coverage gap below:
+a new technical restore now covers the owner's HTTPS photo. It does not close the
+extended native or independent recovery-readiness gates. Existing historical
+records and failed attempts are retained.
+
+Started on `codex/k3s-trial`, HEAD `89ee0da`, ahead of its local tracking ref by
+13 commits. README, implementation status and Task 06 prompt were already modified;
+the focused Task 05 validation prompt was already untracked. Those changes were
+preserved. No applicable repository/ancestor AGENTS.md was found. No runtime
+release, migration, phone installation, seed, image import, edge or DNS change
+was performed. Runtime source/image remain exactly as recorded below.
+
+### Baseline and physical evidence
+
+Live read-only baseline: four accepted originals, four ready logical jobs,
+twelve valid variants, one accepted/ready event pair per original; all original
+and derivative hashes, sizes, oriented dimensions and decodes passed. Phone
+Documents copied at 08:58 UTC: SQLite v4, `integrity_check=ok`, one cached project
+(`North · Riverside repair`), one cached assignment, two media rows and two
+`server_accepted` queue receipts. Both existing phone originals matched their
+recorded hashes. They have different account IDs: the older local-HTTP original
+`b162b255-f212-492f-acfa-5268b8415d47` remains under its original local owner;
+`c305e7a8-13f9-469a-b305-e64116b19061` remains under its live-trial owner. Neither
+identity or receipt was rewritten or treated as belonging to a new scope.
+
+The owner confirmed availability. Ordered instructions were supplied for Camera
+off/denial, Settings return, cancel, and then twenty new distinct captures in the
+assigned project with Airplane Mode and Wi-Fi off. No results/counts were received
+before this checkpoint. A follow-up Documents copy failed with CoreDevice 1011
+(device not located). That is not evidence of either failure or success of the
+native scenarios. No uninstall, data reset, permission reset or remote phone
+mutation was performed by the agent.
+
+| Check | Result | Evidence type / limit |
+|---|---|---|
+| Existing phone originals, ownership and accepted receipts | PASS | Read-only physical Documents/SQLite baseline; not a cold-reopen UI test |
+| Existing four live originals/jobs/events/twelve derivatives | PASS | Live DB/filesystem/decoder verification |
+| Camera permission denial, Settings return and cancel | NOT RUN | Owner available and instructed; observations pending |
+| Twenty new physical offline captures and confirmed saved states | NOT RUN | No returned count/ID manifest; wireless device later unreachable |
+| Offline termination/reopen and Query reconstruction | NOT RUN | Await confirmed batch and before/after durable copies |
+| Native upload interruption, restart/retry and lost completion reply | NOT RUN | No physical failure injection this session; earlier synthetic PASS remains separate |
+| Owned worker restart during native batch processing | NOT RUN | Backup writer resumption is not this scenario |
+| Twenty new IDs accepted exactly once, originals and sixty variants | NOT RUN | This run verified the four baseline assets only |
+| Pending/accepted photo logout, account/org switching, revocation and rebootstrap | NOT RUN | No assignments changed in this continuation; no scope-isolation inference from baseline |
+
+### Fresh independent backup and isolated restore
+
+**PASS — technical backup/application restore of the four baseline assets.**
+FileVault remains On. Target free space was 29,621,882,880 bytes in the fresh
+capacity check, above the 20-GiB reserve; the backup also enforced twice the
+logical database/media-size headroom. Node capacity passed (approximately
+310.15 GB free, 6.17 GB available RAM, over 29 million free inodes). The
+first-bootstrap preflight's only false check was `hostname_not_already_owned`,
+expected because this authorized deployment already owns its route; no bootstrap
+was attempted.
+
+Fresh private backup:
+`~/Library/Application Support/HandoverTrack/recovery/handovertrack-20260922T090553Z-ac1227/`
+
+- `consistent=true`, `hashes_verified=true`; all **20** archived media paths match.
+- `database.dump`: **49,680 bytes**, SHA-256
+  `943c06fc15ad22e8d2eb564c6066f8f57a1df9bae7440813f4a805307d44f9a2`.
+- `media.tar.gz`: **10,621,155 bytes**, SHA-256
+  `2b5ebdeb6750485918446bc49bc69951a2095363a84781347020111c06d89ba6`.
+- Five source Secrets, two ConfigMaps, workload identities and the original
+  bootstrap recovery file remain private and retained. This is FileVault disk
+  encryption, not an independently keyed portable encrypted archive.
+
+Exact accepted-original coverage:
+
+| Media ID | Bytes | SHA-256 |
+|---|---:|---|
+| `1efa19d7-bf3a-44fc-9a0b-8d64f0a89207` | 52,428,800 | `57e2e9c9decfe30159ad3e25cecf5f51838f507cc369d2b9d476f6c5b32ffeb6` |
+| `62a8100f-69f4-405b-bee6-7e73ee67c454` | 313 | `b316a4d4662dc2e9434fcd7b1058e006a2a316cdfdfa761586939e1ff0dafeea` |
+| `66967541-50c3-4597-9145-3a37b5db43b4` | 313 | `b316a4d4662dc2e9434fcd7b1058e006a2a316cdfdfa761586939e1ff0dafeea` |
+| `c305e7a8-13f9-469a-b305-e64116b19061` (owner's HTTPS photo) | 5,156,368 | `18a719e42fc56dc80af85f1d544aee0e1be3c67a3d04b416b73ceb2a1a0e3971` |
+
+This backup contains three synthetic originals and one owner-captured original;
+**it does not contain a new twenty-photo physical batch or the older local-HTTP
+phone original**. The latter remains on the phone and in prior local evidence.
+Take another consistent backup and restore after the new batch is accepted.
+
+New namespace **`handovertrack-restore-20260922b`**, with separate Retain claims:
+
+- database → `pvc-64368cf5-9c85-40ea-82a8-5ede676a0616`
+- media → `pvc-b7427a66-afc3-444a-8b68-dfb97b093af0`
+
+All namespace selectors were rewritten; edge ingress stayed denied, Services
+were ClusterIP only, and testing used an owned loopback port-forward. The source
+and previous `handovertrack-restore-20260922` volumes were not reused. No seed or
+migration ran over the restored dump. Before worker start, every saved table hash
+matched, including users, sessions, owners/memberships, assignments, migrations,
+accepted originals, jobs, events and variants. After startup, the same table
+hashes still matched; the four jobs were already ready. Saved manager/worker/other
+organization sessions authenticated, authorized original downloads matched,
+worker/foreign reads returned 404 and unauthenticated reads 401. The gallery
+contained four ready assets. All originals and twelve variants decoded correctly.
+Application verification completed **315.7 seconds after restore preparation**,
+**473.3 seconds after backup start**; this includes diagnosis/recovery time and
+excludes final controller shutdown. Earlier expired-lease recovery PASS is
+preserved; no new pending/expired lease was injected into this ready-only snapshot.
+
+**FAIL, corrected — fresh extraction runbook.** GNU tar still attempted to change
+PVC-root mode with `--no-overwrite-dir` and exited 2. Every extracted path/hash and
+all restored DB tables were checked before resuming. A fresh helper-temporary
+extraction selecting regular files only passed and retained root mode 0700. The
+verified partial PVC extraction was resumed with the same regular-file list and
+`--skip-old-files`, preserving its existing root metadata and all bytes. No DB
+restore was replayed. New `scripts/ops/restore-members.py` verifies inventory
+hashes and rejects traversal, special members and duplicates before writing an
+exclusive mode-0600 NUL-separated list. RECOVERY.md now uses that list so archive
+root metadata is never selected. The CLI's output matched the list actually
+used in the Linux helper. Nine operator unit tests pass, including fresh
+root-preserving extraction and unsafe/archive-integrity rejection. The initial
+macOS test used GNU-only options and failed; the portable regression was corrected,
+while the full GNU option sequence was validated in the live Linux helper.
+
+Two read-only harness attempts also required correction: a raw Kubernetes stats
+request incorrectly appended `-o json`, and the media-inventory tool correctly
+refused a temporary root other than `/media`. Corrected raw stats and a separate
+temporary-directory hash reader passed. These are retained harness failures,
+not application-data failures. A root HTTP probe initially expected 200 without
+following redirects; actual 307 to `/sign-in` and the sign-in page's 200 were
+verified, with private/no-store headers.
+
+Restore peak memory: **NOT RUN**; cgroup v1/v2 peak counters were unavailable.
+One metrics sample measured API **64 MiB**, database **44 MiB**, worker **27 MiB**,
+helper **103 MiB**. These are instantaneous working-set samples, not peak/RSS
+claims. Restored filesystem had 309,859,692,544 free bytes and 29,341,576 free
+inodes at verification. New restore API/worker/database controllers are stopped;
+the temporary helper and port-forward are removed. Its namespace, five recovery
+Secrets and both Retain PVCs remain. Earlier stopped rehearsal resources remain.
+
+### Remaining recovery decisions and next step
+
+| Check | Result | Evidence / limit |
+|---|---|---|
+| Fresh backup covering owner's HTTPS original | PASS | Consistent verified FileVault target, exact coverage above |
+| Fresh isolated application restore | PASS | Table/file hashes, saved sessions, access denials and gallery |
+| Independently accessible FileVault key/credential custody | NOT RUN | Requested owner confirmation; no key/password/token requested or returned |
+| Access to backup bytes after loss/inaccessibility of this Mac | NOT RUN | No independent copy/access path confirmed; a recovery key alone cannot replace lost bytes |
+| Accepted operator, cadence, Mac availability and missed-backup response | NOT RUN | Proposed manual procedure documented in RECOVERY.md; owner decisions pending |
+| Unattended scheduling or alert delivery | NOT RUN | None configured, authorized or claimed |
+
+Proposed cadence is after each disposable test session and before a release,
+with receipt and writer-readiness checks; failed/missed runs pause further intake
+and retain partial attempts for diagnosis before retrying. This is a documented
+manual procedure, not an accepted service commitment or automated schedule.
+
+Smallest next step: obtain the permission/cancel observations and twenty-photo
+saved count while the phone remains offline. If its wireless connection is off,
+connect it by USB without reconnecting network access so a durable before-copy
+can be taken; then coordinate offline force-close/reopen and a second copy before
+native interruption and scope-isolation tests. Never infer a physical PASS from
+availability, pairing, file presence or synthetic tests. Confirm recovery custody,
+backup access after Mac loss, and the named operator/cadence separately. Stop
+before Task 06.
+
+Evidence is in private ignored `.local/task05-validation-20260922/`: `baseline.json`,
+`phone-baseline.json`, `server-before.json`, `https-checks.json`,
+`before-fresh-backup-{tables,media}.json`, `fresh-backup-summary.json`,
+`fresh-restore-{plan,result,pvs}.json`, `fresh-restored-{data,media}.json`, retained
+failed/retry logs, `ops-tests-final.log` and `final-preservation.json`. Secret-bearing
+recovery files remain outside Git. Final checks preserve all 28 prior recovery
+files, source credential/config values, local configuration/migrations, source
+originals/receipts and source PVC identities; shared edge bytes/spec and Rrugë
+resource identities/restarts are unchanged. All six public sites return HTTPS 200.
 
 ## Exact live release and resources
 
