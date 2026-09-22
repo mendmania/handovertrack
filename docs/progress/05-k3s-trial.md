@@ -6,6 +6,34 @@ namespace/database now exist. API, worker, web, migrations, provisioning and the
 public route have **not** started. Task 06 has not started. This checkpoint
 supersedes the historical “nothing deployed/import pending” entries below.
 
+## Image-reference follow-up — 2026-09-22
+
+The owner's final `ctr images list` output confirms the full source tag
+`handovertrack.local/runtime:ba2ecc8d8040eda6e5d57bf73d6d17e90a4d2337`
+points to exactly
+`sha256:125cd8a42f0bb92bf87251d40c4cc14c561ab27e0f00911205e000856d66d7cc`,
+linux/amd64, 363.8 MiB, with `io.cri-containerd.image=managed`. Only the
+repository@digest reference is missing; no rebuild or re-upload is needed.
+The owner was given `sudo k3s ctr -n k8s.io images tag SOURCE_REF DIGEST_REF`
+with these exact references, without force or reference-check bypass. Its
+execution and a successful digest-only Kubernetes probe remain pending.
+
+Fresh direct access through the original explicit kubeconfig now works;
+the old SSH tunnel is no longer running or required on this network.
+Keychain-backed SSH works, but the agent's `sudo -n true` still requires owner
+authentication. The previous bounded release lock has expired: a nonblocking
+acquire/release succeeded. No long-lived lock is currently held by this follow-up.
+Reacquire it for the next deployment phase. Every fresh preflight check passes,
+including DNS and existing-site health. `database-0` remains Ready with zero
+restarts; its PVC identity is unchanged, and `media` remains Pending its first
+consumer. No application Deployments or Jobs exist. The shared edge spec still
+matches the saved baseline. No cluster mutation occurred in this follow-up.
+
+Evidence: `.local/task05-20260922-preflight.json` and
+`.local/task05-20260922-image-reference-checkpoint.json`. Recovery/native gates
+remain as recorded below. Continue from the digest-reference repair, preserving
+the existing namespace, database, credentials and private recovery file.
+
 ## Live bootstrap checkpoint — 2026-09-21 18:45 UTC
 
 The owner reported `k3s ctr -n k8s.io images import` saving the expected manifest
