@@ -1,10 +1,88 @@
 # Task 04 — verified uploads, processing and manager gallery
 
+**Status: implemented-awaiting-validation.** Updated 2026-09-22. The current
+Task 05 continuation verifies twenty new physical offline saves, offline cold
+reopen, camera denial/Settings return/cancel, blocked pending work after revocation,
+manager account/org isolation and worker rebootstrap. Owner observations are
+corroborated by read-only USB/SQLite checks; all 23 local originals/receipts survive,
+22 under the current worker and one under the earlier local-HTTP owner.
+
+All 21 new native captures (twenty plus the extra) uploaded with matching hashes,
+size and ownership, one asset/job/event pair and three valid derivatives each.
+The worker stop/start recovered all 21 pending jobs once. Server total is 25
+originals/ready jobs and 75 variants. Native stream interruption, app restart during
+upload, retry and lost completion response remain **NOT RUN**: every new upload
+completed on its first attempt. Earlier synthetic faults remain separate evidence.
+The test assignment is restored at active v5 and the worker is running normally.
+
+The fresh full-batch backup and separate `handovertrack-restore-20260922c`
+application restore pass all 18 public table hashes, 125 media paths, sessions,
+access checks and full image decodes. Three stopped rehearsals and all recovery
+files remain retained. Independent Mac-loss backup/key access and accepted manual
+backup responsibility/availability remain unconfirmed. No new runtime/schema/phone
+installation occurred; Task 06 has not started. See the authoritative
+[Task 05 checkpoint](05-k3s-trial.md), [native evidence](evidence/05-native-validation-20260922.json)
+and [recovery evidence](evidence/05-batch-recovery-20260922.json).
+
+## Historical task and intermediate validation records
+
+The dated records below preserve what was known at each earlier checkpoint;
+temporary revocation and pending-backup instructions there are superseded above.
+
 **Status: implemented-awaiting-validation.** Updated 2026-09-21.
 Profile: selfhosted-trial; local PostgreSQL and private filesystem only.
 Automated twenty-photo failure scenario and browser gallery pass. Physical
 camera, native binary upload, airplane-mode/captured-photo restart and isolation
 remain **NOT RUN**. Those release gates remain open.
+
+
+## Current Task 05 validation follow-up — 2026-09-22
+
+Latest update, 10:38 UTC: offline close/reopen preservation **PASS** for the
+recorded twenty new originals and both older photos/receipts, corroborated by
+owner-reported gallery visibility and unchanged before/after USB data. An extra
+pending capture is retained: 23 originals total, 21 pending, 22 in the current
+account. The North worker test assignment is temporarily revoked through the
+real manager API for blocked-pending/isolation validation; restoration is required
+as documented in the current Task 05 handoff. Permission and native failure/scope
+checks remain incomplete.
+
+Latest update, 10:35 UTC: **PASS — twenty new owner-reported offline saves with
+physical Documents/SQLite verification**, twenty distinct hashes and pending
+queues under the original owner. Both older originals/receipts survive, all
+22 originals decode, and SQLite v4 integrity/foreign keys pass. Current-account
+saved count is 21. Exact expected IDs/bytes are in the
+[batch manifest](evidence/05-native-batch-20260922.json). This supersedes the
+no-new-batch observations below. Offline cold-reopen comparison and native
+retry/isolation are still pending; the owner has been given reopen instructions.
+The new batch remains outside the latest verified server backup.
+
+**Status remains `implemented-awaiting-validation`.** The historical task record
+below is preserved. The existing phone now runs the HTTPS Release build with
+SQLite v4. One prior owner-observed capture-to-web PASS is corroborated by the
+server; the current read-only phone baseline contains two verified originals and
+two accepted receipts under their original owners, one from local HTTP and one
+from the live trial. SQLite integrity passes. Live verification checks four
+accepted assets, four ready jobs, twelve variants and exactly one accepted/ready
+event pair per asset, with original/variant hashes, dimensions and decodes.
+
+The owner confirmed availability and received ordered permission/cancel and
+20-photo offline instructions. Results/counts were not returned before this
+checkpoint; a later Documents copy failed because CoreDevice could not locate
+the phone. Permission branches, the new offline batch, captured-photo cold reopen,
+native interruption/lost reply/retry, and captured-photo scope/revocation checks
+remain **NOT RUN**. Neither pairing nor the two preserved baseline files closes
+those native gates. No app erase, reinstall or SQLite downgrade occurred.
+
+A fresh 09:05 UTC verified FileVault backup and isolated application restore now
+cover the four server baseline originals, including the owner's HTTPS photo,
+and twelve variants (twenty archived paths). This is a **technical recovery PASS**,
+not coverage of a new twenty-photo batch or the older local-HTTP phone original.
+Recovery-key custody, access after Mac loss and accepted backup operation remain
+**NOT RUN/unconfirmed**. Source originals/configuration and earlier recovery
+resources are preserved; both rehearsal controllers are stopped. See the
+[current Task 05 evidence, exact coverage and remaining steps](05-k3s-trial.md).
+No Task 06 implementation or new live runtime/schema release was performed.
 
 ## Repository and preservation
 

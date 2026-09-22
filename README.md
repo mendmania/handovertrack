@@ -6,7 +6,7 @@ SQLite and incremental pull sync, and a database-connected worker. Managers crea
 and update projects and worker assignments online. The native app adds local camera capture, private originals, durable queue intent
 and a local gallery. Authenticated streamed uploads, immutable server originals,
 PostgreSQL processing jobs, derivatives and a manager gallery are implemented
-locally. Physical camera/native-upload validation remains open. Task 05 deployment preparation is implemented; rollout is blocked by DNS/TLS and artifact access, and nothing is deployed.
+and deployed over verified HTTPS at https://handovertrack.com. Physical offline capture, permission, reopen, isolation and upload checks passed; native interruption/retry and recovery readiness remain open. Task 05 remains disposable-only; preserve the existing deployment and retained recovery resources.
 
 ## Install and configure
 
@@ -135,14 +135,14 @@ for updates/assignment changes (0 for a never-created assignment). Conflicts
 return 409 without discarding submitted intent. Business state, audit, command
 receipt and feed publication commit together.
 
-The canonical future origin is `https://handovertrack.com`. A future gateway
-must send browser app/BFF traffic to Next, native `/v1/*` and `/api/auth/*` to
-Fastify, and reserve `/media/*` for direct streamed API media transport. Media
+The deployed canonical origin is `https://handovertrack.com`. Caddy sends
+browser app/BFF traffic to Next, native `/v1/*` and `/api/auth/*` to Fastify,
+and `/media/*` directly to the API for streamed media transport. Media
 uploads now stream directly to Fastify; the local Next media bridge is GET-only.
 The BFF cannot accept an upload; its
 application routes allow only the documented small JSON commands and reads;
 auth forwarding streams the request body.
-An additive Caddy candidate and restricted deployment manifests are prepared. No live Caddy, DNS or deployment changes have been applied; see [trial operations](infra/kubernetes/README.md).
+The additive Caddy route and restricted deployment are live, with DNS-only apex routing and verified origin TLS; see [trial operations](infra/kubernetes/README.md).
 
 ## iOS and offline access
 
@@ -267,7 +267,7 @@ examples are in `.env.example`; your existing `.env` is preserved.
 JPEG uploads are bounded to 50 MiB, 50 million pixels and two concurrent streams
 per API, with streamed hash/length checks and full decoder validation. A durable
 no-replace original plus a committed database receipt is required for acceptance.
-The default disk reserve is 256 MiB. Local bounded container decoding was measured during Task 05. API/worker capacity on the actual cluster volume and independent backup/restore remain unverified.
+The local default disk reserve is 256 MiB; the live trial reserves 20 GiB. Task 05 verified shared-volume filesystem behavior, bounded decoding on the target node and a technical independent backup/application restore. Recovery-key custody and dependable backup operation remain open; see the current Task 05 checkpoint for exact backup coverage.
 
 ```sh
 pnpm media:maintenance status
@@ -318,6 +318,17 @@ See [Task 01 evidence](docs/progress/01-foundation.md),
 [Task 04 handoff](docs/progress/04-upload-and-preview.md), and
 [the prepared Task 05 prompt](docs/prompts/05-trial-deployment.md).
 
-## Existing-k3s trial preparation
+## Existing-k3s disposable trial
 
-See [Task 05 evidence and blockers](docs/progress/05-k3s-trial.md), [deployment operations](infra/kubernetes/README.md), and [isolated recovery](infra/kubernetes/RECOVERY.md). The deployment is dedicated to disposable test data until physical camera/native upload and independent encrypted restore are verified. No live rollout occurred. The [Task 06 prompt](docs/prompts/06-checklists.md) is prepared; Task 06 has not started.
+The latest [Task 05 checkpoint](docs/progress/05-k3s-trial.md) records twenty new
+physical offline captures plus one extra, preserved through offline reopen,
+revocation, account/org isolation and native upload. Camera permission checks pass.
+All 23 phone originals/receipts survive. The server's 25 originals, 25 ready jobs,
+75 variants and all 18 public tables are covered by a fresh verified backup and
+isolated application restore. Three stopped recovery rehearsals and all earlier
+files are retained. The test assignment is restored and the worker is running.
+Native interruption/retry/lost-response recovery, independent Mac-loss backup/key
+access and dependable backup operation remain unverified. Use disposable photos
+only; Task 06 has not started.
+
+Continue with the [Task 05 validation prompt](docs/prompts/05-trial-validation.md). Read [deployment operations](infra/kubernetes/README.md) and [isolated recovery](infra/kubernetes/RECOVERY.md) before live work; preserve the existing installation and retained restore data. The [Task 06 prompt](docs/prompts/06-checklists.md) is prepared and requires a separate assignment; Task 06 has not started.

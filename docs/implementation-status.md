@@ -1,21 +1,55 @@
 # Implementation status
 
-Updated 2026-09-21. Profile: `selfhosted-trial`. Task 05 preparation implemented; live rollout blocked. Nothing deployed.
+Updated 2026-09-22. Profile: `selfhosted-trial`; HTTPS is live at
+[handovertrack.com](https://handovertrack.com). Disposable data only. The current
+[Task 05 checkpoint](progress/05-k3s-trial.md) supersedes historical rollout and
+in-progress test instructions.
 
 | Task | Scope | State | Evidence / gate |
 |---|---|---|---|
-| 01 | Local authenticated project foundation | complete | [Handoff](progress/01-foundation.md); required automated and interactive Release simulator checks passed 2026-09-21 |
-| 02 | Project management, assignments and sync feed | complete | [Handoff](progress/02-projects-and-sync.md); required updated Release native UI checks passed before Task 03 |
-| 03 | Durable offline camera capture | implemented-awaiting-validation | [Handoff](progress/03-offline-capture.md); automated and simulator checks pass; actual physical camera/offline restart NOT RUN |
-| 04 | Verified uploads, durable jobs and previews | implemented-awaiting-validation | [Handoff](progress/04-upload-and-preview.md); automated twenty-photo/worker/browser checks pass; physical camera/native upload gate NOT RUN |
-| 05 | Existing-k3s preflight and private trial deployment | blocked-rollout | [Handoff](progress/05-k3s-trial.md); live capacity inspected, manifests/image/runbooks prepared; absent DNS/TLS and artifact access block rollout; native and recovery gates NOT RUN |
-| 06 | Required-photo checklists and offline conflicts | planned | [Prepared prompt](prompts/06-checklists.md); Task 05 remains blocked; not started |
+| 01 | Local authenticated project foundation | complete | [Handoff](progress/01-foundation.md); required automated/Release simulator checks passed |
+| 02 | Project management, assignments and sync feed | complete | [Handoff](progress/02-projects-and-sync.md); required native UI checks passed |
+| 03 | Durable offline camera capture | implemented-awaiting-validation | [Handoff](progress/03-offline-capture.md); physical twenty-photo capture, permissions, offline reopen and scope preservation pass; shared native/recovery gates remain open |
+| 04 | Verified uploads, durable jobs and previews | implemented-awaiting-validation | [Handoff](progress/04-upload-and-preview.md); all 21 new native assets/63 variants and worker restart pass; native interruption/retry/lost response NOT RUN |
+| 05 | Existing-k3s preflight and private trial deployment | implemented-awaiting-validation | [Handoff](progress/05-k3s-trial.md); HTTPS and full-batch backup/application restore pass; native fault scenarios and independent recovery readiness remain open |
+| 06 | Required-photo checklists and offline conflicts | planned | [Prepared prompt](prompts/06-checklists.md); not started or assigned by Task 05 |
 | 07 | Proof composition and immutable reports | planned | Depends on 06 |
 | 08 | Scoped sharing and customer decisions | planned | Depends on 07 |
 | 09 | Whole-trial reliability and recovery | planned | Depends on 08 |
 | 10 | Optional S3/Kafka/Temporal expansion | deferred | Separate selection after 09 |
 
-Task 01’s native gate is satisfied by actual simulator execution. Task 02’s native UI gate is also satisfied. Task 03 is implemented but not complete: a physical Release build was installed and launched, while actual camera capture and captured-photo restart/isolation still need direct device evidence. Task 04 uploads, PostgreSQL jobs, derivatives and gallery are implemented locally. Physical capture/native upload validation remains open; nothing is deployed. Task 05 upgraded the existing phone in place and observed SQLite v4, but no physical capture/upload checks ran. Live k3s preflight found sufficient initial capacity, missing apex DNS/TLS and unavailable private artifact/server access. Dedicated manifests, local AMD64 OCI image, guarded release/edge preparation and backup/restore runbooks are prepared. No cluster resources, shared edge route, DNS or Rrugë data were changed. See [Task 05](progress/05-k3s-trial.md). Any later authorized trial remains disposable-only until native and independent recovery gates pass.
+The physical phone preserves 23 originals and accepted receipts, with 22 belonging
+to the current North worker and one to the earlier local-HTTP owner. Owner-observed
+UI results plus USB/SQLite/hash checks establish camera permission behavior,
+twenty offline saves, offline cold reopen, revoked pending work blocking,
+manager.both galleries empty in North and South, and return-to-worker rebootstrap.
+The assignment is active at v5 after the owner's manager action; no restoration
+is outstanding. All 21 new uploads completed at attempt 1. The paused/restarted
+worker processed their 21 durable pending jobs once. These successes do not prove
+native stream interruption, restart during upload, retry or lost completion reply.
+
+Server total is 25 accepted originals, 25 ready jobs and 75 variants. The latest
+FileVault backup and third isolated restore cover all of them, 125 media paths
+and matching counts/hashes for all 18 public tables. Saved sessions, manager
+original downloads, access denials and full image decodes pass. Three separate
+rehearsals remain stopped with Retain PVCs and credentials preserved. The older
+local-HTTP phone photo is retained locally but is outside server backup coverage.
+Two failed larger-backup transfers are retained without successful receipts;
+operator tooling now uses verified bounded reads with limited read retries and
+regular-file-only restoration. Twelve focused operator tests pass.
+
+Independent recovery key/backup access if the Mac is unavailable, manual backup
+operator/cadence/availability and failed/missed-backup response remain
+NOT RUN/unconfirmed. FileVault being On and this successful application restore
+are narrower evidence. No unattended schedule or external alerts are configured.
+Keep Tasks 03–05 implemented-awaiting-validation and the disposable-only gate.
+
+Runtime source remains `ba2ecc8d8040eda6e5d57bf73d6d17e90a4d2337`, immutable image
+`handovertrack.local/runtime@sha256:125cd8a42f0bb92bf87251d40c4cc14c561ab27e0f00911205e000856d66d7cc`.
+DNS-only origin HTTPS, local configuration, credentials, migrations, source PVCs,
+all original photos, previous recovery resources and Rrugë remain preserved.
+No runtime/schema release, bootstrap/seed, image import or Task 06 implementation
+occurred. See the handoff and evidence manifests for exact backup hashes/resources.
 
 Task 04 publication follow-up: codex/upload-and-preview, based on origin/main
 at 8063d1e after the foundation PR merged. The owner requested a dedicated

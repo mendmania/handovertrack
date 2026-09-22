@@ -1,4 +1,5 @@
-# Append only after DNS, private upstream and origin TLS prerequisites are ready.
+# Append after origin ownership, DNS and private upstream checks pass.
+# Caddy obtains the first certificate after this route is activated; verify TLS then.
 # No import of shared logging snippets: auth/cookie/query data stays out of logs.
 handovertrack.com {
   header {
@@ -11,8 +12,10 @@ handovertrack.com {
   request_body {
     max_size 52428800
   }
-  @private_admin path /health/* /metrics /metrics/* /debug/*
-  respond @private_admin 404
+  @private_admin path /health /health/* /metrics /metrics/* /debug /debug/*
+  handle @private_admin {
+    respond 404
+  }
   @api path /api/auth/* /v1/* /media/*
   handle @api {
     reverse_proxy api.handovertrack.svc.cluster.local:3301 {

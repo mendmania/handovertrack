@@ -3,7 +3,8 @@
 Default: check-only. Install deliberately on the host; never execute freshly pulled scripts.
 No schema, Secret, edge, PVC, StatefulSet or other namespace mutations are possible.
 """
-import argparse,fcntl,hashlib,json,os,re,subprocess,time
+import argparse,fcntl,json,os,re,stat,subprocess
+import time
 from pathlib import Path
 NS='handovertrack'; COMPONENTS=('web','api','worker')
 def image_ok(value): return bool(re.fullmatch(r'[a-z0-9./_-]+@sha256:[0-9a-f]{64}',value))
@@ -19,9 +20,15 @@ def image_patch(obj, image, source):
             {'op':'replace','path':'/spec/template/spec/containers/0/image','value':image},
             {'op':'add','path':'/spec/template/metadata/annotations','value':annotations}]
 def main():
+    # Assertions below are deployment guards, so optimized Python must fail closed.
+    if not __debug__: raise SystemExit('Run without -O: release safety guards require assertions')
     p=argparse.ArgumentParser(); p.add_argument('--kubeconfig',required=True); p.add_argument('--candidate',required=True)
     p.add_argument('--policy',required=True); p.add_argument('--runtime',required=True); p.add_argument('--apply',action='store_true'); a=p.parse_args()
-    candidate=json.loads(Path(a.candidate).read_text()); policy=json.loads(Path(a.policy).read_text())
+    policy_path=Path(a.policy)
+    policy_stat=policy_path.stat()
+    assert stat.S_ISREG(policy_stat.st_mode) and policy_stat.st_uid==os.geteuid(), 'Policy must be an operator-owned regular file'
+    assert policy_stat.st_mode & 0o077 == 0, 'Policy must be owner-only (mode 0600)'
+    candidate=json.loads(Path(a.candidate).read_text()); policy=json.loads(policy_path.read_text())
     assert policy['namespace']==NS and policy['data_policy']=='disposable-only'
     assert image_ok(candidate['image']) and re.fullmatch('[0-9a-f]{40}',candidate['source'])
     assert candidate['database_contract']==policy['database_contract'],'Schema change requires explicit migration maintenance'

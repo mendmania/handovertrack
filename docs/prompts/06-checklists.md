@@ -1,9 +1,9 @@
 # HandoverTrack — Task 06: required-photo checklists and offline conflicts
 
-Prepared prompt only. **Wait for explicit Task 06 assignment.** Task 05 deployment
-is blocked, not complete; this prompt does not waive native, routing, artifact
-access, storage or independent-recovery gates. Stop before implementing Task 06
-in the Task 05 session.
+Prepared prompt only. **Wait for explicit Task 06 assignment.** Task 05 is live
+over verified HTTPS with disposable test data; extended native and recovery
+readiness remain incomplete. This prompt does not waive those gates or authorize
+updating the live release. Stop before implementing Task 06 in the Task 05 session.
 
 ## Inspect and preserve
 
@@ -20,23 +20,38 @@ real data, deletion, history rewrite, incompatible rollback or paid expansion.
 Migrations 001–004 are applied and checksum immutable; add new migrations.
 Phone SQLite version 4 must upgrade in place and cannot be downgraded.
 
-First attempt inherited gates. The Task 05 phone was upgraded to current Task 04
-Release at temporary LAN origin http://10.10.1.209:7331; that server was stopped
-at handoff and restarted during the owner's login follow-up. Verify its current
-availability. Camera permissions, offline captures/reopen, captured-photo isolation
-and native binary upload are still NOT RUN. The phone's observed version-4 DB
-was empty; install/migration success proves no camera or preservation scenario.
-Use a fresh reachable override and existing verified signing metadata, preserving
-all newly accumulated data. If live DNS/TLS are now ready, rebuild for verified
-https://handovertrack.com and run real HTTPS capture-to-gallery checks.
+Read the current Task 05 checkpoint before its historical investigation entries.
+The existing HTTPS Release phone retains SQLite v4 and 23 originals/receipts.
+Twenty new offline captures plus one extra passed cold reopen, permission checks,
+revoked-pending preservation, manager account/org isolation, worker rebootstrap
+and native upload. The test assignment is restored at active v5 and the worker
+is running; historical instructions to restore v4 are superseded. All 21 new
+uploads finished on their first attempt. Native interruption/restart/retry and
+lost completion-response recovery remain NOT RUN; synthetic fault evidence does
+not close those gates. Preserve the exact cohort/extra/validation manifests in
+`docs/progress/evidence/`.
 
-Task 05's no-A/AAAA DNS, missing private package scope/server SSH and unverified
-backup/restore blocked rollout; no HandoverTrack namespace or shared edge change
-was applied. Reinspect those facts rather than assuming they persist. The local
-OCI and container tests are not cluster evidence. Real/customer evidence remains
-excluded from any disposable-only trial. If Task 06 is authorized while these
-remain unavailable, perform only independent local implementation and preserve
-all affected release gates as incomplete.
+The fresh full-batch backup/application restore covers 25 server originals,
+75 variants, 125 media paths and all 18 public table hashes. All three isolated
+rehearsals (`handovertrack-restore-20260922`, `...20260922b`, `...20260922c`) are
+stopped with separate Retain PVCs. Preserve them and every prior/partial backup.
+The older local-HTTP phone photo is retained but is outside server backup coverage.
+Read RECOVERY.md for bounded verified media downloads and regular-file-only
+extraction; long gzip exec streams also failed for the physical batch. Independent
+Mac-loss backup/key access and accepted manual backup operation remain open.
+No unattended automation/alerts are installed. Do not repeat image import,
+bootstrap, seed or edge activation from historical instructions. Current HEAD
+is not the deployed image; no live release is authorized by this prepared prompt.
+
+If Task 06 is explicitly assigned before those gates close, perform independent
+local implementation and retain every incomplete release gate. Use an isolated
+local backend for new-schema native testing; do not point a new client at the live
+Task 04 API unless compatibility is demonstrated. Prefer a simulator or separate
+test device for local development; preserve the existing HTTPS phone's evidence
+and validate migration/backend compatibility before upgrading or repointing it.
+Record additive SQL/SQLite
+migrations and update future release/migration instructions for the new contract;
+the existing 001–004 deployment assumptions cannot silently cover new schemas.
 
 ## Existing implementation to extend
 
@@ -52,8 +67,8 @@ all affected release gates as incomplete.
   streamed JPEG PUT, checksum/length verification and durable acceptance receipt.
   Accepted originals/jobs/events and image-v1 variants are immutable. Current
   access is rechecked on every replay, and original owner remains fixed.
-- Task 05 adds restricted deployment preparation and optional worker heartbeat
-  file only. It adds no checklist/report/share schema or product functionality.
+- Task 05 adds the restricted live disposable trial, operator recovery/release
+  tooling and optional worker heartbeat. It adds no checklist/report/share schema.
 
 ## Implement
 

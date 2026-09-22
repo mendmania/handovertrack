@@ -1,6 +1,14 @@
 # HandoverTrack k3s disposable trial
 
-**Prepared; not deployed.** See [Task 05 evidence](../../docs/progress/05-k3s-trial.md).
+**Live over verified HTTPS; disposable-only.** The committed immutable runtime
+is deployed and the technical independent restore rehearsal passed. Physical offline capture, permissions, cold reopen, scope isolation and all 21
+new native uploads pass owner observations and storage/server verification. The
+fresh full-batch restore covers 25 originals and 75 variants. Native interruption/
+retry and independent Mac-loss backup/key access remain incomplete.
+Read the current [Task 05 checkpoint](../../docs/progress/05-k3s-trial.md) before
+any live command. Preserve the existing installation and stopped restore volumes;
+do not repeat first-bootstrap namespace/credential creation.
+
 The target is the existing `netcup-k3s-direct` context, node
 `netcupmaniaserver` (`159.195.30.113`, amd64), namespace `handovertrack`.
 Do not use the workstation's default context. No paid service, new storage
@@ -43,6 +51,8 @@ Do not point the trial at a phone account containing real pending evidence.
 ## Build and immutable artifact
 
 Use the pinned local toolchain and run the README regression commands first.
+Run `python3 -m unittest discover -s scripts/ops -p 'test_*.py' -v` for the
+release-controller maintenance gates; tests mock Kubernetes and never deploy.
 Commit the reviewed release source before promotion (the prepared working-tree
 image is for validation, not an approved published release).
 
@@ -92,7 +102,10 @@ the checked-in secret-free Kustomize base; the overlay adds no hidden defaults.
 
 ## First bootstrap: ordered maintenance
 
-Only execute after routing and artifact prerequisites pass. Acquire the
+Only execute after origin ownership, DNS and artifact delivery prerequisites pass.
+A certificate for a new hostname is not a bootstrap prerequisite: Caddy obtains
+its first certificate after the guarded route is activated. Verify HTTPS after
+that rollout, before any public application checks. Acquire the
 HandoverTrack `release.lock` using `flock` on the server; use the same lock for
 backup/release commands. Do not acquire, stop or rewrite Rrugë's controller.
 Save a fresh existing-site health report and shared edge spec/config hash first.
@@ -203,7 +216,8 @@ ready job/event/variant set. Never use these tests against real evidence.
 
 Install a reviewed fixed copy of `scripts/ops/release.py` on the server only after
 bootstrap. The controller defaults to check-only and never pulls or executes
-new scripts. Its owner-only policy names `namespace`, `data_policy` (must be
+new scripts. Run it without Python `-O`; it refuses disabled assertion guards. Its operator-owned
+mode-0600 policy names `namespace`, `data_policy` (must be
 `disposable-only`), exact `approved_source`, `approved_image`, `artifact_verified`,
 `database_contract`, `preflight_file`, and `backup_receipt`. The source/image/
 contract come from the reviewed release receipt and verified import/publication,
