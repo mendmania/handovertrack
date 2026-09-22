@@ -12,8 +12,10 @@ handovertrack.com {
   request_body {
     max_size 52428800
   }
-  @private_admin path /health/* /metrics /metrics/* /debug/*
-  respond @private_admin 404
+  @private_admin path /health /health/* /metrics /metrics/* /debug /debug/*
+  handle @private_admin {
+    respond 404
+  }
   @api path /api/auth/* /v1/* /media/*
   handle @api {
     reverse_proxy api.handovertrack.svc.cluster.local:3301 {
