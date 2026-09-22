@@ -1,10 +1,210 @@
-# Task 05 — k3s disposable trial
+# Task 05 — live disposable k3s trial
 
-**Status: partial bootstrap; blocked on immutable image reference; disposable-only.**
-Updated 2026-09-21 after the owner imported the verified OCI archive. The dedicated
-namespace/database now exist. API, worker, web, migrations, provisioning and the
-public route have **not** started. Task 06 has not started. This checkpoint
-supersedes the historical “nothing deployed/import pending” entries below.
+**Status: deployed over verified HTTPS; technical backup/restore rehearsal PASS;
+physical camera and independent recovery-key gates incomplete. Disposable-only.**
+Updated 2026-09-22. [handovertrack.com](https://handovertrack.com) is live on the
+existing VPS. Task 06 has **not** started. No customer/real-evidence intake is
+approved. This checkpoint supersedes all historical blocked/bootstrap entries
+below; preserve them as the investigation trail.
+
+## Exact live release and resources
+
+- Runtime source: `ba2ecc8d8040eda6e5d57bf73d6d17e90a4d2337`, built from that
+  committed archive. Runtime image on API, worker and web:
+  `handovertrack.local/runtime@sha256:125cd8a42f0bb92bf87251d40c4cc14c561ab27e0f00911205e000856d66d7cc`.
+  Config digest: `sha256:1dea15fee1d5be927dc3fe3af69af694806fbda37e08dd82b3f77d22b17b9a6d`.
+  The owner added the missing digest alias to the already verified SSH-imported
+  image. A `Never`-pull digest probe passed; actual workload imageIDs match.
+  The old working-tree image was not promoted. No registry path was used.
+- Origin/node/context: `159.195.30.113`, `netcupmaniaserver`, explicit
+  `netcup-k3s-direct` using the original `~/.kube/netcup-k3s-admin-direct.yaml`.
+  Direct access works again; no SSH tunnel/default-context/firewall change is
+  required. No privileged Pod, host mount or Docker access bypass was used.
+- Namespace `handovertrack`, restricted and labelled `disposable-only`.
+  Deployments `api`, `worker`, `web`: one Ready replica each. StatefulSet
+  `database`: one Ready PostgreSQL 18.3 replica pinned to
+  `sha256:7e32e9833a6fb1c92c32552794cb6ed569d51b445a54907d35fc112ef39684db`.
+- StorageClass `handovertrack-local-retain`, Retain / WaitForFirstConsumer,
+  unchanged cluster default. Both 4-GiB source claims are Bound to this node:
+  `database` → `pvc-24606a50-0d12-4379-b3b4-f183b8802106`;
+  `media` → `pvc-afc6cc12-5a3b-4df5-a8c3-22e8a2674e80`.
+- Secrets: `auth`, `database-admin`, `migration`, `runtime`, `trial-accounts`.
+  ConfigMaps: `runtime`, `database-init`; ServiceAccount `runtime`;
+  ResourceQuota `trial-budget`; ClusterIP Services `database:5432`, `api:3301`,
+  `web:3300`; NetworkPolicies `default-deny`, `dns`, `database`, `api`, `web`,
+  `worker`, `migrate`, `provision`, `backup`. Kubernetes-generated default SA
+  and `kube-root-ca.crt` also exist. No public DB, NodePort or Ingress was added.
+- Jobs `migrate-ba2ecc8d8040` and `provision-ba2ecc8d8040` completed, then were
+  removed after evidence capture. Migrations 001–004 match the committed
+  checksums. Only five `.example.test` users, two organizations and four fixture
+  projects were provisioned. Three synthetic accepted originals now have three
+  ready jobs, nine variants and exactly one accepted/ready event per original.
+- Shared edge `edge-caddy/edge-caddy` now references immutable ConfigMap
+  **`handovertrack-edge-78d464618d04`**. Additive NetworkPolicy
+  `edge-caddy/handovertrack-egress` permits only the trial's web/API upstreams.
+  Previous `erdhairdesign-edge-497262a88fcc` and intermediate
+  `handovertrack-edge-1da2a23b2acc` ConfigMaps are retained. The complete original
+  Caddyfile bytes precede the single HandoverTrack fragment unchanged.
+- Edge-only configuration source: `7fba566fd97d9cc0f046957fd8ab5c7351d4aef0`.
+  Actual Caddy adaptation exposed a private-path denial ordered after the web
+  fallback. Changed it to a matched `handle` before the fallback; full pinned
+  Caddy validation, adapted-order assertion, server dry-run and guarded
+  resourceVersion/config-reference patch passed. `/health`, `/metrics`, `/debug`
+  and their subpaths now return empty 404s directly at Caddy.
+  Runtime application source/image stayed at the exact release above.
+
+## Verified results and preservation
+
+- Apex DNS remains the authorized **DNS-only A → 159.195.30.113**. No www/AAAA,
+  proxy or paid-service change. Public HTTPS and direct-origin SNI certificate
+  verification pass without `-k`; current certificate expires
+  `2026-12-21 06:54:31 GMT`. First issuance occurred after the guarded route;
+  no preexisting HandoverTrack certificate was required.
+- Internal 401/private-no-store, manager/worker differences, unknown and foreign
+  404s, current assignment revoke/restore, native cookie/Expo headers, no signup,
+  web sign-in, absent mounted API token and blocked Rrugë DB egress pass.
+- Target PVC: no-replace hardlink, file/directory fsync and two concurrent
+  50-million-pixel decodes pass; peak RSS **374,152 KiB**, decode **29 ms**.
+  API-write/worker-read sentinel inode/hash matched, then only the sentinel was
+  removed. Source and restore volumes have verified Retain/node affinity.
+- Public route: secure HttpOnly host-only cookie issuance, signout invalidation,
+  foreign-origin rejection, private/no-store/noindex, streamed native-header JPEG
+  upload, interrupted stream then retry, discarded completion response then replay,
+  exact **52,428,800-byte** valid JPEG request, original hashes, worker processing,
+  authorized gallery/variants and unauthenticated/cross-tenant/worker denials pass.
+  These are automated **synthetic** fixtures, not physical camera proof.
+- Restarted only trial web/API/worker/database, one controller at a time.
+  Every saved table hash, original hash and prior session survived. The final
+  worker Pod has one automatic restart: an initial DB connection was refused at
+  `2026-09-22T08:12:01Z`; it started successfully one second later and is Ready.
+  No failed media jobs or outstanding reservations remain. Other source Pods
+  have zero container restarts. Current memory sample: API 54 MiB, DB 31 MiB,
+  web 52 MiB, worker 31 MiB; this is not a peak measurement.
+- `rruge.com`, `mendmania.com`, `typechars.com`, `virtualboardzone.com`,
+  `tregubio.com` and the new apex all return HTTPS 200. Rrugë web/worker Pod IDs
+  differed from yesterday because replacements started at 03:33 UTC, **before**
+  today's work. Their identities stayed unchanged through today's edge/recovery
+  checks, with zero restarts; Rrugë DB/proxy/gateway identities remain unchanged.
+- `.env`, local Compose and migrations retain saved hashes/modes. Local databases,
+  original media, saved signing metadata and previous built app/image are retained.
+  Reviewed `release.py` passes live check-only schema/image patch dry-runs; its
+  explicit `time` import and seven maintenance-gate tests were validated earlier.
+  No release apply/controller timer/CI deployment automation was enabled.
+
+## Independent backup and isolated restore
+
+FileVault is On. The existing physically independent Mac had ~27.5 GiB free
+before backup, above the script's 20-GiB reserve plus twice the logical source
+size. No new service, key, storage purchase or Rrugë credential was used.
+All backup/credential directories are private, with mode-0600 files outside Git:
+
+`~/Library/Application Support/HandoverTrack/recovery/handovertrack-20260922T081042Z-bf88b3/`
+
+The receipt has `consistent=true`, `hashes_verified=true`; DB dump **48,101 B**,
+SHA-256 `2f97fa86fadf153f5b304535499da03ffe84cf17880246b1c7eb6a02427cb172`;
+media gzip **103,489 B**, SHA-256
+`b2727b638e2dee88b0abcf18235844972c3a68294bceab0e70d69341a8524ada`.
+Its small compressed size reflects deliberately compressible synthetic JPEG
+padding; it does not predict compression of real photos. All **12** media paths
+(including staged hardlinks archived as full regular files) matched source hashes.
+Five dedicated Secrets, two ConfigMaps and workload identities are saved too.
+Bootstrap credentials remain separately preserved in
+`task05-ba2ecc8d8040-bootstrap.json` in the same recovery parent.
+
+Two earlier uncompressed downloads were truncated despite successful command
+exit, on both default and alternate streaming transports. Archive verification
+rejected both; no successful receipt was issued, and their private partial
+folders are retained. The operator backup script now uses gzip before transfer
+(commit `1f8efe19b0d994cae2c5d1a27ec3e1c3f11f0977`), validated first with
+incompressible data/hardlinks, then with this successful live verified backup.
+This is an operator-tool revision; the runtime image was not changed or retagged.
+
+The backup was restored into **`handovertrack-restore-20260922`**, never into the
+source namespace. Its separate 4-GiB Retain PVCs are:
+
+- `database` → `pvc-f6587afc-8934-45eb-aaf1-deeffaf8ab43`
+- `media` → `pvc-cf853dc8-1c51-4e7c-a0c2-9237684b9a84`
+
+The rehearsal retains SA `runtime`, quota `trial-budget`, the five recovery
+Secrets, ConfigMaps `runtime`/`database-init`, ClusterIP Services `database`/`api`,
+and policies `default-deny`, `dns`, `database`, `api`, `worker`, `backup`.
+Every namespace selector was rewritten and edge ingress removed. Restored API
+and worker used the same immutable image. No route, DNS, Ingress, NodePort or
+source volume was reused. Controllers API/worker/database are scaled to **zero**;
+the ephemeral media helper is removed after verification. Namespace, credentials
+and PVC data remain private for review; no helper credential was created.
+
+All table hashes matched before worker startup, including migration checksums,
+accounts, ownership, memberships, sessions, accepted originals/jobs/events.
+The saved sessions still authenticated, foreign/worker original access stayed
+404, and unauthenticated access stayed 401. All originals and nine WebP hashes,
+sizes/dimensions and decodes passed. A deliberately abandoned one-second lease
+recovered once in both source and restore: attempt 2, one accepted event, one
+ready event and three variants. Gallery count is three; no duplicate acceptance.
+Verification finished 393.1 seconds after the successful backup started.
+Stable table hashes matched after recovery; only the expected lease/ready-event
+completion timestamps differ. No seed or migration ran over the restored dump.
+
+First extraction wrote correct bytes but failed when nonroot tar attempted to
+change the provisioner's PVC-root metadata. The existing files were verified
+before a non-overwriting retry; `--skip-old-files` passed after local testing.
+The fresh-restore runbook now preserves root metadata with `--no-overwrite-dir`.
+An attempted combination of these mutually exclusive tar options was rejected
+without writes. Restore peak memory was **NOT MEASURED**; file/DB/application
+integrity checks and bounded resource limits were verified.
+
+**Technical independent encrypted backup/application restore: PASS. Full recovery
+readiness: INCOMPLETE.** Independent FileVault recovery-key custody and reliable
+workstation availability/backup scheduling remain unconfirmed. The owner was
+asked to confirm recoverability without sharing any key. No unattended backup
+schedule or alert-delivery test was installed/claimed. Retain disposable-only.
+
+Private shared-edge recovery archives (configuration plus TLS state, all hashes
+matched before/after reading) are retained outside Git in
+`edge-before-task05-20260922` and `edge-before-task05-correction-20260922`.
+No certificate key was placed in this repository.
+
+## Physical device and remaining gates
+
+The paired iPhone 17 Pro Max was available. Read-only Documents copies before
+and after the in-place HTTPS Release build show SQLite v4 `integrity_check=ok`,
+one preserved original and the same `server_accepted` queue receipt. Original
+SHA-256 remains
+`ba333a2172c3f2847ab92f7e2173fe564706b9d15d93ddd167cafa9448b1a545`.
+The previous signed app was retained. Existing team/profile were reused, without
+new provisioning or paid services. Embedded bundle contains
+`https://handovertrack.com` and no old LAN origin; code signature/profile checks
+pass. The existing profile uses a wildcard application identifier; verification
+checks the unchanged profile and the app's concrete bundle ID, rather than
+incorrectly requiring a non-wildcard profile. Install and terminate/relaunch
+succeeded. No SQLite downgrade, erase, original deletion or new phone upload was
+performed. The previous accepted physical photo remains evidence of local HTTP
+upload only, not upload to this trial.
+
+**NOT RUN:** directly observed camera permission/shutter branches, twenty
+physical offline captures, physical interruption/retry and account isolation,
+and physical HTTPS camera-to-gallery. iPhone Mirroring requires the owner's
+Mac-password unlock; the owner was asked to unlock it without sharing a password.
+Do not mark these complete from synthetic tests or successful installation.
+Cloudflare proxy/Full (strict) checks are also NOT RUN because the authorized
+trial stays DNS-only; do not enable proxying as a shortcut.
+
+The owned server release lock was released and the three temporary loopback
+port-forwards were stopped after verification. No trial automation is running.
+
+Continue only within Task 05: complete the unlocked physical-phone scenarios and
+confirm independently recoverable FileVault custody/availability. Do not rerun
+first-bootstrap credential creation, seed/migrate the restore, replay old edge
+patches, delete retained PVCs/backups, admit real evidence or begin Task 06.
+
+Evidence is under ignored `.local/task05-*`, notably `20260922-digest-probe`,
+`live-{migration-job,provision-job,storage-probe-result,volume-network,internal-checks,
+public-checks,public-auth,restart-checks,backup-summary,isolated-restore-result}`,
+`edge-20260922-corrected/`, `https-phone-*`, `phone-after-https-preservation`,
+`final-health` and `final-resources-20260922`. Secrets/cookies/edge keys remain
+in the private encrypted recovery directory, not these public summaries.
+
+## Historical investigation and checkpoints
 
 ## Image-reference follow-up — 2026-09-22
 

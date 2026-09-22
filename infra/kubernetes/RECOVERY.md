@@ -1,4 +1,4 @@
-# Recovery rehearsal (not yet executed on k3s)
+# Recovery rehearsal (technical application restore verified)
 
 The active trial must contain disposable test evidence only. Source backups and
 restore rehearsal PVCs are retained until reviewed; no original cleanup/prune
@@ -101,8 +101,10 @@ Never run seed or migrations over a restored dump merely to silence an error.
    Check `$RESTORE_NAMESPACE` matches the unique rehearsal name before executing.
    No `--clean`, reset, drop, source database restore or source PV reuse is allowed.
 6. Stream `media.tar.gz` into the new media helper's `/media` mount with
-   `tar --no-same-owner -C /media -xzf -`, only after reviewing the archive has
+   `tar --no-same-owner --no-overwrite-dir -C /media -xzf -`, only after reviewing the archive has
    relative regular-file/directory entries, no traversal, symlinks or devices.
+   Preserve the provisioner's existing PVC root ownership/mode; the nonroot
+   helper must not try to change that directory's timestamps or permissions.
    Recompute `media-inventory.mjs` in that helper and compare **every** path/hash
    with `media-sha256.json`. Check accepted `media_uploads.id/sha256/size`
    against `<id>/original.jpg`, organization/project/account foreign keys, and
@@ -130,20 +132,31 @@ an isolated application restore, original checksum/ownership/job/session checks
 and unchanged source/existing-site health. Record live evidence in the Task 05
 handoff; until then disaster recovery remains NOT RUN.
 
-## Resumed Task 05 recovery status
+## Resumed Task 05 recovery status — 2026-09-22
 
-The dedicated namespace and healthy database now exist, but application startup
-is blocked on the imported image's missing repository@digest reference. No
-application migration or seed has run. Apex DNS and current preflight pass.
-The private bootstrap credential recovery file is saved outside the repository
-on the existing FileVault-encrypted workstation; this is not a consistent
-application backup. Current measured free space is 30,029,816 KiB (~28.64 GiB);
-remeasure and retain the size/headroom guards before downloading.
+A consistent FileVault-encrypted backup from the deployed disposable trial passed
+all 12 media-path/hash checks and was restored to separate Retain PVCs in
+`handovertrack-restore-20260922`. The dump, exact runtime image, table hashes,
+original/derivative hashes and dimensions, saved-session authentication, tenant
+restrictions, gallery and exactly-once expired-lease recovery all passed.
+The source stayed intact; its writers are Ready again. Restore controllers are
+stopped, its helper removed and its namespace/PVCs/credentials retained privately.
+No source database or volume was overwritten and no seed/migration ran over the
+dump. See [Task 05](../../docs/progress/05-k3s-trial.md) for exact paths, digests,
+resource names, retained failed attempts and evidence.
 
-No live consistent backup or isolated application restore was performed; both
-remain **NOT RUN**. Independent recovery-key custody and scheduled availability
-have not been demonstrated. Exact resources, source/image and next steps are in
-[Task 05](../../docs/progress/05-k3s-trial.md). Preserve the existing database,
-Secrets and recovery file; do not regenerate credentials or start bootstrap again.
-Local smoke, diagnostic image execution and phone-file copies must not be reported
-as an independent server restore. Retain the disposable-only gate.
+The operator script now writes `media.tar.gz`: uncompressed exec-stream downloads
+were truncated and correctly rejected by archive/hash checks; gzip transport
+passed full verification. Hardlinks are still complete regular files in the
+archive. Compression of this synthetic fixture must not be used to estimate real
+photo capacity. Preserve both failed downloads; they have no valid backup receipt.
+The nonroot restore preserves provisioner-owned PVC-root metadata. On a partial
+extraction, inspect/check every existing path/hash before deciding how to resume;
+do not overwrite an unverified file or rerun pg_restore over the existing DB.
+
+**Technical restore PASS; complete DR readiness INCOMPLETE.** FileVault is On and
+the workstation is physically independent of the VPS, but independent key custody
+and reliable availability/backup scheduling remain unverified. No unattended
+backup/alert delivery was demonstrated. Restore peak memory was not measured.
+Keep the disposable-only gate until these recovery and physical-native requirements
+are satisfied. No new paid service, key or storage purchase was introduced.

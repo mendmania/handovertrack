@@ -1,9 +1,12 @@
 # HandoverTrack k3s disposable trial
 
-**Partial bootstrap; disposable-only.** Namespace/database are created; the
-immutable image reference gate blocks application startup. See the current
-[Task 05 checkpoint](../../docs/progress/05-k3s-trial.md) before any live command.
-Do not replay namespace/credential creation over this existing partial bootstrap.
+**Live over verified HTTPS; disposable-only.** The committed immutable runtime
+is deployed and the technical independent restore rehearsal passed. Physical
+camera/HTTPS scenarios and independent FileVault key custody remain incomplete.
+Read the current [Task 05 checkpoint](../../docs/progress/05-k3s-trial.md) before
+any live command. Preserve the existing installation and stopped restore volumes;
+do not repeat first-bootstrap namespace/credential creation.
+
 The target is the existing `netcup-k3s-direct` context, node
 `netcupmaniaserver` (`159.195.30.113`, amd64), namespace `handovertrack`.
 Do not use the workstation's default context. No paid service, new storage
