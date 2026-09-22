@@ -1,0 +1,83 @@
+name: Validate and publish HandoverTrack
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: handovertrack-release-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+      - run: npm install --global pnpm@10.32.1
+      - run: pnpm install --frozen-lockfile
+      - name: Prepare isolated runner fixtures
+        run: pnpm setup:local && pnpm db:up && pnpm db:migrate && pnpm db:seed
+      - run: pnpm lint && pnpm typecheck && pnpm contracts:check && pnpm test
+      - run: python3 -m unittest discover -s scripts/ops -p 'test_*.py' -v
+      - run: python3 scripts/ops/check-manifests.py
+      - run: pnpm test:integration && pnpm test:sync && pnpm test:media
+      - run: pnpm build && pnpm test:api-build && pnpm test:worker
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm test:web
+      - run: pnpm mobile:check && pnpm mobile:export && pnpm check:client-bundles
+      # Never upload .env, database/media fixtures, screenshots or raw service logs.
+  publish:
+    needs: validate
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Build and smoke-test the exact version before publication
+        env:
+          SOURCE: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          mkdir -p .local
+          image="ghcr.io/mendmania/handovertrack:git-$SOURCE"
+          docker build --platform linux/amd64 --build-arg "SOURCE_REVISION=$SOURCE" --tag "$image" -f infra/docker/Dockerfile .
+          python3 scripts/ops/image-smoke.py --image "$image"
+      - name: Publish commit version and immutable deployment metadata
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          export DOCKER_CONFIG="$RUNNER_TEMP/handovertrack-registry-auth"
+          install -d -m 700 "$DOCKER_CONFIG"
+          trap 'rm -rf -- "$DOCKER_CONFIG"' EXIT
+          printf '%s' "$GH_TOKEN" | docker login ghcr.io --username "$GITHUB_ACTOR" --password-stdin
+          image="ghcr.io/mendmania/handovertrack:git-$SOURCE"
+          docker push "$image"
+          docker inspect "$image" --format '{{index .RepoDigests 0}}' > "$RUNNER_TEMP/handovertrack-image.txt"
+          python3 scripts/ops/release-metadata.py --source "$SOURCE" --image-file "$RUNNER_TEMP/handovertrack-image.txt" --output "$RUNNER_TEMP/release.json"
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          r=json.loads((Path(os.environ['RUNNER_TEMP'])/'release.json').read_text())
+          with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as f:
+              f.write(f"Version: `{r['version']}`\n\nSource: `{r['source']}`\n\nImage: `{r['image']}`\n\nVPS deployment is separately verified by the fixed pull controller.\n")
+          PY
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: handovertrack-release
+          path: ${{ runner.temp }}/release.json
+          retention-days: 90
+          if-no-files-found: error
