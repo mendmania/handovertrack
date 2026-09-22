@@ -1,7 +1,8 @@
 # Task 05 — live disposable k3s trial
 
 **Status: deployed over verified HTTPS; technical backup/restore rehearsal PASS;
-physical camera and independent recovery-key gates incomplete. Disposable-only.**
+one owner-observed physical HTTPS photo-to-web test PASS; extended native and
+independent recovery-key gates incomplete. Disposable-only.**
 Updated 2026-09-22. [handovertrack.com](https://handovertrack.com) is live on the
 existing VPS. Task 06 has **not** started. No customer/real-evidence intake is
 approved. This checkpoint supersedes all historical blocked/bootstrap entries
@@ -37,8 +38,10 @@ below; preserve them as the investigation trail.
 - Jobs `migrate-ba2ecc8d8040` and `provision-ba2ecc8d8040` completed, then were
   removed after evidence capture. Migrations 001–004 match the committed
   checksums. Only five `.example.test` users, two organizations and four fixture
-  projects were provisioned. Three synthetic accepted originals now have three
+  projects were provisioned. Three synthetic accepted originals have three
   ready jobs, nine variants and exactly one accepted/ready event per original.
+  A subsequent owner-captured phone photo adds one ready job and three variants
+  (four accepted originals and twelve variants total at this checkpoint).
 - Shared edge `edge-caddy/edge-caddy` now references immutable ConfigMap
   **`handovertrack-edge-78d464618d04`**. Additive NetworkPolicy
   `edge-caddy/handovertrack-egress` permits only the trial's web/API upstreams.
@@ -110,6 +113,8 @@ padding; it does not predict compression of real photos. All **12** media paths
 Five dedicated Secrets, two ConfigMaps and workload identities are saved too.
 Bootstrap credentials remain separately preserved in
 `task05-ba2ecc8d8040-bootstrap.json` in the same recovery parent.
+This 08:10 UTC snapshot predates the owner's 08:30 UTC physical photo below;
+that new original is preserved live but was not part of this backup/restore test.
 
 Two earlier uncompressed downloads were truncated despite successful command
 exit, on both default and alternate streaming transports. Archive verification
@@ -177,15 +182,31 @@ new provisioning or paid services. Embedded bundle contains
 pass. The existing profile uses a wildcard application identifier; verification
 checks the unchanged profile and the app's concrete bundle ID, rather than
 incorrectly requiring a non-wildcard profile. Install and terminate/relaunch
-succeeded. No SQLite downgrade, erase, original deletion or new phone upload was
-performed. The previous accepted physical photo remains evidence of local HTTP
+succeeded. No SQLite downgrade, erase or original deletion was performed. During
+installation verification no new phone upload was performed. The previous accepted
+physical photo remains evidence of local HTTP
 upload only, not upload to this trial.
 
-**NOT RUN:** directly observed camera permission/shutter branches, twenty
-physical offline captures, physical interruption/retry and account isolation,
-and physical HTTPS camera-to-gallery. iPhone Mirroring requires the owner's
-Mac-password unlock; the owner was asked to unlock it without sharing a password.
-Do not mark these complete from synthetic tests or successful installation.
+**PASS — one owner-observed physical HTTPS capture-to-web test, 2026-09-22.**
+The owner reports testing both logins, taking a photo on mobile and seeing it on
+the web. Read-only server verification corroborates the new accepted original
+`c305e7a8-13f9-469a-b305-e64116b19061`, upload
+`6612943a-976f-41fb-8f4b-15b5b8b41f31`, accepted at
+`2026-09-22T08:30:14.669Z`: **5,156,368 bytes**, SHA-256
+`18a719e42fc56dc80af85f1d544aee0e1be3c67a3d04b416b73ceb2a1a0e3971`.
+Original bytes match the database hash/size and decode successfully; EXIF
+orientation 6 maps encoded 2902×3024 to the declared 3024×2902 dimensions.
+Processing finished on attempt 1 with exactly one accepted and one ready event.
+All three WebP variants pass hash, size, dimensions and decode checks. Capture
+and web visibility are owner-observed; the agent verified server/filesystem
+evidence, without directly observing the shutter or web UI. Runtime image and
+deployment configuration are unchanged.
+
+**NOT RUN:** camera permission grant/denial branches, twenty physical offline
+captures, physical interruption/retry and account isolation. iPhone Mirroring
+previously required the owner's Mac-password unlock; this does not invalidate
+the owner's direct observation above. Do not mark the remaining scenarios
+complete from one successful capture, synthetic tests or successful installation.
 Cloudflare proxy/Full (strict) checks are also NOT RUN because the authorized
 trial stays DNS-only; do not enable proxying as a shortcut.
 
@@ -201,7 +222,8 @@ Evidence is under ignored `.local/task05-*`, notably `20260922-digest-probe`,
 `live-{migration-job,provision-job,storage-probe-result,volume-network,internal-checks,
 public-checks,public-auth,restart-checks,backup-summary,isolated-restore-result}`,
 `edge-20260922-corrected/`, `https-phone-*`, `phone-after-https-preservation`,
-`final-health` and `final-resources-20260922`. Secrets/cookies/edge keys remain
+`final-health`, `final-resources-20260922` and `owner-photo-20260922`.
+Secrets/cookies/edge keys remain
 in the private encrypted recovery directory, not these public summaries.
 
 ## Historical investigation and checkpoints

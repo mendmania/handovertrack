@@ -1,8 +1,9 @@
 # HandoverTrack k3s disposable trial
 
 **Live over verified HTTPS; disposable-only.** The committed immutable runtime
-is deployed and the technical independent restore rehearsal passed. Physical
-camera/HTTPS scenarios and independent FileVault key custody remain incomplete.
+is deployed and the technical independent restore rehearsal passed. One physical
+HTTPS photo-to-web test passed through owner observation and server verification.
+Extended native scenarios and independent FileVault key custody remain incomplete.
 Read the current [Task 05 checkpoint](../../docs/progress/05-k3s-trial.md) before
 any live command. Preserve the existing installation and stopped restore volumes;
 do not repeat first-bootstrap namespace/credential creation.
