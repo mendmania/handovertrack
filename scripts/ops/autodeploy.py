@@ -134,7 +134,14 @@ class Controller:
                 'Downloaded image provenance mismatch')
 
     def script(self, script, *args, timeout=1800):
-        return command([sys.executable, str(HERE / script), *map(str, args)], timeout=timeout)
+        result = subprocess.run([sys.executable, str(HERE / script), *map(str, args)], capture_output=True, timeout=timeout)
+        # Retain diagnostic output privately, never in the systemd/public log.
+        log = self.runtime / (script + '-' + str(time.time_ns()) + '.log')
+        fd = os.open(log, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+        with os.fdopen(fd, 'wb') as stream:
+            stream.write(result.stdout + result.stderr)
+        require(result.returncode == 0, 'Operator step failed: ' + script)
+        return result.stdout
 
     def backup(self):
         target = self.args.backup_target.resolve()
@@ -200,12 +207,16 @@ class Controller:
                 return
             preflight = self.runtime / ('preflight-' + stamp + '.json')
             self.script('preflight.py', '--kubeconfig', self.args.kubeconfig, '--existing-trial', '--output', preflight)
+            if api('git/ref/heads/main')['object']['sha'] != sha:
+                self.status('superseded', source=sha, backup_receipt=str(snapshot))
+                return
             candidate = self.runtime / ('candidate-' + stamp + '.json')
             exact_policy = self.runtime / ('policy-' + stamp + '.json')
             save(candidate, release)
             save(exact_policy, {'namespace': 'handovertrack', 'data_policy': 'disposable-only',
                 'approved_source': sha, 'approved_image': release['image'], 'database_contract': policy['database_contract'],
-                'artifact_verified': True, 'preflight_file': str(preflight), 'backup_receipt': str(snapshot)})
+                'artifact_verified': True, 'preflight_file': str(preflight), 'backup_receipt': str(snapshot),
+                'expected_specs': {n: before[n]['spec'] for n in COMPONENTS}})
             self.status('deploying', source=sha, image=release['image'], stage='rollout', run_id=run_id, backup_receipt=str(snapshot))
             self.script('release.py', '--kubeconfig', self.args.kubeconfig, '--candidate', candidate,
                         '--policy', exact_policy, '--runtime', self.runtime, '--apply')

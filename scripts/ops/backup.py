@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-"""Consistent download of the owned trial to an existing encrypted independent target.
-Requires that the operator has verified target encryption/capacity and key custody.
+"""Consistent download of the owned trial to an existing operator-selected target.
+The default requires verified independent target encryption/capacity/key custody.
+An explicit on-node disposable snapshot is release safety only, never DR evidence.
 No remote repository initialization, purchases, pruning or original deletion.
 """
 import argparse,fcntl,hashlib,json,os,secrets,shutil,subprocess,time
