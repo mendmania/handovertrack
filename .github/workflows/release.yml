@@ -8,7 +8,7 @@ permissions:
   contents: read
 concurrency:
   group: handovertrack-release-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   validate:
     runs-on: ubuntu-24.04
@@ -27,8 +27,12 @@ jobs:
       - run: pnpm lint && pnpm typecheck && pnpm contracts:check && pnpm test
       - run: python3 -m unittest discover -s scripts/ops -p 'test_*.py' -v
       - run: python3 scripts/ops/check-manifests.py
-      - run: pnpm test:integration && pnpm test:sync && pnpm test:media
-      - run: pnpm build && pnpm test:api-build && pnpm test:worker
+      - run: pnpm test:integration && pnpm test:sync
+        timeout-minutes: 5
+      # Media acceptance spawns the compiled worker; a fresh runner has no dist/.
+      - run: pnpm build
+      - run: pnpm test:api-build && pnpm test:worker && pnpm test:media
+        timeout-minutes: 8
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm test:web
       - run: pnpm mobile:check && pnpm mobile:export && pnpm check:client-bundles
