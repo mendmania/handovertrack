@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
-"""Consistent download of the owned trial to an existing encrypted independent target.
-Requires that the operator has verified target encryption/capacity and key custody.
+"""Consistent download of the owned trial to an existing operator-selected target.
+The default requires verified independent target encryption/capacity/key custody.
+An explicit on-node disposable snapshot is release safety only, never DR evidence.
 No remote repository initialization, purchases, pruning or original deletion.
 """
 import argparse,fcntl,hashlib,json,os,secrets,shutil,subprocess,time
 from pathlib import Path
 from backup_media import write_verified_archive
-p=argparse.ArgumentParser(); p.add_argument('--kubeconfig',required=True); p.add_argument('--target',required=True); p.add_argument('--runtime',required=True); a=p.parse_args()
+if not __debug__: raise SystemExit('Run without -O: backup preservation guards require assertions')
+p=argparse.ArgumentParser(); p.add_argument('--kubeconfig',required=True); p.add_argument('--target',required=True); p.add_argument('--runtime',required=True)
+p.add_argument('--on-node-disposable',action='store_true',help='Explicit release safety snapshot on the VPS; NOT independent disaster recovery')
+a=p.parse_args()
 k=['kubectl','--kubeconfig',a.kubeconfig,'--context','netcup-k3s-direct','-n','handovertrack','--request-timeout=60s']
 def run(args,**kwargs): return subprocess.check_output(k+args,**kwargs)
 def get(*args): return json.loads(run(list(args)))
@@ -16,12 +20,16 @@ state=Path(a.runtime); state.mkdir(parents=True,mode=0o700,exist_ok=True)
 with open(state/'release.lock','a') as lock:
     fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
     ns=get('get','namespace','handovertrack','-o','json'); assert ns['metadata']['labels']['app.kubernetes.io/part-of']=='handovertrack'
+    if a.on_node_disposable:
+        assert ns['metadata']['labels'].get('handovertrack.com/data-policy')=='disposable-only'
+        assert base.stat().st_mode & 0o077 == 0, 'On-node snapshots require an owner-only directory'
     deployments={n:get('get','deployment',n,'-o','json') for n in ['web','api','worker']}
     assert all(x['metadata']['labels']['app.kubernetes.io/part-of']=='handovertrack' for x in deployments.values())
     folder=base/('handovertrack-'+time.strftime('%Y%m%dT%H%M%SZ',time.gmtime())+'-'+secrets.token_hex(3)); folder.mkdir(mode=0o700)
     image=deployments['api']['spec']['template']['spec']['containers'][0]['image']; assert '@sha256:' in image
     helper='backup-'+secrets.token_hex(4); created=False; paused=[]
-    receipt={'namespace':'handovertrack','at_unix':time.time(),'consistent':False,'hashes_verified':False,'image':image,'independent_restore_verified':False}
+    receipt={'namespace':'handovertrack','at_unix':time.time(),'consistent':False,'hashes_verified':False,'image':image,'independent_restore_verified':False,
+             'storage_scope':'on-node-disposable-release-snapshot' if a.on_node_disposable else 'operator-selected-independent-target'}
     def write(name,data):
         f=folder/name; f.write_bytes(data); f.chmod(0o600)
     try:

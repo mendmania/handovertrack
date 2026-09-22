@@ -45,6 +45,8 @@ def main():
         applied=json.loads(run(['exec','database-0','--','psql','-U','postgres','-d','handovertrack','-At','-c',"SELECT coalesce(json_object_agg(name,checksum),'{}'::json) FROM schema_migrations"]))
         assert applied==candidate['database_contract'], 'Live schema contract differs; explicit migration review required'
         before={n:json.loads(run(['get','deployment',n,'-o','json'])) for n in COMPONENTS}
+        if 'expected_specs' in policy:
+            assert policy['expected_specs']=={n:o['spec'] for n,o in before.items()}, 'Workload changed after release qualification'
         assert all(x['spec']['replicas']==1 and x['status'].get('availableReplicas')==1 for x in before.values())
         patches={n:image_patch(o,candidate['image'],candidate['source']) for n,o in before.items()}
         for n,patch in patches.items(): run(['patch','deployment',n,'--type=json','-p',json.dumps(patch),'--dry-run=server'])

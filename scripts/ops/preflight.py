@@ -3,6 +3,7 @@
 import argparse, hashlib, json, socket, subprocess, time, urllib.request
 from pathlib import Path
 p=argparse.ArgumentParser(); p.add_argument('--kubeconfig',required=True); p.add_argument('--output',required=True)
+p.add_argument('--existing-trial',action='store_true',help='Validate the already-active hostname instead of first-bootstrap absence')
 a=p.parse_args(); k=['kubectl','--kubeconfig',a.kubeconfig,'--context','netcup-k3s-direct','--request-timeout=20s']
 def get(*args): return json.loads(subprocess.check_output(k+list(args),text=True))
 node=get('get','node','netcupmaniaserver','-o','json')
@@ -33,6 +34,9 @@ checks={'node_ready':conds.get('Ready')=='True','no_pressure':all(conds.get(c)==
         'dns_direct_origin':ips==['159.195.30.113'],
         'hostname_not_already_owned':'handovertrack.com' not in cm['data']['Caddyfile'],
         'existing_sites_healthy':all(v==200 for v in health.values())}
+if a.existing_trial:
+    del checks['hostname_not_already_owned']
+    checks['trial_hostname_present']='handovertrack.com' in cm['data']['Caddyfile']
 result={'at_unix':time.time(),'node':node['metadata']['name'],'architecture':node['status']['nodeInfo']['architecture'],
         'allocatable':node['status']['allocatable'],'cpu_requests_milli':cpu_requests,'node_fs':summary['fs'],'node_memory':summary['memory'],
         'dns':ips,'sites':health,'checks':checks,'edge_config':cm['metadata']['name'],
