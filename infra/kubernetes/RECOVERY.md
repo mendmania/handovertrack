@@ -46,7 +46,7 @@ The script uses the same `release.lock` as image releases, checks namespace
 ownership, records replica counts and scales only web/api/worker to zero. It
 waits for their pods to terminate so DB/media form a quiescent pair. It mounts
 only the owned media PVC in a bounded nonroot read-only helper, downloads a
-custom-format PostgreSQL dump plus full media archive and SHA-256 inventory,
+custom-format PostgreSQL dump plus full gzip-compressed media archive and SHA-256 inventory,
 compares downloaded file hashes with the source inventory, and saves the five
 named application Secrets, two ConfigMaps and workload identities as private
 recovery files. Media hardlinks are archived as ordinary complete files. No
@@ -100,8 +100,8 @@ Never run seed or migrations over a restored dump merely to silence an error.
 
    Check `$RESTORE_NAMESPACE` matches the unique rehearsal name before executing.
    No `--clean`, reset, drop, source database restore or source PV reuse is allowed.
-6. Stream `media.tar` into the new media helper's `/media` mount with
-   `tar --no-same-owner -C /media -xf -`, only after reviewing the archive has
+6. Stream `media.tar.gz` into the new media helper's `/media` mount with
+   `tar --no-same-owner -C /media -xzf -`, only after reviewing the archive has
    relative regular-file/directory entries, no traversal, symlinks or devices.
    Recompute `media-inventory.mjs` in that helper and compare **every** path/hash
    with `media-sha256.json`. Check accepted `media_uploads.id/sha256/size`

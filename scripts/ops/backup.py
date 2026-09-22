@@ -35,13 +35,16 @@ with open(state/'release.lock','a') as lock:
         db_size=int(run(['exec','database-0','--','psql','-U','postgres','-d','handovertrack','-At','-c',"SELECT pg_database_size('handovertrack')"]))
         media_size=int(run(['exec',helper,'--','node','-e',"const fs=require('fs');let n=0;function walk(p){for(const e of fs.readdirSync(p,{withFileTypes:true})){let q=p+'/'+e.name;if(e.isDirectory())walk(q);else if(e.isFile())n+=fs.statSync(q).size;else throw Error('Unexpected media file type')}}walk('/media');console.log(n)"]))
         assert shutil.disk_usage(base).free>20*1024**3+db_size*2+media_size*2, 'Insufficient independent target headroom'
-        for name,args in [('database.dump',['exec','database-0','--','pg_dump','-U','postgres','-d','handovertrack','-Fc']),('media.tar',['exec',helper,'--','tar','--hard-dereference','-C','/media','-cf','-','.'])]:
+        # Compress in the read-only helper before streaming. The archive still
+        # contains full regular files for hardlinks, and every downloaded byte
+        # is checked against the source inventory before a receipt is issued.
+        for name,args in [('database.dump',['exec','database-0','--','pg_dump','-U','postgres','-d','handovertrack','-Fc']),('media.tar.gz',['exec',helper,'--','tar','--hard-dereference','-C','/media','-czf','-','.'])]:
             fd=os.open(folder/name,os.O_CREAT|os.O_EXCL|os.O_WRONLY,0o600)
             with os.fdopen(fd,'wb') as out: subprocess.run(k+args,stdout=out,stderr=subprocess.DEVNULL,check=True); out.flush(); os.fsync(out.fileno())
         write('media-sha256.json', run(['exec',helper,'--','env','MEDIA_ROOT=/media','node','scripts/ops/media-inventory.mjs']))
         import tarfile
         expected=json.loads((folder/'media-sha256.json').read_text()); actual={}
-        with tarfile.open(folder/'media.tar') as archive:
+        with tarfile.open(folder/'media.tar.gz', 'r:gz') as archive:
             for member in archive:
                 if member.isdir(): continue
                 assert member.isfile(), 'Unexpected archive member'
