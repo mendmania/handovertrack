@@ -1,0 +1,516 @@
+{
+  "checked_at": "2026-09-22T12:04:56.862404+00:00",
+  "status": "implemented-awaiting-validation",
+  "data_policy": "disposable-only",
+  "task06_started": false,
+  "source": {
+    "branch": "codex/k3s-trial",
+    "head_at_start": "02e6975",
+    "runtime_source": "ba2ecc8d8040eda6e5d57bf73d6d17e90a4d2337",
+    "runtime_image": "handovertrack.local/runtime@sha256:125cd8a42f0bb92bf87251d40c4cc14c561ab27e0f00911205e000856d66d7cc",
+    "namespace": "handovertrack",
+    "context": "netcup-k3s-direct",
+    "runtime_changed": false,
+    "schema_changed": false,
+    "phone_installed": false
+  },
+  "owner_observation": {
+    "phone_interaction": "Phone interaction is unavailable right now",
+    "offline_state": "NOT CONFIRMED; no capture/reconnect requested",
+    "recovery_reply": "xontinue",
+    "recovery_decisions_confirmed": false
+  },
+  "physical_cases": [
+    {
+      "case": "interrupted_binary_stream",
+      "native_result": "NOT RUN",
+      "owner_result": "NOT RUN",
+      "new_media_id": null,
+      "fault_mechanism": "Native NSURLSession delegate suspend/cancel on positive incomplete callback AND task counters for exact named HTTPS session",
+      "required_proof": "Final positive incomplete bytes, cancellation, pending unaccepted server session; same ID/session retry to one acceptance"
+    },
+    {
+      "case": "termination_during_upload",
+      "native_result": "NOT RUN",
+      "owner_result": "NOT RUN",
+      "new_media_id": null,
+      "fault_mechanism": "Native delegate suspends a named task for app termination while unfinished",
+      "required_proof": "Task/session/process/counter/server timing before termination, termination command, durable SQLite state and same-session reconciliation after reopening; timeout-before-termination is not PASS"
+    },
+    {
+      "case": "completion_response_delivery_loss",
+      "native_result": "NOT RUN",
+      "owner_result": "NOT RUN",
+      "new_media_id": null,
+      "fault_mechanism": "Wrapper withholds successful real HTTPS completion acceptance from UploadExecutor; durable receipt and retry hold",
+      "required_proof": "Server committed accepted while SQLite lacks acceptance; restart/release reconciles same accepted asset; label controlled response-delivery loss, not radio loss"
+    }
+  ],
+  "new_ids": [],
+  "controls_armed": 0,
+  "special_build": {
+    "special_build": "task05-native-faults-v1",
+    "signature_verified": true,
+    "checks": {
+      "test_build_key": true,
+      "same_bundle": true,
+      "same_profile": true,
+      "https": true,
+      "no_old_lan": true,
+      "js_fault": true,
+      "native_fault": true,
+      "baseline_forbidden": true
+    },
+    "installed": false,
+    "database_schema": 4,
+    "no_backend_or_schema_changes": true,
+    "https_origin": "https://handovertrack.com",
+    "baseline_forbidden_ids": 23,
+    "main_jsbundle_sha256": "d1422b4ec086079fdc0145d0d1d66fff6abce4caf5b4dce82dae8da8490c47fe",
+    "executable_sha256": "9c9ea2929eaa21913d143c881e0253e20b6abc733de4154f7122f08cb78eae73",
+    "info_plist_sha256": "87964f84d21092371546f9e2349519f11bfb7b16f0d02a589a5e5bae99e1286c"
+  },
+  "build_attempts": [
+    {
+      "result": "REJECTED",
+      "reason": "Initial signed build omitted native delegate because ExpoFileSystem was precompiled; binary inspection caught missing native marker; never installed"
+    },
+    {
+      "result": "PASS preparation",
+      "reason": "Temporary expo-file-system-only buildFromSource; exact delegate compiled and both native/JS markers, HTTPS, baseline exclusions, same bundle/profile and signature verified; never installed"
+    }
+  ],
+  "normal_build_restored": {
+    "checks": {
+      "normal_info_no_test_key": true,
+      "normal_js_no_fault_hook": true,
+      "normal_native_no_fault_hook": true,
+      "normal_https": true,
+      "same_profile": true,
+      "restored_native-upload.ts": true,
+      "restored_task05-faults.ts": true,
+      "restored_EXSessionCancelableUploadTaskDelegate.m": true,
+      "restored_Info.plist": true,
+      "restored_task05-faults.test.ts": true,
+      "restored_package.json": true
+    },
+    "ios_configuration": {
+      "apps/mobile/ios/Podfile.lock": true,
+      "apps/mobile/ios/Pods/Manifest.lock": true,
+      "apps/mobile/ios/HandoverTrack.xcodeproj/project.pbxproj": true,
+      "apps/mobile/ios/Podfile.properties.json": true,
+      "apps/mobile/ios/Podfile": true
+    },
+    "main_jsbundle_sha256": "db23d1793e2e302e9b458548bba8dabebd63f2701ed04ce502249076c18eff7c",
+    "executable_sha256": "cec4454dbe279211a75184f8e42de099c6098b5a5b5214c63832aab825642152",
+    "installed": false
+  },
+  "synthetic_checks": {
+    "native_delegate_harness": {
+      "result": "PASS",
+      "cases": 9,
+      "actual_radio": false
+    },
+    "control_preparation": {
+      "result": "PASS",
+      "tests": 6
+    },
+    "overlay_and_media_store": {
+      "result": "PASS",
+      "tests": 58
+    },
+    "normal_media_store_with_new_monotonic_receipt_regression": {
+      "result": "PASS",
+      "tests": 46
+    },
+    "operator_regressions": {
+      "result": "PASS",
+      "tests": 12
+    },
+    "mobile_typecheck": "PASS",
+    "eslint_boundaries": "PASS"
+  },
+  "phone": {
+    "sqlite_version": 4,
+    "baseline_process_id": 76773,
+    "process_action": "read-only inspection; no terminate or launch",
+    "originals": 23,
+    "accepted_receipts": 23,
+    "current_worker_photos": 22,
+    "older_local_http_owner_photos": 1,
+    "before_after_equal": true,
+    "media": [
+      {
+        "id": "24afa180-f640-4f89-a5d0-fa2b93482c75",
+        "account_id": "d6cc7b45-75f0-4f08-b87b-594152f780bd",
+        "organization_id": "11111111-1111-4111-8111-111111111111",
+        "project_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1",
+        "size": 6275386,
+        "sha256": "19a30678ee79cdee3db25b55c27431735070b65d6ff8ab7fd4f58e595ce95c45",
+        "created_at": "2026-09-22T10:35:00.798Z",
+        "upload_id": "661ef47a-ad6a-4ef4-9116-0571f5d43f94",
+        "accepted_at": "2026-09-22T11:09:58.775Z",
+        "queue_state": "server_accepted"
+      },
+      {
+        "id": "2840371b-2f68-493a-88f4-165f3e87a7d2",
+        "account_id": "d6cc7b45-75f0-4f08-b87b-594152f780bd",
+        "organization_id": "11111111-1111-4111-8111-111111111111",
+        "project_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1",
+        "size": 4060289,
+        "sha256": "3c1af3394bae9f578a639102a0321dcc40344a3a7b61a204655e1c6016885a0e",
+        "created_at": "2026-09-22T10:35:09.698Z",
+        "upload_id": "27bead9c-c350-4bd6-8a9f-013be0d7cbe1",
+        "accepted_at": "2026-09-22T11:09:37.322Z",
+        "queue_state": "server_accepted"
+      },
+      {
+        "id": "5262fdae-60a4-4c42-b5a5-3791513164de",
+        "account_id": "d6cc7b45-75f0-4f08-b87b-594152f780bd",
+        "organization_id": "11111111-1111-4111-8111-111111111111",
+        "project_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1",
+        "size": 4105298,
+        "sha256": "a8c509c0500f1981829a5c47ffde474ed3e3656657ac792e33d6bd6ed8135d3c",
+        "created_at": "2026-09-22T10:35:08.767Z",
+        "upload_id": "603d1444-0528-476d-ba50-38d53be01090",
+        "accepted_at": "2026-09-22T11:09:38.934Z",
+        "queue_state": "server_accepted"
+      },
+      {
+        "id": "5f2954a8-b36c-421e-9323-1ab7590a5bb1",
+        "account_id": "d6cc7b45-75f0-4f08-b87b-594152f780bd",
+        "organization_id": "11111111-1111-4111-8111-111111111111",
+        "project_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1",
+        "size": 4136382,
+        "sha256": "526b76c1dbd3a5ab9f93ede1e0e279e82309faec29fedee7daf82521bfad806c",
+        "created_at": "2026-09-22T10:35:06.514Z",
+        "upload_id": "e16fcc29-b486-4459-a608-4e5632e50c96",
+        "accepted_at": "2026-09-22T11:09:41.966Z",
+        "queue_state": "server_accepted"
+      },
+      {
+        "id": "7b1b7ed6-c61c-40d0-96e4-957986e85c66",
+        "account_id": "d6cc7b45-75f0-4f08-b87b-594152f780bd",
+        "organization_id": "11111111-1111-4111-8111-111111111111",
+        "project_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1",
+        "size": 4652361,
+        "sha256": "79af4a8df255d2e358bb1fc3b976bb94985627b9db1ee5523d3e74dd038f7c12",
+        "created_at": "2026-09-22T10:34:52.845Z",
+        "upload_id": "4da704b2-b84c-489c-b45e-2b3fbc297871",
+        "accepted_at": "2026-09-22T11:10:10.192Z",
+        "queue_state": "server_accepted"
+      },
+      {
+        "id": "81c524b1-d835-4b1f-815f-e7f7def5581a",
+        "account_id": "d6cc7b45-75f0-4f08-b87b-594152f780bd",
+        "organization_id": "11111111-1111-4111-8111-111111111111",
+        "project_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1",
+        "size": 4158388,
+        "sha256": "74cf09bf99ca7c6d8fb276c92e3fbf24f8c956851fdab0a113988183f7d1004e",
+        "created_at": "2026-09-22T10:35:05.779Z",
+        "upload_id": "8207cf1b-8225-4756-837e-e9eb4fda15ce",
+        "accepted_at": "2026-09-22T11:09:43.513Z",
+        "queue_state": "server_accepted"
+      },
+      {
+        "id": "91dc7928-e506-4f6e-b424-af9150623e5a",
+        "account_id": "d6cc7b45-75f0-4f08-b87b-594152f780bd",
+        "organization_id": "11111111-1111-4111-8111-111111111111",
+        "project_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1",
+        "size": 4760941,
+        "sha256": "3f790a3e35c1294e9bf7bc8e789a6b1fa423f49535f715d6c809a96363ffd25e",
+        "created_at": "2026-09-22T10:34:58.047Z",
+        "upload_id": "5f22a658-a422-4b30-99d8-9d62713e02ee",
+        "accepted_at": "2026-09-22T11:10:01.564Z",
+        "queue_state": "server_accepted"
+      },
+      {
+        "id": "9bdfb6a5-89e2-4e32-8334-c23c97a17f37",
+        "account_id": "d6cc7b45-75f0-4f08-b87b-594152f780bd",
+        "organization_id": "11111111-1111-4111-8111-111111111111",
+        "project_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1",
+        "size": 3522197,
+        "sha256": "6be61f0c21e76dc8a707bd5c64b2e6107feab169a4d112cd05f3f49b495df00e",
+        "created_at": "2026-09-22T10:35:13.167Z",
+        "upload_id": "852beddb-e23c-4fa3-93ea-7bbbdc2620c9",
+        "accepted_at": "2026-09-22T11:09:32.031Z",
+        "queue_state": "server_accepted"
+      },
+      {
+        "id": "9e88cedd-c182-4082-a0e3-203166e90538",
+        "account_id": "d6cc7b45-75f0-4f08-b87b-594152f780bd",
+        "organization_id": "11111111-1111-4111-8111-111111111111",
+        "project_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1",
+        "size": 4055610,
+        "sha256": "d049f201522708ca2b28adb94325e87164ca43870dc897e53460e51d664763ab",
+        "created_at": "2026-09-22T10:35:10.598Z",
+        "upload_id": "614ab85e-e73a-43b1-b3fd-b331c37be4bd",
+        "accepted_at": "2026-09-22T11:09:35.348Z",
+        "queue_state": "server_accepted"
+      },
+      {
+        "id": "a5a62dff-1c2f-4c83-b91f-7a5c31088bf6",
+        "account_id": "d6cc7b45-75f0-4f08-b87b-594152f780bd",
+        "organization_id": "11111111-1111-4111-8111-111111111111",
+        "project_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1",
+        "size": 4109018,
+        "sha256": "26641a1c1fb60bc9d79e4d985b453c57214bd6b9a7b56f0814894310dccf3c97",
+        "created_at": "2026-09-22T10:35:05.115Z",
+        "upload_id": "d64d3874-e354-4bb7-9c97-74a4fc91cf90",
+        "accepted_at": "2026-09-22T11:09:45.467Z",
+        "queue_state": "server_accepted"
+      },
+      {
+        "id": "a8045200-f5dc-4c35-bde3-2e0518aa7040",
+        "account_id": "d6cc7b45-75f0-4f08-b87b-594152f780bd",
+        "organization_id": "11111111-1111-4111-8111-111111111111",
+        "project_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1",
+        "size": 4268212,
+        "sha256": "d9c742d9efe080e0cc916475189bb024c83f2b32ba4b49d8cb82f8588bbc5fc7",
+        "created_at": "2026-09-22T10:35:03.631Z",
+        "upload_id": "90dd801a-70d1-4825-9841-22d681236c9e",
+        "accepted_at": "2026-09-22T11:09:49.692Z",
+        "queue_state": "server_accepted"
+      },
+      {
+        "id": "aeaa4426-3d8b-46ef-8f3f-4b40e87e886e",
+        "account_id": "d6cc7b45-75f0-4f08-b87b-594152f780bd",
+        "organization_id": "11111111-1111-4111-8111-111111111111",
+        "project_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1",
+        "size": 4146218,
+        "sha256": "ea33a71acf4a882874281774b2498fdb9f796b5706f27bc5320bf4aeea673419",
+        "created_at": "2026-09-22T10:35:04.329Z",
+        "upload_id": "a8ef2243-5253-4c89-9fc5-5a73dac330b4",
+        "accepted_at": "2026-09-22T11:09:47.703Z",
+        "queue_state": "server_accepted"
+      },
+      {
+        "id": "afcaa5b5-a4ef-421a-8c1b-50addf3e6a38",
+        "account_id": "d6cc7b45-75f0-4f08-b87b-594152f780bd",
+        "organization_id": "11111111-1111-4111-8111-111111111111",
+        "project_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1",
+        "size": 4134932,
+        "sha256": "f5c32129c1272969f4ff73d5a1349395f74a23ea20e4768464440a5a7157db3a",
+        "created_at": "2026-09-22T10:35:07.833Z",
+        "upload_id": "16531558-fbda-49dc-8b4c-ca3d2230c6aa",
+        "accepted_at": "2026-09-22T11:09:40.435Z",
+        "queue_state": "server_accepted"
+      },
+      {
+        "id": "b162b255-f212-492f-acfa-5268b8415d47",
+        "account_id": "fcf2973b-1277-4b59-99d5-a6ec9f3bcb1f",
+        "organization_id": "11111111-1111-4111-8111-111111111111",
+        "project_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1",
+        "size": 4455595,
+        "sha256": "ba333a2172c3f2847ab92f7e2173fe564706b9d15d93ddd167cafa9448b1a545",
+        "created_at": "2026-09-21T13:30:41.109Z",
+        "upload_id": "5c23bdda-a629-4b88-93f0-5eb2b2cc1265",
+        "accepted_at": "2026-09-21T13:30:46.649Z",
+        "queue_state": "server_accepted"
+      },
+      {
+        "id": "b7ffbbfd-9dc5-4057-ad0b-259d42769822",
+        "account_id": "d6cc7b45-75f0-4f08-b87b-594152f780bd",
+        "organization_id": "11111111-1111-4111-8111-111111111111",
+        "project_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1",
+        "size": 5156406,
+        "sha256": "479e4dc825b9b60baf62fab52a4052abaa449008449a86762bc981c2ce438661",
+        "created_at": "2026-09-22T10:34:56.662Z",
+        "upload_id": "aca93f66-aba3-4edf-bfaf-16952f3f48b4",
+        "accepted_at": "2026-09-22T11:10:04.648Z",
+        "queue_state": "server_accepted"
+      },
+      {
+        "id": "c305e7a8-13f9-469a-b305-e64116b19061",
+        "account_id": "d6cc7b45-75f0-4f08-b87b-594152f780bd",
+        "organization_id": "11111111-1111-4111-8111-111111111111",
+        "project_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1",
+        "size": 5156368,
+        "sha256": "18a719e42fc56dc80af85f1d544aee0e1be3c67a3d04b416b73ceb2a1a0e3971",
+        "created_at": "2026-09-22T08:30:09.262Z",
+        "upload_id": "6612943a-976f-41fb-8f4b-15b5b8b41f31",
+        "accepted_at": "2026-09-22T08:30:14.669Z",
+        "queue_state": "server_accepted"
+      },
+      {
+        "id": "cebaab5a-6141-4084-83a4-c71bc6bcdfcc",
+        "account_id": "d6cc7b45-75f0-4f08-b87b-594152f780bd",
+        "organization_id": "11111111-1111-4111-8111-111111111111",
+        "project_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1",
+        "size": 4600817,
+        "sha256": "c6c46cb1a87693480bf52a6e258f3e66ee3af4b69c406189a48513e321ccd4f9",
+        "created_at": "2026-09-22T10:36:31.548Z",
+        "upload_id": "408adb0e-0488-457b-9200-2ed5f0f84e0e",
+        "accepted_at": "2026-09-22T11:09:29.767Z",
+        "queue_state": "server_accepted"
+      },
+      {
+        "id": "ceef1c0d-9582-47e5-b6f0-88575f0d1ae3",
+        "account_id": "d6cc7b45-75f0-4f08-b87b-594152f780bd",
+        "organization_id": "11111111-1111-4111-8111-111111111111",
+        "project_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1",
+        "size": 4053386,
+        "sha256": "901769714f48571bb1d3eaaea288b18a18d6301cd5d198a62c39e63e73865c1c",
+        "created_at": "2026-09-22T10:35:11.981Z",
+        "upload_id": "c7cb745b-05bc-40b3-a13f-611d6ad82443",
+        "accepted_at": "2026-09-22T11:09:33.462Z",
+        "queue_state": "server_accepted"
+      },
+      {
+        "id": "d6fafd33-90c7-49be-a447-8be258810c41",
+        "account_id": "d6cc7b45-75f0-4f08-b87b-594152f780bd",
+        "organization_id": "11111111-1111-4111-8111-111111111111",
+        "project_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1",
+        "size": 4247431,
+        "sha256": "d4ac8eaab389d466929b5aacd00f024b1e5d24a935d7be73346895217764bba4",
+        "created_at": "2026-09-22T10:35:01.965Z",
+        "upload_id": "3415c72d-97fe-4c4e-9650-e4d91c8d3a5f",
+        "accepted_at": "2026-09-22T11:09:55.165Z",
+        "queue_state": "server_accepted"
+      },
+      {
+        "id": "da09f948-830b-45f2-bc75-4b1205551639",
+        "account_id": "d6cc7b45-75f0-4f08-b87b-594152f780bd",
+        "organization_id": "11111111-1111-4111-8111-111111111111",
+        "project_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1",
+        "size": 4362454,
+        "sha256": "8374360b2e715b743c0f1fff3c1db5ae01ba202e202945059fc3a994de6db9a8",
+        "created_at": "2026-09-22T10:35:02.781Z",
+        "upload_id": "a922b4bf-c04e-4293-b795-953e92504c34",
+        "accepted_at": "2026-09-22T11:09:52.886Z",
+        "queue_state": "server_accepted"
+      },
+      {
+        "id": "dc9155ff-16ff-4265-9b67-d0e62e1b9225",
+        "account_id": "d6cc7b45-75f0-4f08-b87b-594152f780bd",
+        "organization_id": "11111111-1111-4111-8111-111111111111",
+        "project_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1",
+        "size": 4364037,
+        "sha256": "bb775ddea4b48a100163c53fce8346f64fde3afb83226b170ac0622532b5c581",
+        "created_at": "2026-09-22T10:27:33.329Z",
+        "upload_id": "6ece28f8-d868-4730-b619-839c42e3ee8b",
+        "accepted_at": "2026-09-22T11:10:14.994Z",
+        "queue_state": "server_accepted"
+      },
+      {
+        "id": "e2b0a03f-5251-45c0-b1fe-f73e5e318e9e",
+        "account_id": "d6cc7b45-75f0-4f08-b87b-594152f780bd",
+        "organization_id": "11111111-1111-4111-8111-111111111111",
+        "project_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1",
+        "size": 4105969,
+        "sha256": "1662be9c67180e9654831b3133797ac73290550dc83c3dcbf1f43b32834c4c3c",
+        "created_at": "2026-09-22T10:34:54.764Z",
+        "upload_id": "689b40d0-0a3a-4b11-a55e-6d75c9b08eaa",
+        "accepted_at": "2026-09-22T11:10:07.859Z",
+        "queue_state": "server_accepted"
+      },
+      {
+        "id": "ef7dfca9-a403-4e71-86ce-ad4d5af88e78",
+        "account_id": "d6cc7b45-75f0-4f08-b87b-594152f780bd",
+        "organization_id": "11111111-1111-4111-8111-111111111111",
+        "project_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1",
+        "size": 5069592,
+        "sha256": "6d69931eacb469a8d0ce33449b45a09d29c02af2588365ea56844fa674219e33",
+        "created_at": "2026-09-22T10:34:51.162Z",
+        "upload_id": "afd421d1-6528-4e65-82f9-cd73da325315",
+        "accepted_at": "2026-09-22T11:10:12.474Z",
+        "queue_state": "server_accepted"
+      }
+    ]
+  },
+  "server": {
+    "accepted_originals": 25,
+    "ready_jobs": 25,
+    "variants": 75,
+    "before_after_equal": true,
+    "all_originals_and_variants_decoded": true,
+    "exact_id_hash_reference": "05-native-validation-20260922.json",
+    "reference_sha256": "970a7398ff81d378e5354bf39ede6f7d501f803c0e6f89a373496cbca0c8c789",
+    "assignment_active_version": 5
+  },
+  "backup": {
+    "new_backup": "NOT RUN: no new photos or source media changes",
+    "existing_snapshot": "handovertrack-20260922T112734Z-54ce2f",
+    "verified_originals": 25,
+    "verified_variants": 75,
+    "verified_media_paths": 125,
+    "application_restore": "Prior PASS retained; not repeated",
+    "recovery_reference": "05-batch-recovery-20260922.json",
+    "retained_files_reverified": 59,
+    "all_file_hashes_modes_unchanged": true,
+    "older_local_http_photo": "Preserved locally; outside server backup coverage",
+    "new_rehearsals": 0
+  },
+  "recovery_decisions": {
+    "independent_filevault_credential_access": {
+      "status": "UNCONFIRMED",
+      "accepted_decision": null
+    },
+    "backup_bytes_access_after_mac_loss": {
+      "status": "UNCONFIRMED",
+      "accepted_decision": null
+    },
+    "authorized_independent_backup_destination": {
+      "status": "UNCONFIRMED",
+      "accepted_decision": null
+    },
+    "accountable_operator": {
+      "status": "UNCONFIRMED",
+      "accepted_decision": null
+    },
+    "backup_cadence": {
+      "status": "UNCONFIRMED",
+      "accepted_decision": null
+    },
+    "mac_availability": {
+      "status": "UNCONFIRMED",
+      "accepted_decision": null
+    },
+    "failed_or_missed_run_response": {
+      "status": "UNCONFIRMED",
+      "accepted_decision": null
+    }
+  },
+  "no_external_copy_or_automation_or_notification": true,
+  "final_preservation": {
+    "at_unix": 1790078532.24666,
+    "checks": {
+      "all_59_recovery_files_unchanged": true,
+      "config_compose_migrations_unchanged": true,
+      "handovertrack_resources_preserved": true,
+      "source_ready": true,
+      "handovertrack-restore-20260922_resources_preserved": true,
+      "handovertrack-restore-20260922_controllers_stopped": true,
+      "handovertrack-restore-20260922b_resources_preserved": true,
+      "handovertrack-restore-20260922b_controllers_stopped": true,
+      "handovertrack-restore-20260922c_resources_preserved": true,
+      "handovertrack-restore-20260922c_controllers_stopped": true,
+      "rruge_resources_preserved": true,
+      "edge_spec_unchanged": true,
+      "edge_bytes_unchanged": true,
+      "assignments_unchanged": true,
+      "all_25_server_originals_receipts_jobs_variants_decode_unchanged": true,
+      "phone_all_23_originals_receipts_unchanged": true,
+      "phone_sqlite_healthy_v4": true,
+      "no_phone_fault_control": true,
+      "prior_signed_app_preserved": true,
+      "all_six_https_sites_200": true
+    },
+    "sites": {
+      "handovertrack.com": "200",
+      "rruge.com": "200",
+      "mendmania.com": "200",
+      "typechars.com": "200",
+      "virtualboardzone.com": "200",
+      "tregubio.com": "200"
+    },
+    "phone_originals": 23,
+    "phone_receipts": 23,
+    "server_originals": 25,
+    "server_variants": 75,
+    "new_ids": [],
+    "recovery_files_verified": 59
+  },
+  "private_evidence_directory": ".local/task05-native-faults-20260922/",
+  "remaining": "Available confirmed-offline phone, one new named ID per physical case, verified armed control before reconnect, actual native/server reconciliation, restore normal app, fresh backup for actual new IDs; owner recovery decisions. Stop before Task 06."
+}

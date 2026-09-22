@@ -1,0 +1,59 @@
+{
+  "recorded_at": "2026-09-22T12:39:22.253651+00:00",
+  "pull_request": "https://github.com/mendmania/handovertrack/pull/5",
+  "merge_source": "1bf8d8732b41a28ad7eb3cbd19bd99424d8bf989",
+  "pr_validation": {
+    "result": "PASS",
+    "source": "e3bdd29bf13bb68d54de39b67ec52ba370ebf393",
+    "run": "https://github.com/mendmania/handovertrack/actions/runs/35727119599"
+  },
+  "main_run": "https://github.com/mendmania/handovertrack/actions/runs/35727843641",
+  "build_publish": "PASS",
+  "deployment": "NOT RUN",
+  "timer_installed": false,
+  "controller_installed": false,
+  "registry_visibility_changed": false,
+  "blockers": [
+    "SSH authentication currently fails for the existing dedicated Keychain-backed key",
+    "Owner registry visibility/access choice remains unanswered"
+  ],
+  "recovery_decisions": "Independent key/backup access after Mac loss and operator/cadence/failure response remain unconfirmed",
+  "task06": "NOT STARTED",
+  "preservation_evidence": {
+    "at": "2026-09-22T12:24:22.218883+00:00",
+    "checks": {
+      "handovertrack": true,
+      "handovertrack-restore-20260922": true,
+      "handovertrack-restore-20260922b": true,
+      "handovertrack-restore-20260922c": true,
+      "rruge": true,
+      "edge-caddy": true,
+      "all_25_assets_and_75_decoded_variants_unchanged": true
+    },
+    "server_assets": 25,
+    "variants": 75,
+    "application_release_performed": false,
+    "timer_installed": false,
+    "new_resources": "Only dedicated autodeploy service account/token and scoped RBAC; no workload, original, receipt, PVC or retained rehearsal changes"
+  },
+  "release": {
+    "source": "1bf8d8732b41a28ad7eb3cbd19bd99424d8bf989",
+    "image": "ghcr.io/mendmania/handovertrack@sha256:3850e9bfe36263021ba0ccdd32397163bf35905d34fc53f186e0bef9264d74a2",
+    "database_contract": {
+      "001_foundation.sql": "4d1bd612fffd01d0bb98b68706350ebbf08b1294cffbabf8bf1d58805f6cd7c4",
+      "002_projects_and_sync.sql": "ad4fc7dabe3d84421d78d70c12fb7a32ac1d7b027223fd76dd9fec93d163ca8b",
+      "003_membership_lock_and_receipt_scope.sql": "3c4032d59211e3e40682e38da085f11264be16a653edcc75d207a4ab42dc216b",
+      "004_media_uploads.sql": "58059ae9e9d3d9de67e47f9b5190bdee33c59636c710a8e018178a66a84b3773"
+    },
+    "data_policy": "disposable-only",
+    "platform": "linux/amd64",
+    "version": "main-4-1bf8d8732b41"
+  },
+  "actual_controller_run_artifact_qualification": "PASS",
+  "live_schema_matches_published_image_contract": true,
+  "remaining_task05": {
+    "physical_interruption_restart_lost_response": "NOT RUN: phone interaction unavailable",
+    "independent_recovery_arrangements": "UNCONFIRMED: continue is not a custody or operational decision",
+    "existing_native_fault_controls": "Prepared, verified, not installed; no control armed"
+  }
+}

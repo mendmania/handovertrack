@@ -1,111 +1,145 @@
-# HandoverTrack — finish Task 05 native and recovery validation
+# HandoverTrack — finish Task 05 native failure and recovery validation
 
-Resume Task 05 validation on the existing disposable trial. This assignment
-authorizes scoped validation using test photos, the existing backup/recovery
-tools and isolated rehearsal resources. Task 06 is not assigned. Do not restart
-first bootstrap or rebuild the architecture.
+Resume Task 05 on the existing disposable HTTPS trial. This assignment authorizes
+scoped native failure validation, focused fixes and existing backup verification.
+Task 06 is not assigned. Preserve the ongoing working tree, live release, phone
+data, configuration and all source/backup/rehearsal resources.
 
-## Read the current checkpoint first
+## Read current evidence before acting
 
 Read repository instructions, git status/branch/log, README,
-`docs/implementation-status.md`, the current section at the top of
-`docs/progress/05-k3s-trial.md`, Tasks 03/04 evidence, and
-`infra/kubernetes/README.md` plus `RECOVERY.md`. Historical blocked entries are
-an investigation trail, not current rollout instructions. Inspect actual state
-before operating; do not assume a recorded process or resource is still current.
+docs/implementation-status.md, the CURRENT section at the top of
+docs/progress/05-k3s-trial.md, its linked evidence manifests, and
+infra/kubernetes/README.md plus RECOVERY.md. Historical instructions to keep an
+assignment revoked, resume a worker or repeat bootstrap are superseded.
+Inspect actual state before operating; never overwrite another operator's change.
 
 Recorded checkpoint, 2026-09-22:
 
-- `https://handovertrack.com` is deployed with DNS-only Cloudflare records and
-  verified origin HTTPS. Source namespace is `handovertrack`, on the existing
-  `netcup-k3s-direct` context. Always select its explicit authorized kubeconfig;
-  the workstation default context is unrelated.
-- Runtime source is `ba2ecc8d8040eda6e5d57bf73d6d17e90a4d2337`, using
-  `handovertrack.local/runtime@sha256:125cd8a42f0bb92bf87251d40c4cc14c561ab27e0f00911205e000856d66d7cc`.
-  Edge and backup tools have separate later revisions. Do not deploy current
-  HEAD merely to align it with documentation.
-- The phone runs the HTTPS Release build with SQLite v4 and preserved evidence.
-  One owner-observed physical photo-to-web test passed. Server verification
-  confirmed its original hash/size, one processing job, one accepted/ready event
-  pair and all three valid variants. This is a narrow physical PASS.
-- Live synthetic failure tests, target filesystem checks, restart persistence
-  and a technical independent encrypted backup/application restore passed.
-  The successful 08:10 UTC backup predates the owner's 08:30 UTC physical photo.
-- Extended native scenarios and independent recovery-key/operational readiness
-  remain incomplete. No unattended backup or deployment automation is running.
+- HTTPS is live at https://handovertrack.com, DNS-only. Source namespace is
+  handovertrack, explicit context netcup-k3s-direct; the default workstation
+  context is unrelated. Runtime source remains
+  ba2ecc8d8040eda6e5d57bf73d6d17e90a4d2337, image
+  handovertrack.local/runtime@sha256:125cd8a42f0bb92bf87251d40c4cc14c561ab27e0f00911205e000856d66d7cc.
+  Later edge/operator-tool revisions are separate from the runtime release.
+- Camera permissions, twenty offline captures, offline reopen, pending-photo
+  revocation, account/org isolation and return-to-owner rebootstrap passed.
+  Owner-observed UI and agent-observed USB/SQLite/hash evidence are distinguished.
+- The phone preserves 23 originals/accepted receipts: 22 current North-worker
+  photos plus one earlier local-HTTP photo under another owner. The server has
+  25 accepted originals/ready jobs and 75 variants. New-cohort uploads completed
+  on attempt 1; they did not exercise native interruption or lost responses.
+- Test assignment is active at v5 following the owner's action. Source worker,
+  API and web are Ready; no assignment restoration or worker resumption is owed.
+- Fresh backup handovertrack-20260922T112734Z-54ce2f and isolated application
+  restore cover all 25 server originals, 75 derivatives, 125 media paths and all
+  18 public tables. The older local-HTTP phone original is outside server backup
+  coverage and remains preserved locally. Twelve focused operator tests passed.
+  All three rehearsal controllers are stopped; their resources are retained.
+- Open gates: controlled native stream interruption, app restart during upload,
+  retry/lost completion response, independently accessible backup/key custody,
+  access after Mac loss, and accepted backup responsibility/cadence.
 
-## A. Complete the remaining physical scenarios
+## A. Prepare controllable native failure tests
 
-Coordinate direct phone interaction with the owner. Give short ordered actions,
-then correlate their observations with the phone's durable data and server
-records. Keep owner-observed UI results distinct from agent-observed records.
-Device availability, installation, fixtures and simulator checks cannot replace
-physical evidence. If interaction is unavailable, record the exact NOT RUN gap
-and continue independent recovery/documentation work.
+1. Record current baseline IDs/hashes, ownership, queue receipts, assignments,
+   process state and server health. Reuse passing evidence; do not ask for another
+   twenty-photo batch or rerun passed checks without a new reason.
+2. Inspect apps/mobile/src/capture/native-upload.ts and
+   apps/mobile/src/media/upload.ts before selecting failure controls. Plan a
+   small NEW disposable-photo cohort, normally one distinct ID per failure case.
+   Never reset accepted rows or delete receipts to force existing photos pending.
+3. Prepare and verify the controls BEFORE asking the owner to reconnect/capture.
+   Previous transfers finished before interruption; an attempt counter or a
+   guessed delay is insufficient proof that the intended failure happened.
+   Keep the phone offline until the new IDs and fault controls are ready.
+4. Prefer scoped native transport cancellation and a development-only test seam
+   if deterministic timing requires one. Any seam must be explicit, disabled by
+   default, limited to named NEW IDs and one armed case, and preserve normal
+   authorization, ownership, TLS and immutable-byte verification. Keep the actual
+   native binary transport and real HTTPS API. Never record credentials.
+   Do not change shared Caddy/network policy, expose a production failure endpoint
+   or affect other applications to inject a fault.
+5. If a special native build is needed, reuse verified signing and install in
+   place only after confirming database/backend compatibility. Preserve originals,
+   receipt state and the previous signed build. Identify the test build and
+   distinguish it from the default runtime. Restore normal compatible app
+   configuration afterward without erase, schema downgrade or permanent fault hooks.
 
-1. Record baseline media IDs/counts, scope, queue receipts and current server
-   health without exposing credentials. Existing photos must survive the test.
-2. Exercise camera permission denial/cancel/Settings return and successful
-   capture. Permission reset must not uninstall the app or erase its data.
-3. Download an assigned test project, go offline, and capture a NEW batch of
-   twenty distinct disposable photos. Record each stable media ID and confirmed
-   saved state. Terminate/reopen offline; verify all originals, gallery entries
-   and queue intent survive under the same owner. Query cache reconstruction
-   must not depend on remote data or recreate media identities.
-4. Reconnect and test native upload interruption, restart and retry. Exercise
-   lost completion-response recovery and an owned worker restart with scoped
-   controls. Document how the failure was induced; a synthetic-only failure
-   test remains separate evidence. Do not change shared Caddy/network policy
-   or another application's processes to inject failure.
-5. Verify each of those twenty IDs has exactly one accepted logical asset,
-   original bytes matching its expected hash/size, one logical processing job
-   and all three valid derivatives. Compare to the recorded baseline: the
-   checkpoint already contains four accepted originals. Never require the
-   entire server to contain only twenty or delete older photos to make it so.
-6. Exercise logout/account/org switching, assignment revocation and rebootstrap
-   while pending and accepted photos exist. Another scope cannot see or inherit
-   them. Revoked pending work stays blocked under its original owner; bytes and
-   intent survive. Restore only test assignments changed by this exercise,
-   using the real manager APIs so the sync feed records changes.
+## B. Execute three distinct physical cases
 
-If a defect appears, reproduce and fix it within Task 05, validate affected
-regressions, and document the change. A live application/schema update needs the
-reviewed immutable-release procedure and compatibility checks; do not patch a
-running container, overwrite an image tag, reset data or downgrade SQLite.
+Coordinate one short phone action at a time with the owner and correlate native
+transport, SQLite and server evidence. Each case needs its own timing proof:
 
-## B. Close recovery coverage and readiness gaps
+1. **Interrupted binary stream:** verify a real native upload started and was
+   interrupted with positive but incomplete transferred bytes, before acceptance.
+   Preserve original bytes and queue identity. Reconnect/retry with the same
+   media/session identity and obtain one server acceptance. Record the observed
+   partial-transfer evidence; cancellation before dispatch or after full delivery
+   is a different result.
+2. **App termination during upload:** establish unfinished native work, terminate
+   the app, then reopen and reconcile durable state. Verify the existing ID/session
+   resumes or discovers acceptance without duplicate assets. Document whether the
+   server accepted before or after termination; do not guess from the UI alone.
+3. **Lost completion response:** prove the server committed acceptance while the
+   native executor did not record/deliver its acceptance receipt, then restart or
+   retry and reconcile the same accepted asset. A rejected completion request,
+   lost PUT response or worker pause does not establish this case. If a native
+   seam discards a successful completion result before the executor receives it,
+   label it controlled response-delivery loss, not observed radio loss.
 
-1. Preserve the existing technical restore PASS and its exact coverage. Take a
-   fresh consistent verified backup after the physical tests, with recorded
-   media IDs/hashes showing that the owner photo and new test batch are included.
-   Recheck target space and the required reserve; do not delete earlier backups
-   or evidence to make room. Keep secret-bearing recovery files outside Git.
-2. Verify restoration of that fresh batch in isolated resources after checking
-   capacity and existing rehearsal state. The stopped
-   `handovertrack-restore-20260922` resources must not be overwritten or deleted.
-   Source database/PVCs and retained earlier backups remain untouched. Follow
-   the corrected gzip/archive and nonroot extraction procedures in RECOVERY.md.
-3. Ask the owner to confirm independently recoverable FileVault key/credential
-   custody and how they would access the backup after losing access to this Mac.
-   Record confirmation, limitations or NOT RUN; never request or display the
-   actual recovery key, password or session token. Do not rotate keys or lock
-   the device merely to manufacture evidence.
-4. Establish a documented feasible backup cadence, operator responsibility,
-   workstation availability and failed/missed-backup response using existing
-   resources. Do not claim an unattended schedule or alert delivery without
-   testing it. Any missing decision stays explicit; this prompt does not invent
-   a schedule or authorize external notifications.
+For every new ID verify unchanged local hash/owner, one accepted server asset,
+one logical processing job, one accepted/ready event pair and three valid decoded
+derivatives. Worker attempts may vary without duplicating the logical effect.
+Verify late progress/recovery cannot move accepted state back to pending.
+All pre-existing 23 phone originals and 25 server originals must remain intact;
+expected totals are baseline plus the actual new IDs, never a reset target.
+
+Record PASS/FAIL/NOT RUN separately for actual native behavior, owner observation,
+test-seam delivery loss and synthetic tests. If phone interaction is unavailable,
+retain the named gap and continue independent documentation/recovery work.
+Fix reproducible defects and run affected regressions. A live runtime/schema
+change must follow the reviewed immutable release and compatibility procedure;
+do not patch running containers or redeploy HEAD merely to align documentation.
+
+## C. Resolve the operational recovery decisions
+
+Ask for owner confirmation of these distinct facts, without requesting keys,
+passwords, tokens or secret contents:
+
+- Where/how the FileVault recovery credential is independently accessible.
+- How actual backup BYTES can be accessed if this Mac is lost/unavailable.
+  A recovery key cannot recreate missing bytes. Confirm an existing authorized
+  location/access path before copying secret-bearing backups anywhere.
+- Who accepts backup responsibility, what cadence they accept, when the Mac is
+  available, and what happens after a failed/missed run. RECOVERY.md proposes
+  manual backup after each test session and before release; this is not yet an
+  owner-accepted commitment or an unattended schedule.
+
+Use existing resources and maintain encryption/access controls. No paid storage,
+new external destination, scheduled automation or outbound notification is
+implied. Missing owner decisions remain explicit; another same-Mac restore does
+not close an independent-access or responsibility gap.
+
+After adding test photos, take a fresh verified backup where capacity permits
+and record exact ID/hash coverage with the repaired bounded-transfer tooling.
+Preserve previous successful and failed attempts. The prior full-batch application
+restore stays PASS; do not allocate a fourth full rehearsal merely to repeat it.
+Repeat application restoration only when new tooling/schema changes, failed
+integrity checks or a specific unresolved concern justify it, with a scoped plan
+that preserves source and retained rehearsals. Distinguish verified backup
+coverage from application restoration of that exact new snapshot.
 
 ## Finish and stop
 
-Update Tasks 03/04 follow-up evidence and the current Task 05 checkpoint, keeping
-historical entries intact. Reconcile implementation status, README and the
-prepared Task 06 prompt with the actual outcome. Each check is PASS, FAIL or
-NOT RUN, with evidence type and limitations. Mark a task complete only when its
-required checks pass; unresolved native/recovery gates retain
-`implemented-awaiting-validation` and the disposable-only restriction.
+Remove/disarm only controls introduced by this test. Restore only test-owned
+state using current-version guards, and verify normal app behavior and healthy
+source workloads. Preserve existing photos, secrets, backups and Retain PVCs.
+No Cloudflare proxy switch, bootstrap/seed replay, source reset or Rrugë change.
 
-Report what passed, remaining owner actions, exact backup coverage and the next
-smallest step. Preserve identities, originals, credentials, retained volumes and
-Rrugë. No new paid service, Cloudflare proxy switch, bootstrap/seed replay,
-automatic deployment, customer intake or Task 06 implementation.
+Update Tasks 03/04 follow-up evidence, the current Task 05 checkpoint, status and
+prepared Task 06 prompt. Include actual fault mechanisms, new IDs/counts, before/
+after identities, backup coverage, accepted owner decisions and smallest remaining
+gaps. Mark required checks honestly; retain implemented-awaiting-validation and
+disposable-only while native/recovery gates remain unresolved. Do not invent an
+unattended backup/alert PASS. Stop before Task 06 and customer intake.

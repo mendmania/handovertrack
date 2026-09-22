@@ -44,6 +44,22 @@ Independent backup/key access after Mac loss and accepted operational responsibi
 remain unconfirmed; the manual procedure below is still proposed. Technical
 restore PASS does not remove the disposable-only restriction.
 
+## Owner-decision follow-up — native fault preparation, 2026-09-22
+
+The owner was asked separately about independent FileVault recovery credential
+access, actual backup bytes accessible after loss of this Mac, and accepted
+operator/cadence/availability/failed-or-missed-run response. The reply “xontinue”
+authorizes continuing validation work; it confirms **none** of those arrangements.
+All remain **UNCONFIRMED**, including any authorized external backup destination.
+No secrets were requested, no new destination was used and no automation or
+outbound notification was created. The manual procedure below remains proposed.
+
+No photos were added during this continuation. All 59 retained recovery files
+were hash/mode checked unchanged, including previous successes and partial attempts;
+source media still matches the 25-original/75-variant restored batch. No fresh
+backup or fourth application rehearsal was necessary or performed. Technical
+restore PASS remains the prior measured result, not new Mac-loss-access evidence.
+
 ## Target and consistent backup
 
 An independent target must survive loss of `netcupmaniaserver`. The workstation

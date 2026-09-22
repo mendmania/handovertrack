@@ -1,0 +1,66 @@
+import { describe, expect, it, vi } from 'vitest';
+vi.mock('expo-file-system', () => ({ File: class {}, Paths: {} }));
+import { wrapTask05Transport, type FaultControl, type FaultFiles } from './task05-faults';
+import type { CaptureRecord } from '../media/types';
+import type { Upload } from '@handovertrack/contracts';
+
+function fixture(kind: FaultControl['kind'] = 'completion') {
+  const c: FaultControl = { version:1, caseId:'10000000-0000-4000-8000-000000000001', kind, action:'arm',
+    mediaId:'10000000-0000-4000-8000-000000000002', accountId:'10000000-0000-4000-8000-000000000003',
+    organizationId:'10000000-0000-4000-8000-000000000004', projectId:'10000000-0000-4000-8000-000000000005',
+    sha256:'a'.repeat(64),size:4096,createdAt:'2099-01-01T00:00:00.000Z' };
+  const row: CaptureRecord = { id:c.mediaId,accountId:c.accountId,organizationId:c.organizationId,projectId:c.projectId,
+    size:c.size,sha256:c.sha256,createdAt:c.createdAt,updatedAt:c.createdAt,directory:'captures/test',state:'saved_local',
+    width:10,height:10,reason:null,queueState:'pending',uploadId:null,attempts:0,nextAttemptAt:0,bytesSent:0,
+    acceptedAt:null,queueReason:null,projectAvailable:true,originalPath:'captures/test/original.jpg' };
+  const upload: Upload = { ...row, mediaId:row.id,uploadId:'10000000-0000-4000-8000-000000000006',
+    state:'staged',size:c.size,sha256:c.sha256,width:10,height:10,acceptedAt:null };
+  const accepted: Upload = { ...upload,state:'accepted',acceptedAt:'2099-01-01T01:00:00.000Z' };
+  const data = new Map<string,string>([['task05-control.json',JSON.stringify(c)]]);
+  const files: FaultFiles = { read:n=>data.get(n)??null,writeOnce(n,v) { if (data.has(n)) throw Error('Exists'); data.set(n,JSON.stringify(v)); } };
+  const api = { me:vi.fn(),createUpload:vi.fn(),uploadStatus:vi.fn(async()=>accepted),completeUpload:vi.fn(async()=>accepted) };
+  const content = vi.fn(async()=>upload);
+  const transport = wrapTask05Transport({ api,content }, files);
+  const signal = new AbortController().signal;
+  const dispatch = (input = row) => transport.content(input,upload.uploadId,signal,()=>{});
+  const release = () => data.set('task05-control.json',JSON.stringify({...c,action:'release'}));
+  return {c,row,upload,accepted,data,api,content,transport,signal,dispatch,release};
+}
+describe('Task 05 temporary delivery controls (synthetic)', () => {
+  it('is inert with no explicit control', async()=>{
+    const f=fixture();f.data.clear();expect(await f.dispatch()).toEqual(f.upload);expect(f.data.size).toBe(0);
+  });
+  it('does not affect a different media ID',async()=>{
+    const f=fixture();await f.dispatch({...f.row,id:'10000000-0000-4000-8000-000000000099'});expect(f.data.size).toBe(1);
+  });
+  it.each(['sha256','accountId','organizationId','projectId','createdAt'] as const)('rejects changed immutable %s before transport',async key=>{
+    const f=fixture();await expect(f.dispatch({...f.row,[key]:'changed'})).rejects.toThrow('binding mismatch');expect(f.content).not.toHaveBeenCalled();
+  });
+  it('refuses accepted rows and old captures',async()=>{
+    const f=fixture();f.row.queueState='server_accepted';await expect(f.dispatch()).rejects.toThrow('binding mismatch');
+    f.data.set('task05-control.json',JSON.stringify({...f.c,createdAt:'2020-01-01T00:00:00.000Z'}));await expect(f.dispatch()).rejects.toThrow('Invalid Task 05 control');
+  });
+  it.each(['cancel','terminate'] as const)('never sends completion for a missed %s trigger',async kind=>{
+    const f=fixture(kind);await f.dispatch();await expect(f.transport.api.completeUpload(f.row,f.upload.uploadId,f.signal)).rejects.toThrow('no completion dispatched');expect(f.api.completeUpload).not.toHaveBeenCalled();
+  });
+  it('drops real successful acceptance before the executor and holds retries across wrapper restart',async()=>{
+    const f=fixture();await f.dispatch();await expect(f.transport.api.completeUpload(f.row,f.upload.uploadId,f.signal)).rejects.toThrow('delivery loss');
+    expect(f.api.completeUpload).toHaveBeenCalledTimes(1);
+    expect(JSON.parse(f.data.get(`task05-${f.c.caseId}-completion.json`)!)).toMatchObject({kind:'controlled-response-delivery-loss',receipt:f.accepted});
+    await expect(f.transport.api.uploadStatus(f.row,f.upload.uploadId,f.signal)).rejects.toThrow('operator release');expect(f.api.uploadStatus).not.toHaveBeenCalled();
+    const restarted=wrapTask05Transport({api:f.api,content:f.content},{read:n=>f.data.get(n)??null,writeOnce(){throw Error('unexpected write');}});
+    await expect(restarted.api.uploadStatus(f.row,f.upload.uploadId,f.signal)).rejects.toThrow('operator release');
+    f.release();expect(await restarted.api.uploadStatus(f.row,f.upload.uploadId,f.signal)).toEqual(f.accepted);
+    expect(f.api.completeUpload).toHaveBeenCalledTimes(1);expect(f.content).toHaveBeenCalledTimes(1);
+  });
+  it('does not label a rejected completion as response loss',async()=>{
+    const f=fixture();await f.dispatch();f.api.completeUpload.mockRejectedValueOnce(Error('Rejected'));
+    await expect(f.transport.api.completeUpload(f.row,f.upload.uploadId,f.signal)).rejects.toThrow('Rejected');
+    expect(f.data.has(`task05-${f.c.caseId}-completion.json`)).toBe(false);
+  });
+  it('holds native failure evidence and never overwrites its session binding',async()=>{
+    const f=fixture('cancel');await f.dispatch();f.data.set(`task05-${f.c.caseId}-native.json`,'{}');
+    await expect(f.dispatch()).rejects.toThrow('already dispatched');await expect(f.transport.api.uploadStatus(f.row,f.upload.uploadId,f.signal)).rejects.toThrow('operator release');
+    f.release();await f.transport.api.uploadStatus(f.row,f.upload.uploadId,f.signal);expect(f.content).toHaveBeenCalledTimes(1);
+  });
+});

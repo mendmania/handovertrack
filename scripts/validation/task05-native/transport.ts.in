@@ -1,0 +1,77 @@
+// TEMPORARY Task 05 build overlay. Never imported by the normal app.
+import type { UploadTransport } from '../media/upload';
+import type { CaptureRecord } from '../media/types';
+import { File, Paths } from 'expo-file-system';
+
+export interface FaultControl {
+  version: 1; caseId: string; kind: 'cancel' | 'terminate' | 'completion';
+  action: 'arm' | 'release'; mediaId: string; accountId: string;
+  organizationId: string; projectId: string; sha256: string; size: number;
+  createdAt: string; uploadId?: string;
+}
+export interface FaultFiles {
+  read(name: string): string | null;
+  writeOnce(name: string, value: unknown): void;
+}
+const controlName = 'task05-control.json';
+const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
+const forbidden: string[] = __BASELINE_IDS__;
+const notBefore = '__NOT_BEFORE__';
+const nativeFiles: FaultFiles = {
+  read(name) { const f = new File(Paths.document, name); return f.exists ? f.textSync() : null; },
+  writeOnce(name, value) {
+    const f = new File(Paths.document, name);
+    f.create(); f.write(JSON.stringify(value)); // Refuse overwrite; preserve all evidence.
+  },
+};
+export function wrapTask05Transport(transport: UploadTransport, files: FaultFiles = nativeFiles): UploadTransport {
+  const read = () => {
+    const raw = files.read(controlName); if (raw === null) return null;
+    const c = JSON.parse(raw) as FaultControl;
+    if (c.version !== 1 || !uuid.test(c.caseId) || !uuid.test(c.mediaId)
+      || !['cancel','terminate','completion'].includes(c.kind) || !['arm','release'].includes(c.action)
+      || forbidden.includes(c.mediaId) || !Number.isFinite(Date.parse(c.createdAt)) || c.createdAt <= notBefore
+      || !/^[a-f0-9]{64}$/.test(c.sha256) || !Number.isSafeInteger(c.size) || c.size <= 0) throw Error('Invalid Task 05 control');
+    return c;
+  };
+  const name = (c: FaultControl, event: string) => `task05-${c.caseId}-${event}.json`;
+  const held = (c: FaultControl) => files.read(name(c,'native')) !== null || files.read(name(c,'completion')) !== null;
+  const matchingSession = (c: FaultControl, uploadId: string) => {
+    const raw = files.read(name(c,'binding'));
+    return raw !== null && (JSON.parse(raw) as { uploadId: string }).uploadId === uploadId;
+  };
+  return {
+    api: {
+      ...transport.api,
+      async uploadStatus(scope, uploadId, signal) {
+        const c = read();
+        if (c?.action === 'arm' && matchingSession(c,uploadId) && held(c)) throw Error('Task 05 evidence held; operator release required');
+        return transport.api.uploadStatus(scope,uploadId,signal);
+      },
+      async completeUpload(scope, uploadId, signal) {
+        const c = read();
+        if (!c || c.action !== 'arm' || !matchingSession(c,uploadId)) return transport.api.completeUpload(scope,uploadId,signal);
+        // Never accidentally accept a missed partial-stream trigger.
+        if (c.kind !== 'completion' || held(c)) throw Error('Task 05 evidence held; no completion dispatched');
+        const receipt = await transport.api.completeUpload(scope,uploadId,signal);
+        if (receipt.state !== 'accepted' || !receipt.acceptedAt || receipt.mediaId !== c.mediaId
+          || receipt.accountId !== c.accountId || receipt.organizationId !== c.organizationId
+          || receipt.projectId !== c.projectId || receipt.sha256 !== c.sha256 || receipt.size !== c.size) throw Error('Invalid Task 05 acceptance');
+        files.writeOnce(name(c,'completion'), { at: new Date().toISOString(), kind: 'controlled-response-delivery-loss', receipt });
+        // The real HTTPS call committed and returned acceptance, but the executor
+        // receives an error. This is explicitly NOT a claim of radio loss.
+        throw Error('Task 05 controlled completion response delivery loss');
+      },
+    },
+    async content(row: CaptureRecord, uploadId, signal, progress) {
+      const c = read();
+      if (!c || c.action !== 'arm' || row.id !== c.mediaId) return transport.content(row,uploadId,signal,progress);
+      if (row.queueState === 'server_accepted' || row.createdAt !== c.createdAt
+        || row.accountId !== c.accountId || row.organizationId !== c.organizationId || row.projectId !== c.projectId
+        || row.sha256 !== c.sha256 || row.size !== c.size) throw Error('Task 05 immutable binding mismatch');
+      if (held(c) || files.read(name(c,'binding')) !== null) throw Error('Task 05 case already dispatched; release before retry');
+      files.writeOnce(name(c,'binding'), { ...c, uploadId, at: new Date().toISOString() });
+      return transport.content(row,uploadId,signal,progress);
+    },
+  };
+}
