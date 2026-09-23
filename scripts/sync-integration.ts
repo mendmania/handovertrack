@@ -80,7 +80,7 @@ try {
   const updateKey = key(); const edited = await manager.updateProject(scope, p.id, { ...input('Updated project'), baseVersion: 1 }, updateKey);
   assert.equal(edited.version, 2);
   assert.deepEqual(await manager.updateProject(scope, p.id, { ...input('Updated project'), baseVersion: 1 }, updateKey), edited);
-  await assert.rejects(manager.updateProject(scope, p.id, { ...input('Retain my submitted intent'), baseVersion: 1 }, key()), (error: unknown) => error instanceof ApiError && error.code === 'VERSION_CONFLICT' && error.status === 409 && error.current?.version === 2);
+  await assert.rejects(manager.updateProject(scope, p.id, { ...input('Retain my submitted intent'), baseVersion: 1 }, key()), (error: unknown) => error instanceof ApiError && error.code === 'VERSION_CONFLICT' && error.status === 409 && !!error.current && 'version' in error.current && error.current.version === 2);
   const grant = await manager.setAssignment(scope, p.id, workerId, { active: true, baseVersion: 0 }, key()); assert.equal(grant.version, 1);
   assert.deepEqual((await manager.workers(scope)).map((w) => w.accountId), [workerId]);
   assert.equal((await manager.assignments(scope, p.id))[0]?.version, 1);

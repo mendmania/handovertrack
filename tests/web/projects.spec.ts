@@ -18,7 +18,7 @@ test('real manager sign-in, SSR hydration, detail, logout and previous-page priv
   await expect(page.getByText('South · Workshop refit', { exact: true })).toHaveCount(0);
   await page.waitForTimeout(500); // Settled hydration must not refetch fresh SSR data.
   expect(browserProjectFetches).toBe(0);
-  await page.screenshot({ path: '.local/web-projects.png', fullPage: true });
+  await page.screenshot({ path: `${process.env.TEST_ARTIFACT_DIR ?? '.local'}/web-projects.png`, fullPage: true });
   await page.getByRole('link', { name: /North · Riverside repair/ }).click();
   await expect(page.getByRole('heading', { name: 'Project overview' })).toBeVisible();
   await expect(page.getByText('12 Riverside Lane', { exact: true })).toBeVisible();
@@ -124,7 +124,7 @@ test('manager creates with safe retry, preserves conflict intent, and grants/rem
   await worker.goto(`/org/${orgA}/projects`);
   await expect(worker.getByRole('link', { name: new RegExp(name) })).toHaveCount(0);
   await workerContext.close();
-  await page.screenshot({ path: '.local/web-task02-project.png', fullPage: true });
+  await page.screenshot({ path: `${process.env.TEST_ARTIFACT_DIR ?? '.local'}/web-task02-project.png`, fullPage: true });
 
   let release!: () => void;
   let committed!: () => void;

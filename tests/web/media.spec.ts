@@ -13,7 +13,9 @@ test('manager gallery polls committed media, serves private derivatives and clos
   const me = await (await page.request.get('/bff/v1/me')).json();
   const mediaId = randomUUID();
   const bytes = await sharp({ create:{ width:960,height:720,channels:3,background:'#447564' } }).jpeg().toBuffer();
-  const apiOrigin = 'http://localhost:3301';
+  const endpoint = new URL(process.env.API_INTERNAL_URL ?? 'http://localhost:3301');
+  endpoint.hostname = new URL(page.url()).hostname; // Same host-only session cookie across local ports.
+  const apiOrigin = endpoint.origin;
   const origin = new URL(page.url()).origin;
   const created = await page.request.post(`${apiOrigin}/v1/organizations/${organizationId}/projects/${projectId}/uploads`, {
     headers:{ origin }, data:{ accountId:me.accountId,mediaId,mime:'image/jpeg',capturedAt:new Date().toISOString(),size:bytes.length,sha256:createHash('sha256').update(bytes).digest('hex'),width:960,height:720 },
@@ -37,7 +39,7 @@ test('manager gallery polls committed media, serves private derivatives and clos
     const response = await page.request.get(url!); expect(response.status()).toBe(200);
     expect(response.headers()['cache-control']).toBe('private, no-store');
     expect(createHash('sha256').update(await response.body()).digest('hex')).toBe(createHash('sha256').update(bytes).digest('hex'));
-    await page.screenshot({ path:'.local/task04-manager-gallery.png',fullPage:true });
+    await page.screenshot({ path:`${process.env.TEST_ARTIFACT_DIR ?? '.local'}/task04-manager-gallery.png`,fullPage:true });
     await page.getByRole('button',{ name:'Sign out',exact:true }).click();
     await expect(page).toHaveURL(/sign-in/);
     expect((await page.request.get(url!)).status()).toBe(401);

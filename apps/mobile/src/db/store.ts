@@ -1,5 +1,7 @@
+import { migrationV5 } from '../checklists/migration';
+import { assertChecklistRun } from '../checklists/validation';
 import { assertBootstrap, assertPage } from '../sync/protocol';
-import { assertCompleteSnapshot, type Project, type ProjectSnapshot, type Scope, type Assignment, type SyncBootstrap, type SyncPage } from '@handovertrack/contracts';
+import { assertCompleteSnapshot, type Project, type ProjectSnapshot, type Scope, type ChecklistRun, type ChecklistTemplate, type Assignment, type SyncBootstrap, type SyncPage } from '@handovertrack/contracts';
 type Bind = string | number | null;
 export interface SqlConnection {
   execAsync(sql: string): Promise<void>;
@@ -102,17 +104,20 @@ export class SnapshotStore {
   async migrate() {
     await this.db.execAsync('PRAGMA journal_mode=WAL; PRAGMA foreign_keys=ON; PRAGMA busy_timeout=5000;');
     const version = await this.db.getFirstAsync<{ user_version: number }>('PRAGMA user_version');
-    if ((version?.user_version ?? 0) > 4) throw new Error('Local database is newer than this app');
+    if ((version?.user_version ?? 0) > 5) throw new Error('Local database is newer than this app');
     if (!version?.user_version) await this.db.withExclusiveTransactionAsync((tx) => tx.execAsync(migrationV1));
     if ((version?.user_version ?? 0) < 2) await this.db.withExclusiveTransactionAsync((tx) => tx.execAsync(migrationV2));
     if ((version?.user_version ?? 0) < 3) await this.db.withExclusiveTransactionAsync((tx) => tx.execAsync(migrationV3));
     if ((version?.user_version ?? 0) < 4) await this.db.withExclusiveTransactionAsync((tx) => tx.execAsync(migrationV4));
+    if ((version?.user_version ?? 0) < 5) await this.db.withExclusiveTransactionAsync((tx) => tx.execAsync(migrationV5));
   }
   async replace(scope: Scope, snapshot: ProjectSnapshot, assertCurrent: () => void) {
     assertCompleteSnapshot(snapshot, scope);
     await this.exclusive(async (tx) => {
       assertCurrent();
       await tx.runAsync('INSERT INTO cache_scopes(account_id,organization_id,revision,validated_at) VALUES(?,?,1,?) ON CONFLICT(account_id,organization_id) DO UPDATE SET revision=revision+1, validated_at=excluded.validated_at,cursor=NULL,last_page=NULL', scope.accountId, scope.organizationId, snapshot.generatedAt);
+      await tx.runAsync('DELETE FROM cached_checklists WHERE account_id=? AND organization_id=?', scope.accountId, scope.organizationId);
+      await tx.runAsync('DELETE FROM cached_checklist_templates WHERE account_id=? AND organization_id=?', scope.accountId, scope.organizationId);
       await tx.runAsync('DELETE FROM cached_assignments WHERE account_id=? AND organization_id=?', scope.accountId, scope.organizationId);
       await tx.runAsync('DELETE FROM cached_projects WHERE account_id=? AND organization_id=?', scope.accountId, scope.organizationId);
       for (const project of snapshot.projects) {
@@ -129,9 +134,13 @@ export class SnapshotStore {
     await this.exclusive(async (tx) => {
       assertCurrent();
       await tx.runAsync('INSERT INTO cache_scopes(account_id,organization_id,revision,validated_at,cursor) VALUES(?,?,1,?,?) ON CONFLICT(account_id,organization_id) DO UPDATE SET revision=revision+1,validated_at=excluded.validated_at,cursor=excluded.cursor,last_page=NULL', scope.accountId, scope.organizationId, value.generatedAt, value.cursor);
+      await tx.runAsync('DELETE FROM cached_checklists WHERE account_id=? AND organization_id=?', scope.accountId, scope.organizationId);
+      await tx.runAsync('DELETE FROM cached_checklist_templates WHERE account_id=? AND organization_id=?', scope.accountId, scope.organizationId);
       await tx.runAsync('DELETE FROM cached_assignments WHERE account_id=? AND organization_id=?', scope.accountId, scope.organizationId);
       await tx.runAsync('DELETE FROM cached_projects WHERE account_id=? AND organization_id=?', scope.accountId, scope.organizationId);
       for (const project of value.projects) { assertCurrent(); await this.upsertProject(tx, scope, project); }
+      for (const run of value.checklists ?? []) { assertCurrent(); await this.upsertChecklist(tx,scope,run); }
+      for (const template of value.templates ?? []) { assertCurrent(); await this.upsertTemplate(tx,scope,template); }
       for (const assignment of value.assignments) { assertCurrent(); await this.upsertAssignment(tx, scope, assignment); }
       assertCurrent();
     });
@@ -146,10 +155,16 @@ export class SnapshotStore {
       if (!before?.cursor || before.cursor !== page.fromCursor) throw new Error('Sync cursor changed; refresh from the durable cursor');
       for (const change of page.changes) {
         assertCurrent();
-        if (change.entity === 'project') {
+        if (change.entity === 'checklist') {
+          if (change.operation === 'upsert') await this.upsertChecklist(tx,scope,change.checklist!);
+          else await tx.runAsync('DELETE FROM cached_checklists WHERE account_id=? AND organization_id=? AND project_id=?',scope.accountId,scope.organizationId,change.projectId);
+        } else if (change.entity === 'template') {
+          if (change.operation === 'upsert') await this.upsertTemplate(tx,scope,change.template!);
+        } else if (change.entity === 'project') {
           if (change.operation === 'upsert') await this.upsertProject(tx, scope, change.project!);
           else {
             await tx.runAsync('DELETE FROM cached_assignments WHERE account_id=? AND organization_id=? AND project_id=?', scope.accountId, scope.organizationId, change.projectId);
+            await tx.runAsync('DELETE FROM cached_checklists WHERE account_id=? AND organization_id=? AND project_id=?', scope.accountId, scope.organizationId, change.projectId);
             await tx.runAsync('DELETE FROM cached_projects WHERE account_id=? AND organization_id=? AND id=?', scope.accountId, scope.organizationId, change.projectId);
           }
         } else if (change.operation === 'upsert') await this.upsertAssignment(tx, scope, change.assignment!);
@@ -158,7 +173,10 @@ export class SnapshotStore {
           // A raw page boundary can split an assignment and project tombstone.
           // Own assignment removal is already authoritative: hide the project
           // in THIS commit even if the next network page never arrives.
-          if (change.accountId === scope.accountId) await tx.runAsync('DELETE FROM cached_projects WHERE account_id=? AND organization_id=? AND id=?', scope.accountId, scope.organizationId, change.projectId);
+          if (change.accountId === scope.accountId) {
+            await tx.runAsync('DELETE FROM cached_checklists WHERE account_id=? AND organization_id=? AND project_id=?',scope.accountId,scope.organizationId,change.projectId);
+            await tx.runAsync('DELETE FROM cached_projects WHERE account_id=? AND organization_id=? AND id=?', scope.accountId, scope.organizationId, change.projectId);
+          }
         }
       }
       // A crash, SQL failure or scope switch before this point rolls back rows AND
@@ -168,6 +186,15 @@ export class SnapshotStore {
       assertCurrent(); applied = true;
     });
     return applied;
+  }
+  async upsertChecklist(tx: SqlConnection, scope: Scope, run: ChecklistRun) {
+    assertChecklistRun(run,scope,run.projectId);
+    const existing = await tx.getFirstAsync<{payload:string}>('SELECT payload FROM cached_checklists WHERE account_id=? AND organization_id=? AND project_id=?',scope.accountId,scope.organizationId,run.projectId);
+    if (existing && (JSON.parse(existing.payload) as ChecklistRun).version > run.version) return;
+    await tx.runAsync('INSERT INTO cached_checklists(account_id,organization_id,project_id,payload) VALUES(?,?,?,?) ON CONFLICT(account_id,organization_id,project_id) DO UPDATE SET payload=excluded.payload',scope.accountId,scope.organizationId,run.projectId,JSON.stringify(run));
+  }
+  private async upsertTemplate(tx: SqlConnection, scope: Scope, template: ChecklistTemplate) {
+    await tx.runAsync('INSERT INTO cached_checklist_templates(account_id,organization_id,id,version,payload) VALUES(?,?,?,?,?) ON CONFLICT DO NOTHING',scope.accountId,scope.organizationId,template.id,template.version,JSON.stringify(template));
   }
   private async upsertProject(tx: SqlConnection, scope: Scope, project: Project) {
     await tx.runAsync('INSERT INTO cached_projects(account_id,organization_id,id,name,description,address,status,updated_at,version) VALUES(?,?,?,?,?,?,?,?,?) ON CONFLICT(account_id,organization_id,id) DO UPDATE SET name=excluded.name,description=excluded.description,address=excluded.address,status=excluded.status,updated_at=excluded.updated_at,version=excluded.version', scope.accountId, scope.organizationId, project.id, project.name, project.description, project.address, project.status, project.updatedAt, project.version);
@@ -194,6 +221,8 @@ export class SnapshotStore {
     await this.exclusive(async (tx) => {
       // Expo exclusive transactions open another connection. Purge explicitly
       // as well as defining FKs; never rely on connection-local PRAGMA defaults.
+      await tx.runAsync('DELETE FROM cached_checklists WHERE account_id=? AND organization_id=?', scope.accountId, scope.organizationId);
+      await tx.runAsync('DELETE FROM cached_checklist_templates WHERE account_id=? AND organization_id=?', scope.accountId, scope.organizationId);
       await tx.runAsync('DELETE FROM cached_assignments WHERE account_id=? AND organization_id=?', scope.accountId, scope.organizationId);
       await tx.runAsync('DELETE FROM cached_projects WHERE account_id=? AND organization_id=?', scope.accountId, scope.organizationId);
       await tx.runAsync('DELETE FROM cache_scopes WHERE account_id=? AND organization_id=?', scope.accountId, scope.organizationId);
@@ -201,6 +230,8 @@ export class SnapshotStore {
   }
   async removeAccount(accountId: string) {
     await this.exclusive(async (tx) => {
+      await tx.runAsync('DELETE FROM cached_checklists WHERE account_id=?',accountId);
+      await tx.runAsync('DELETE FROM cached_checklist_templates WHERE account_id=?',accountId);
       await tx.runAsync('DELETE FROM cached_assignments WHERE account_id=?', accountId);
       await tx.runAsync('DELETE FROM cached_projects WHERE account_id=?', accountId);
       await tx.runAsync('DELETE FROM cache_scopes WHERE account_id=?', accountId);

@@ -1,6 +1,9 @@
+import { registerReports } from './reports';
+import { ReportFiles } from '@handovertrack/platform/reports';
+import { registerChecklists } from './checklists';
 import Fastify, { type FastifyError } from 'fastify';
 import { fromNodeHeaders } from 'better-auth/node';
-import { createAuth, createDatabase, createReaders, createProjectManagement } from '@handovertrack/platform';
+import { createAuth, createDatabase, createReaders, createProjectManagement, createChecklists } from '@handovertrack/platform';
 import { resolveAccount, projectReads, projectManagement, AccessError, capabilities } from '@handovertrack/backend';
 import type { ServerConfig } from '@handovertrack/config/server';
 import type { Me, ProjectSnapshot, ProjectInput, ProjectUpdate, AssignmentInput } from '@handovertrack/contracts';
@@ -14,7 +17,7 @@ export function createApp(config: ServerConfig, logging = true) {
   const readers = createReaders(db);
   const projects = projectReads(readers.projects, readers.memberships);
   const management = projectManagement(createProjectManagement(pool, config.AUTH_SECRET));
-  const app = Fastify({ logger: logging ? { redact: ['req.headers.cookie', 'req.headers.authorization', 'res.headers.set-cookie'], serializers: { req: (req) => ({ method: req.method, url: req.url?.split('?')[0], id: req.id }) } } : false, bodyLimit: 16_384 });
+  const app = Fastify({ ajv: { customOptions: { removeAdditional: false } }, logger: logging ? { redact: ['req.headers.cookie', 'req.headers.authorization', 'res.headers.set-cookie'], serializers: { req: (req) => ({ method: req.method, url: req.url?.split('?')[0], id: req.id }) } } : false, bodyLimit: 16_384 });
   app.addHook('onClose', async () => { await db.destroy(); });
   app.addHook('onSend', async (_req, reply) => { reply.header('cache-control', 'private, no-store'); });
   app.setNotFoundHandler(async () => { throw new AccessError('NOT_FOUND', 404); });
@@ -106,10 +109,12 @@ export function createApp(config: ServerConfig, logging = true) {
     const account = await accountFor(req.headers); return management.bootstrap(account.id, req.params.organizationId);
   });
   app.get<{ Params: { organizationId: string }; Querystring: { cursor: string; limit?: number } }>('/v1/organizations/:organizationId/sync/pull', {
-    schema: { ...schema, querystring: { type: 'object', additionalProperties: false, required: ['cursor'], properties: { cursor: { type: 'string', maxLength: 2048, minLength: 1 }, limit: { type: 'integer', minimum: 1, maximum: 100 } } } },
+    schema: { ...schema, querystring: { type: 'object', additionalProperties: false, required: ['cursor'], properties: { _: { type: 'string', maxLength: 64 }, cursor: { type: 'string', maxLength: 2048, minLength: 1 }, limit: { type: 'integer', minimum: 1, maximum: 100 } } } },
   }, async (req) => {
     const account = await accountFor(req.headers); return management.pull(account.id, req.params.organizationId, req.query.cursor, req.query.limit ?? 100);
   });
   app.register(async (instance) => registerMedia(instance, pool, config, accountFor));
+  registerChecklists(app, createChecklists(pool), accountFor, config.WEB_ORIGIN);
+  registerReports(app, pool, new ReportFiles(config.MEDIA_ROOT, config.MEDIA_RESERVE_BYTES), accountFor, config.WEB_ORIGIN);
   return app;
 }

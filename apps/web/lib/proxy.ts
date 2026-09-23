@@ -11,6 +11,7 @@ export async function proxy(request: Request, path: string) {
   try {
     const upstream = await fetch(new URL(path, process.env.API_INTERNAL_URL ?? 'http://127.0.0.1:3301'), init);
     const responseHeaders = new Headers({ 'cache-control': 'private, no-store' });
+    for (const key of ['content-disposition', 'x-content-type-options', 'etag']) { const value = upstream.headers.get(key); if (value) responseHeaders.set(key, value); }
     const type = upstream.headers.get('content-type'); if (type) responseHeaders.set('content-type', type);
     for (const cookie of upstream.headers.getSetCookie()) responseHeaders.append('set-cookie', cookie);
     return new Response(upstream.body, { status: upstream.status, headers: responseHeaders });

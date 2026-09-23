@@ -295,6 +295,7 @@ pnpm build
 pnpm test:api-build
 pnpm test:worker
 pnpm test:media
+pnpm test:checklists
 pnpm exec playwright install chromium
 pnpm test:web
 pnpm mobile:check
@@ -329,6 +330,77 @@ isolated application restore. Three stopped recovery rehearsals and all earlier
 files are retained. The test assignment is restored and the worker is running.
 Native interruption/retry/lost-response recovery, independent Mac-loss backup/key
 access and dependable backup operation remain unverified. Use disposable photos
-only; Task 06 has not started.
+only. Task 06 is implemented locally with native interactive validation still open.
 
-Continue with the [Task 05 validation prompt](docs/prompts/05-trial-validation.md). Read [deployment operations](infra/kubernetes/README.md) and [isolated recovery](infra/kubernetes/RECOVERY.md) before live work; preserve the existing installation and retained restore data. The [Task 06 prompt](docs/prompts/06-checklists.md) is prepared and requires a separate assignment; Task 06 has not started.
+Continue with the [Task 05 validation prompt](docs/prompts/05-trial-validation.md). Read [deployment operations](infra/kubernetes/README.md) and [isolated recovery](infra/kubernetes/RECOVERY.md) before live work; preserve the existing installation and retained restore data. The [Task 06 handoff](docs/progress/06-checklists.md) records the separately assigned local implementation and remaining checks. [Task 07](docs/progress/07-proof-reports.md) is implemented and validated locally; [Task 08](docs/prompts/08-sharing-and-decisions.md) is prepared only.
+
+
+## Required-photo checklists (Task 06, local only)
+
+Apply additive PostgreSQL migration 005 to an isolated local database before using
+this source. The deployed HTTPS API/phone have not been upgraded. Keep the
+existing phone and recovery resources on their current validated installation.
+
+On a manager project page, use **Manage template versions** to publish questions,
+required answers and minimum-photo rules. Choose a version and **Start frozen
+checklist**. Later template versions do not alter that project's requirements.
+Workers can answer their assigned projects; the native project page saves answers
+and photo selections to SQLite while offline. Foreground sync uploads eligible
+photos first, then sends the separate durable answer commands. **Checklist outbox
+& conflicts** shows pending/blocked answers, including retained inaccessible work.
+
+Conflicts show the local input and current known server answer. Choose **Use server
+answer explicitly** or **Resolve with my edited answer**; each resolution creates
+a new version-checked command and retains the previous payloads. Uncertain delivery
+retries the original command ID and frozen payload. Logout/rebootstrap/scope changes
+preserve all local answers, outbox entries, conflicts and original media under the
+original owner. SQLite remains authoritative for native reads.
+
+Completion requires a frozen run, every required nonblank text answer and the
+configured count of distinct accepted same-project originals for each question.
+Workers can newly link their own accepted photos or retain proof already linked
+to the current answer; managers can use the project's accepted evidence. Pending uploads or forged readiness cannot satisfy proof.
+This applies to the checklist completion button **and existing project status
+updates**; complete-at-creation is rejected. Completed answers are locked until a
+manager reopens the project. Existing pre-migration complete records remain, but
+writing them again as complete must satisfy the new policy.
+
+SQLite migration 5 upgrades the same database file additively. Never downgrade it
+or delete pending work to use an older app. PostgreSQL migration 005, new sync
+entities and matching clients need a separately reviewed compatible rollout.
+[Task 06 validation and limitations](docs/progress/06-checklists.md) distinguish
+local SQL/HTTP/browser evidence from the unperformed native and live checks.
+
+
+## Proof composition and private reports (Task 07, local only)
+
+Apply additive PostgreSQL migration 006 to an isolated local database. On a manager
+project page, **Proof composition & reports** edits internal/report-visible notes,
+image annotations and before/after pairs. Saves create immutable composition
+revisions. New notes are internal by default and are excluded from all reports.
+Rectangles use percentages of the upright, EXIF-oriented image; originals stay
+unchanged. Both pair members must be distinct accepted photos from this project.
+
+Save the composition, complete the checklist, select evidence and choose **Create
+immutable completion PDF**. All checklist proof, annotations and pair photos must
+be selected. Image-v1 report derivatives must be ready. Snapshot creation checks
+current project/checklist/composition versions and revalidates completion inside
+the transaction, even for previously complete projects. Later edits require a new
+report revision; they cannot change an existing PDF.
+
+The API/web/worker share the same private absolute MEDIA_ROOT. The built worker
+includes a separate bounded PDF child and the bundled licensed font. Reports use
+PostgreSQL leases and immutable, verified publication under
+`MEDIA_ROOT/reports/<UUID>/proof.pdf`. Failed report jobs expose an authorized retry;
+failed image processing must be redriven through existing media maintenance before
+requesting the report. Private downloads require current manager access and are
+never publicly cached. No public sharing/customer-decision flow is implemented.
+
+Limits are 40 photos, 20 notes, 20 pairs, 200 pages, 50 MiB PDF and 120 seconds per
+render, one report child per worker alongside independent image dispatch. SQLite
+remains v5 and authoritative; no offline annotation editor or media cleanup was
+added. See the [Task 07 handoff](docs/progress/07-proof-reports.md) for exact bounds,
+state/retry contracts, isolated commands, native follow-up and validation evidence.
+A future live upgrade needs compatible clients/services, resource validation and
+backup/restore coverage for report tables and files. Existing Task 05 backup and
+phone/recovery gates remain open. No live upgrade is included here.

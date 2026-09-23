@@ -5,8 +5,8 @@ async function handler(request: Request, context: { params: Promise<{ path: stri
   const resource = path.join('/');
   const organization = 'organizations/[a-f0-9-]+';
   const routes: Record<string, RegExp> = {
-    GET: new RegExp(`^(me|${organization}/workers|${organization}/projects(?:/(?:snapshot|[a-f0-9-]+(?:/(?:assignments|media))?))?|${organization}/sync/(?:bootstrap|pull))$`),
-    POST: new RegExp(`^${organization}/projects$`),
+    GET: new RegExp(`^(me|${organization}/checklist-templates|${organization}/workers|${organization}/projects(?:/(?:snapshot|[a-f0-9-]+(?:/(?:assignments|media|checklist|proof|reports/[a-f0-9-]+(?:/pdf)?))?))?|${organization}/sync/(?:bootstrap|pull))$`),
+    POST: new RegExp(`^${organization}/(?:checklist-templates|projects(?:/[a-f0-9-]+/(?:checklist|proof|reports(?:/[a-f0-9-]+/retry)?))?)$`),
     PATCH: new RegExp(`^${organization}/projects/[a-f0-9-]+$`),
     PUT: new RegExp(`^${organization}/projects/[a-f0-9-]+/assignments/[a-f0-9-]+$`),
   };

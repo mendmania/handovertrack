@@ -1,5 +1,20 @@
 import createClient from 'openapi-fetch';
 import type { paths, components } from './generated';
+export type ProofNote = components['schemas']['ProofNote'];
+export type ProofMark = components['schemas']['ProofMark'];
+export type ProofAnnotation = components['schemas']['ProofAnnotation'];
+export type ProofPair = components['schemas']['ProofPair'];
+export type Composition = components['schemas']['Composition'];
+export type CompositionInput = components['schemas']['CompositionInput'];
+export type ReportInput = components['schemas']['ReportInput'];
+export type ReportStatus = components['schemas']['ReportStatus'];
+export type ChecklistQuestion = components['schemas']['ChecklistQuestion'];
+export type ChecklistTemplate = components['schemas']['ChecklistTemplate'];
+export type TemplateInput = components['schemas']['TemplateInput'];
+export type ChecklistAnswer = components['schemas']['ChecklistAnswer'];
+export type ChecklistRun = components['schemas']['ChecklistRun'];
+export type ChecklistCommand = components['schemas']['ChecklistCommand'];
+export type ChecklistResult = components['schemas']['ChecklistResult'];
 export type Project = components['schemas']['Project'];
 export type ProjectSnapshot = components['schemas']['ProjectSnapshot'];
 export type ProjectInput = components['schemas']['ProjectInput'];
@@ -17,7 +32,7 @@ export type Me = components['schemas']['Me'];
 export type ApiFailure = components['schemas']['Error'];
 export interface Scope { accountId: string; organizationId: string }
 export class ApiError extends Error {
-  constructor(public readonly status: number, public readonly code: string, message = code, public readonly current?: Project | Assignment) { super(message); }
+  constructor(public readonly status: number, public readonly code: string, message = code, public readonly current?: components['schemas']['Error']['current']) { super(message); }
 }
 export function createApi(options: { baseUrl: string; fetch?: typeof fetch; headers?: HeadersInit; credentials?: RequestCredentials }) {
   const client = createClient<paths>({ ...options, cache: 'no-store' });
@@ -27,6 +42,33 @@ export function createApi(options: { baseUrl: string; fetch?: typeof fetch; head
     return result.data;
   }
   return {
+    async proof(scope: Scope, projectId: string, signal?: AbortSignal) {
+      return unwrap(await client.GET('/v1/organizations/{organizationId}/projects/{projectId}/proof', { params: { path: { ...scope, projectId } }, signal }));
+    },
+    async saveProof(scope: Scope, projectId: string, input: CompositionInput, key: string) {
+      return unwrap(await client.POST('/v1/organizations/{organizationId}/projects/{projectId}/proof', { params: { path: { ...scope, projectId }, header: { 'Idempotency-Key': key } }, body: input }));
+    },
+    async requestReport(scope: Scope, projectId: string, input: ReportInput, key: string) {
+      return unwrap(await client.POST('/v1/organizations/{organizationId}/projects/{projectId}/reports', { params: { path: { ...scope, projectId }, header: { 'Idempotency-Key': key } }, body: input }));
+    },
+    async reportStatus(scope: Scope, projectId: string, reportId: string, signal?: AbortSignal) {
+      return unwrap(await client.GET('/v1/organizations/{organizationId}/projects/{projectId}/reports/{reportId}', { params: { path: { ...scope, projectId, reportId } }, signal }));
+    },
+    async retryReport(scope: Scope, projectId: string, reportId: string, key: string) {
+      return unwrap(await client.POST('/v1/organizations/{organizationId}/projects/{projectId}/reports/{reportId}/retry', { params: { path: { ...scope, projectId, reportId }, header: { 'Idempotency-Key': key } } }));
+    },
+    async checklistTemplates(scope: Scope, signal?: AbortSignal) {
+      return unwrap(await client.GET('/v1/organizations/{organizationId}/checklist-templates', { params: { path: scope }, signal })).templates;
+    },
+    async publishChecklistTemplate(scope: Scope, input: TemplateInput, key: string, signal?: AbortSignal) {
+      return unwrap(await client.POST('/v1/organizations/{organizationId}/checklist-templates', { params: { path: scope, header: { 'Idempotency-Key': key } }, body: input, signal }));
+    },
+    async checklist(scope: Scope, projectId: string, signal?: AbortSignal) {
+      return unwrap(await client.GET('/v1/organizations/{organizationId}/projects/{projectId}/checklist', { params: { path: { ...scope, projectId } }, signal }));
+    },
+    async checklistCommand(scope: Scope, projectId: string, input: ChecklistCommand, key: string, signal?: AbortSignal) {
+      return unwrap(await client.POST('/v1/organizations/{organizationId}/projects/{projectId}/checklist', { params: { path: { ...scope, projectId }, header: { 'Idempotency-Key': key } }, body: input, signal }));
+    },
     async createUpload(scope: Scope, projectId: string, input: UploadInput, signal?: AbortSignal) {
       return unwrap(await client.POST('/v1/organizations/{organizationId}/projects/{projectId}/uploads', { params: { path: { ...scope, projectId } }, body: input, signal }));
     },

@@ -1,0 +1,171 @@
+{
+  "task": 7,
+  "status": "PASS_LOCAL",
+  "date": "2026-09-23T11:33:11.839427+00:00",
+  "branch": "codex/checklists",
+  "baseCommit": "d9a1ef5eac3c6104f1633b4c76e1c1062cade450",
+  "changes": "uncommitted; includes preserved Task06 implementation",
+  "isolation": {
+    "postgresContainer": "handovertrack-task07-postgres",
+    "postgresPort": 55548,
+    "volume": "handovertrack-task07-data",
+    "apiPort": 3371,
+    "webPort": 3370,
+    "simulator": "DE92B94F-367A-491F-89B4-1FD5386D04E1",
+    "ownedServices": "stopped; volumes and files retained"
+  },
+  "checks": {
+    "unit": "PASS 54 tests",
+    "browserReports": "PASS 1 journey",
+    "browserRegressions": "PASS 7 journeys",
+    "reportIntegration": "PASS",
+    "actualWorkerCrash": "PASS",
+    "completionAndChecklistRegression": "PASS",
+    "syncRegression": "PASS",
+    "mediaRegression": "PASS 20 generated photos / 60 derivatives, synthetic only",
+    "migration": "PASS 19 pre-existing table fingerprints unchanged",
+    "lintTypesContractsBuilds": "PASS",
+    "mobileDependencyCheckAndExport": "PASS",
+    "clientSecretScan": "PASS 42 artifacts",
+    "nativeOfflineSaveRestartConflictResolution": "PASS",
+    "nativeRemainingPhotoAndOwnershipScopeUI": "NOT RUN; Mac locked again before continuation",
+    "task05PhysicalFaultAndRecoveryDecisions": "NOT RUN / unchanged",
+    "mixedPeakResourceLoad": "NOT RUN",
+    "liveUpgradeAndNewReportBackupRestore": "NOT RUN / not authorized"
+  },
+  "nativeSQLite": {
+    "integrity": "ok",
+    "userVersion": 5,
+    "counts": {
+      "cache_scopes": 1,
+      "cached_projects": 2,
+      "cached_assignments": 2,
+      "media_local": 0,
+      "media_orphans": 0,
+      "media_scopes": 0,
+      "media_queue": 0,
+      "cached_checklists": 1,
+      "cached_checklist_templates": 0,
+      "checklist_local_answers": 1,
+      "checklist_outbox": 2,
+      "sqlite_sequence": 1
+    },
+    "outboxStates": {
+      "accepted": 1,
+      "resolved": 1
+    },
+    "retainedLocalConflictAndResolutionPayloads": "PASS"
+  },
+  "artifactIntegrity": {
+    "status": "PASS",
+    "verifiedReportArtifacts": 12,
+    "verifiedAcceptedOriginals": 10,
+    "reportJobStates": [
+      {
+        "state": "ready",
+        "count": 12
+      }
+    ]
+  },
+  "pdf": {
+    "path": ".local/task07/pdfs/representative.pdf",
+    "sha256": "0b935388159a619409724a18098f54360c1bf3e3fd7d9db537963c6a0eac7ae7",
+    "reportId": "4ece7521-abbe-496b-bac7-e2c7a1b2cdaa",
+    "pages": 12,
+    "visual": "PASS all 12 rendered pages inspected after layout fixes",
+    "textAndStructure": "PASS long text endpoints, Latin/Greek/Cyrillic, labels, no internal/later content or executable actions"
+  },
+  "preservation": {
+    "noBaselineSourceFilesLost": true,
+    "existingEnvAndMigrationsPreserved": true,
+    "mediaQueuesAndOriginalsPreserved": true,
+    "phoneLiveAndRecovery": "untouched; no remote mutation or connection in Task07"
+  },
+  "logs": {
+    ".local/task07/migration.log": {
+      "sha256": "25933c70a2dfd8381f2facf8493e8f9ec51c94ee5e3c08c98384d6f114a13534",
+      "bytes": 574
+    },
+    ".local/task07/report-integration-final.log": {
+      "sha256": "c4b66665eea61dd04521b6745d8d3e03a8ee57f0f3adb5bb193a9a87df6391bf",
+      "bytes": 1315
+    },
+    ".local/task07/expanded-integration.log": {
+      "sha256": "b9aa8674292fdb477e48980891f934521bb6bdf45774961d5869094040980f90",
+      "bytes": 1408
+    },
+    ".local/task07/worker-crash.log": {
+      "sha256": "1a5f753e7827aeada46c3be442b84246bf52bc99ab813cf6479465bc30c2988b",
+      "bytes": 121
+    },
+    ".local/task07/unit.log": {
+      "sha256": "49a84198f369763f098f3b1d7984c90d45a6b059af83d77469b528524facf740",
+      "bytes": 220
+    },
+    ".local/task07/browser-proof-final.log": {
+      "sha256": "4697d8521b107645f8cd273c73278e88db9fdcc56b135d42703551996516ccd9",
+      "bytes": 386
+    },
+    ".local/task07/browser-regression.log": {
+      "sha256": "270708da76952b5b4266a4ecd964153d2ba40e9d430001e36c6a96466398da5d",
+      "bytes": 1234
+    },
+    ".local/task07/checklist-regression.log": {
+      "sha256": "efec4b5e5d1dd3ba4df5b1bb8ae6001a3431cfb46f0ce8c9d3be1f351dcab065",
+      "bytes": 1728
+    },
+    ".local/task07/sync-regression.log": {
+      "sha256": "b45647731594d44edc07a554688b936d0ff3581daf0cfa15f55327a8369599e5",
+      "bytes": 1576
+    },
+    ".local/task07/media-regression.log": {
+      "sha256": "8a9c1d6b3e3d66aca0836de2e3f0eb22fe951a941bac6afad8c7879889f566a5",
+      "bytes": 1959
+    },
+    ".local/task07/lint.log": {
+      "sha256": "c8e251dcb71476e5e9c0b51b676c862e28796a07cdf78b021495ce768120238f",
+      "bytes": 209
+    },
+    ".local/task07/typecheck.log": {
+      "sha256": "093cf4641c7a552585287cedab846a63bc226ca7e72fe5653479fe6fa034afaa",
+      "bytes": 3907
+    },
+    ".local/task07/contracts.log": {
+      "sha256": "beef352aa74e100935f2665acdfaf53354c5a256db23bd008a011c480b03ebdd",
+      "bytes": 181
+    },
+    ".local/task07/build.log": {
+      "sha256": "d46fdfaf03dc9a9e6d4243cfdbf4af04a6c7d68780d89111f4f2d04bfef1be2c",
+      "bytes": 4583
+    },
+    ".local/task07/api-smoke.log": {
+      "sha256": "b4d67c0016687ec303a0e502a0ee668ccce61ecfe93ace9e19c6dc7e01463a69",
+      "bytes": 104
+    },
+    ".local/task07/worker-smoke.log": {
+      "sha256": "8c7b6d3f29f7efd39ff603148e2996f46d9c287230574bc999ea9a40ab9eead8",
+      "bytes": 113
+    },
+    ".local/task07/mobile-check.log": {
+      "sha256": "2e6abff079bd2c323a8ce98ddfb47339d674ec2f4450963275d998432f81d442",
+      "bytes": 159
+    },
+    ".local/task07/mobile-export.log": {
+      "sha256": "454ff0d78cb2f40e124d6c3789f18236b767bfcdb72c53d7eac363db54922ee1",
+      "bytes": 2432
+    },
+    ".local/task07/client-bundles.log": {
+      "sha256": "6fab7d4e0a55a8ee67c34e543f11884c2dd4baf483431a89746fbf5e07b9d124",
+      "bytes": 95
+    },
+    ".local/task07/install.log": {
+      "sha256": "2bb496ffed323799236cf28d121055064337dc5f956271f25cacc3f2ab2731cf",
+      "bytes": 138
+    },
+    ".local/task07/web-visual.log": {
+      "sha256": "cd4b1f08d8cca9267ae885d77cc29d2af879581806f67600ebe8800a40f1ac5f",
+      "bytes": 64
+    }
+  },
+  "next": "Task08 prompt prepared only; no Task08 implementation"
+}

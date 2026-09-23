@@ -252,3 +252,41 @@ References: [Rrugë conventions](../../../rruge/infra/kubernetes/README.md),
 [K3s image import](https://docs.k3s.io/import-images/),
 [Kubernetes storage classes](https://kubernetes.io/docs/concepts/storage/storage-classes/),
 [Caddy streaming proxy](https://caddyserver.com/docs/caddyfile/directives/reverse_proxy).
+
+## Task 06 compatibility notice — local source only
+
+Task 06 adds PostgreSQL **005_checklists.sql**, SQLite version **5**, checklist
+command contracts and new sync entities. None is deployed by this notice. The
+existing live image/phone and recovery rehearsals remain on their validated
+Task 04-era contract. Do not reuse a release manifest/receipt listing only
+001–004, or bypass the controller's migration-checksum gate.
+
+A future separately authorized release must preserve a consistent full backup,
+review/apply 005 before compatible API/web writers, and coordinate compatible
+native clients and rebootstrap. Old clients reject unknown feed entities and
+cannot open SQLite v5 after downgrade. Preserve local originals, answer/outbox
+rows and conflict payloads. Never restore a pre-005 database or old phone backup
+over newer pending evidence. Existing complete projects are retained by migration;
+future writes keeping them complete require a valid checklist, or an explicit
+manager reopen. Include the two new checklist tables in full backup/restore
+validation. See [Task 06](../../docs/progress/06-checklists.md) for exact local
+checks and still-open gates. This does not activate the release controller.
+
+
+### Task 07 future compatibility gate (no live change)
+
+Task 07 is local only. PostgreSQL migration 006 adds append-only proof compositions,
+report snapshots/artifacts and separate report jobs. A future reviewed release must
+ship the matching API/web/worker, `report-render.js` child and pinned font/license
+assets. Preserve all renderer versions needed by unfinished snapshots. Existing
+Task 06 checklist/native compatibility requirements still apply; the HTTPS phone
+has not been upgraded and its pending work/originals must remain intact.
+
+Before a separately authorized rollout, validate combined image/report memory and
+CPU bounds, a termination grace sufficient for a 120-second report render, and
+lease-fenced fsync/no-replace publication on the target volume. Extend and rehearse
+backup/restore coverage for the four new tables and `MEDIA_ROOT/reports` PDFs and
+partial attempts. Existing Task 05 backup evidence predates these tables/files.
+Do not claim that backup covers Task 07. Preserve every existing source/restore
+PVC, original, receipt, failed backup attempt and stopped rehearsal. No automatic
+release activation or new recovery schedule was performed for this task.
