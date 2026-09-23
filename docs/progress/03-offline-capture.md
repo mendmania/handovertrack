@@ -24,6 +24,15 @@ installation occurred; Task 06 has not started. See the authoritative
 [Task 05 checkpoint](05-k3s-trial.md), [native evidence](evidence/05-native-validation-20260922.json)
 and [recovery evidence](evidence/05-batch-recovery-20260922.json).
 
+Task 05 fault-control follow-up: the owner reports phone interaction unavailable.
+A special signed build and one-ID native cancel/suspend/completion-delivery controls
+are prepared and synthetically checked, **not installed or physically exercised**.
+Before/after read-only checks preserve all 23 phone receipts/originals and the same
+25 server originals/75 derivatives. No new IDs, backup or restore were created;
+all 59 retained recovery files are unchanged. Independent recovery arrangements
+remain unconfirmed. See [control preparation evidence](evidence/05-native-fault-preparation-20260922.json)
+and the current Task 05 checkpoint. The normal app has no active fault controls.
+
 ## Historical task and intermediate validation records
 
 The dated records below preserve what was known at each earlier checkpoint;

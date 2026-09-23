@@ -31,6 +31,15 @@ lost completion-response recovery remain NOT RUN; synthetic fault evidence does
 not close those gates. Preserve the exact cohort/extra/validation manifests in
 `docs/progress/evidence/`.
 
+Latest Task 05 continuation prepared and verified a **separate signed native
+validation build**, but phone interaction was unavailable: no installation,
+new capture, armed case or physical fault/reconciliation occurred. Temporary
+source/dependency/build controls were restored; the normal app remains compatible.
+Do not mistake the synthetic delegate/transport tests or a successful signed build
+for native validation. Read `05-native-fault-preparation-20260922.json` and the
+control runbook for artifact identity and remaining one-ID-at-a-time procedure.
+No owner recovery custody/destination/responsibility decision was confirmed.
+
 The fresh full-batch backup/application restore covers 25 server originals,
 75 variants, 125 media paths and all 18 public table hashes. All three isolated
 rehearsals (`handovertrack-restore-20260922`, `...20260922b`, `...20260922c`) are

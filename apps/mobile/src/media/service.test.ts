@@ -129,6 +129,19 @@ describe('durable local capture, real SQLite and filesystem boundary', () => {
     await f.reopen(); await f.service.reconcile(); await f.service.list(a);
     expect(f.db().prepare('SELECT * FROM media_queue').get()).toEqual(before);
   });
+  it('late progress, retry and cold recovery cannot downgrade an accepted receipt', async () => {
+    const f = await fixture(); const { ticket, saved } = await f.capture();
+    await f.service.repository.uploadState(ticket, { state:'server_accepted', uploadId:randomUUID(),
+      acceptedAt:'2026-09-22T12:00:00.000Z', bytesSent:f.bytes.length, attempts:1 }, () => {});
+    const receipt = f.db().prepare('SELECT * FROM media_queue').get();
+    await f.service.repository.uploadState(ticket, { state:'uploading', bytesSent:1 }, () => {});
+    await f.service.repository.uploadState(ticket, { state:'pending', reason:'NETWORK_RETRY' }, () => {});
+    await f.service.repository.retry(a, () => {});
+    await f.reopen(); await f.service.reconcile();
+    expect(f.db().prepare('SELECT * FROM media_queue').get()).toEqual(receipt);
+    expect(await readFile(f.full(saved.originalPath!))).toEqual(f.bytes);
+    expect((await f.service.list(a))[0]).toMatchObject({ id:ticket.id, queueState:'server_accepted' });
+  });
   it('upload replay aborts after account switch and cannot publish a late accepted receipt', async () => {
     const f = await fixture(); const { saved } = await f.capture(); let current = true; let completions = 0;
     const entered = deferred<void>(); const gate = deferred<void>();

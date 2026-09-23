@@ -3,11 +3,98 @@
 **Status: HTTPS deployed; physical capture/isolation/upload and full-batch technical
 recovery PASS. Native failure/retry and operational recovery gates remain open.**
 
-## Current validation outcome — 2026-09-22
+## Owner-requested automatic release follow-up — 2026-09-22
+
+The owner separately requested automatic **build, publication and deployment to
+handovertrack.com on pushes to main**, superseding the earlier prohibition on
+adding deployment automation. [PR #5](https://github.com/mendmania/handovertrack/pull/5)
+is merged. The first actual main-triggered
+[release run](https://github.com/mendmania/handovertrack/actions/runs/35727843641)
+**PASS**: all validation, exact-image smoke, GHCR publication and immutable
+metadata upload succeeded for `main-4-1bf8d8732b41`. The actual controller's
+run/artifact qualification passes and published migration checksums match live SQL.
+
+**Automatic live deployment is NOT ACTIVE.** SSH authentication for the existing
+operator key fails, so the fixed controller and timer are not installed. Registry
+visibility/access awaits the owner's public/private choice; no visibility change
+was performed. Dedicated scoped RBAC/token resources are prepared; live preflight
+passes and permissions deny Rrugë writes and source PVC deletion. No app release,
+new release snapshot, runtime/schema mutation or recovery-resource cleanup occurred.
+The 25 server originals and 75 variants, source workloads and all three retained
+rehearsals remain unchanged. See the
+[actual activation evidence](evidence/05-automatic-release-20260922.json).
+
+This release work does not close the Task 05 physical or independent-recovery
+gates below. Tasks 03–05 remain `implemented-awaiting-validation`, disposable-only;
+Task 06 is not started. The next deployment step needs working existing SSH access
+and an agreed container-pull method, followed by installation, check-only
+qualification and a verified first rollout before claiming activation.
+
+## Current checkpoint — native fault preparation, 2026-09-22
+
+**Tasks 03–05 remain `implemented-awaiting-validation`; disposable-only. Stop
+before Task 06.** The owner reported **“Phone interaction is unavailable right
+now.”** No capture/reconnect was requested, no new ID was created, no control was
+armed and no app was installed or launched. Read-only USB copying was available.
+The recovery reply was “xontinue”; it authorizes continuing work but confirms no
+custody, storage destination or operating commitment.
+
+The refreshed before/after baseline preserves **23 phone originals and accepted
+receipts**, SQLite v4, **25 server originals/ready jobs and 75 decoded variants**.
+All IDs, owners, original hashes, receipts and logical job/event identities match
+the previous batch. Assignment remains active v5. Source workloads are Ready;
+shared edge, Rrugë, configuration, immutable migrations, all **59 retained recovery
+files** and three stopped rehearsal resource/PVC identities remain preserved.
+
+[Temporary control tooling](../../scripts/validation/task05-native/README.md)
+prepares one named new ID at a time. It refuses baseline/server IDs and verifies
+unattempted pending state, original bytes and ownership before preparing a local
+control. The special build excludes all 23 baseline IDs and captures older than
+this baseline. A durable per-case session binding and result hold prevent retries
+from hiding evidence; release is explicit, with no receipt or queue reset.
+
+| Remaining check | Actual result this continuation |
+|---|---|
+| Interrupted native binary stream | **NOT RUN, physical.** Prepared native NSURLSession delegate suspends/cancels the exact named session at positive incomplete counters; final counters and independent pending server state are required. Missing the partial window is not PASS. |
+| App termination during upload | **NOT RUN, physical.** Prepared delegate suspends unfinished native work for a measured app termination; the ordinary 120-second timeout remains. No app termination was performed. |
+| Lost completion response/reconciliation | **NOT RUN, physical/test-seam execution.** Prepared wrapper withholds a successful real HTTPS acceptance from UploadExecutor and retains the receipt for correlation. Future execution must be labelled controlled response-delivery loss, not radio loss. |
+| Control logic | **PASS, synthetic only.** Nine compiled native delegate cases, six control preparation/preservation cases and 58 overlay/media/store tests pass. Normal regressions include a new SQLite check that late progress, retry and cold recovery cannot downgrade acceptance. |
+| Special signed build | **PASS, preparation only; NOT INSTALLED.** Same bundle/signing profile and schema v4; HTTPS and both JS/native fault markers verified in the actual signed artifact. Prior signed app retained. |
+| Recovery decisions | **UNCONFIRMED.** Independent FileVault credential access, independently accessible backup bytes after Mac loss, operator/cadence/Mac availability and failed/missed-run response are still undecided. No external copy, schedule or notification was created. |
+
+The first special build compiled successfully but artifact verification rejected
+it: SDK 57 linked a precompiled Expo FileSystem framework, omitting the patched
+native delegate. The corrected temporary build selects only `expo-file-system`
+for source compilation. This failed attempt and its logs remain retained. Source,
+package/configuration and dependency changes are restored after building; the
+normal signed Release is rebuilt and inspected for absence of all test markers.
+No permanent fault hook is added to the normal runtime.
+
+Exact artifact hashes, baseline/case results and preservation evidence are in
+[the preparation manifest](evidence/05-native-fault-preparation-20260922.json).
+Private snapshots, signing artifacts, overlay restoration journals and logs are
+under `.local/task05-native-faults-20260922/`. No credentials or image bytes are
+included in the public manifest. No server/runtime/schema release occurred.
+
+No new photo exists, so the verified backup `handovertrack-20260922T112734Z-54ce2f`
+and its previously passing application restore still cover all 25 server originals,
+75 derivatives and 125 paths. This continuation rechecks retained-file hashes and
+unchanged source media; it does not claim a new backup or another application
+restore. The older local-HTTP phone original remains outside server coverage.
+No fourth rehearsal was allocated.
+
+The next action requires the owner's available, confirmed-offline phone: recheck
+current baseline and compatibility, install the prepared special build in place,
+verify preservation, then capture **one** new disposable photo, obtain its ID and
+verify its named control before reconnect. Execute/release each case separately,
+restore the compatible normal app afterward and take a fresh verified backup of
+actual new IDs. Physical fault timing/reconciliation and operational recovery
+readiness remain the smallest open gates. Task 06 has not started.
+
+## Preserved full-batch validation outcome — 2026-09-22
 
 **Tasks 03–05 remain `implemented-awaiting-validation`; disposable-only. Task 06
-has not started.** This section supersedes the historical in-progress checkpoints
-below. There is no outstanding assignment restoration or worker resumption:
+has not started.** The batch results below remain valid; the current continuation is above. There is no outstanding assignment restoration or worker resumption:
 the owner restored North worker/Riverside through manager.both at 11:09:09 UTC
 (active v5, audit revision 7). The guard detected this concurrent change and did
 not overwrite it. Worker, API and web are back at one ready replica each.

@@ -18,6 +18,24 @@ in-progress test instructions.
 | 09 | Whole-trial reliability and recovery | planned | Depends on 08 |
 | 10 | Optional S3/Kafka/Temporal expansion | deferred | Separate selection after 09 |
 
+Automatic release follow-up: the owner requested build, publication and deployment
+on pushes to main. [PR #5](https://github.com/mendmania/handovertrack/pull/5) is
+merged and the first main-triggered build/publication passed for
+`main-4-1bf8d8732b41`. **Live deployment is not active:** existing SSH key access
+fails and the public/private registry decision is pending. The controller/timer
+are not installed; live app images, originals and retained recovery resources
+remain unchanged. [Exact result](progress/evidence/05-automatic-release-20260922.json).
+
+Latest continuation: a signed, scoped native fault-validation build is prepared
+and verified but **not installed** because phone interaction is unavailable.
+Native cancel/suspend/completion-delivery controls pass synthetic checks only;
+all three physical cases and their owner observations remain NOT RUN. No new
+photo IDs were created. Refreshed USB/server hashes preserve the existing totals,
+and all 59 recovery files plus three stopped rehearsals remain intact. The owner's
+“xontinue” reply confirms none of the requested recovery arrangements. Normal
+source/configuration is restored, no control is armed and Task 06 is not started.
+See [the exact preparation evidence](progress/evidence/05-native-fault-preparation-20260922.json).
+
 The physical phone preserves 23 originals and accepted receipts, with 22 belonging
 to the current North worker and one to the earlier local-HTTP owner. Owner-observed
 UI results plus USB/SQLite/hash checks establish camera permission behavior,
