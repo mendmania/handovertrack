@@ -102,6 +102,13 @@ class ReleaseTests(unittest.TestCase):
         self.assertEqual(self.mutations(), [])
         self.assertFalse((self.root / 'runtime/release.json').exists())
 
+    def test_qualified_specs_cannot_overwrite_a_concurrent_operator_change(self):
+        self.policy['expected_specs'] = {n: copy.deepcopy(self.deployment['spec']) for n in release.COMPONENTS}
+        self.deployment['spec']['template']['spec']['containers'][0]['image'] = NEW
+        with self.assertRaisesRegex(AssertionError, 'Workload changed'):
+            self.run_release()
+        self.assertEqual(self.mutations(), [])
+
     def test_stale_or_future_evidence_stops_before_mutation(self):
         for field, offset in [('preflight', -900), ('preflight', 1), ('backup', -3600), ('backup', 1)]:
             with self.subTest(field=field, offset=offset):

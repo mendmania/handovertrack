@@ -1,0 +1,16 @@
+[Unit]
+Description=HandoverTrack tested main image pull deployment
+After=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=%h/.local/share/handovertrack-deployer
+Environment=PATH=%h/.local/share/handovertrack-deployer/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=/usr/bin/python3 %h/.local/share/handovertrack-deployer/scripts/ops/autodeploy.py --kubeconfig %h/.local/share/handovertrack-deployer/runtime/kubeconfig --runtime %h/.local/share/handovertrack-deployer/runtime --backup-target %h/.local/share/handovertrack-deployer/backups
+TimeoutStartSec=35min
+TimeoutStopSec=6min
+UMask=0077
+NoNewPrivileges=yes
+Nice=10
+StandardOutput=journal
+StandardError=journal
