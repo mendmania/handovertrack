@@ -20,6 +20,7 @@
     ".": "./src/index.ts",
     "./database": "./src/database.ts",
     "./media": "./src/media/index.ts",
-    "./reports": "./src/reports/index.ts"
+    "./reports": "./src/reports/index.ts",
+    "./sharing": "./src/sharing/service.ts"
   }
 }

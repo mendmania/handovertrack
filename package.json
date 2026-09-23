@@ -35,7 +35,9 @@
     "media:maintenance": "node scripts/run.mjs tsx scripts/media-maintenance.ts",
     "test:checklists": "node scripts/run.mjs tsx scripts/checklist-integration.ts",
     "test:reports": "node scripts/run.mjs tsx scripts/report-integration.ts",
-    "test:report-worker": "node scripts/run.mjs tsx scripts/report-worker-crash.ts"
+    "test:report-worker": "node scripts/run.mjs tsx scripts/report-worker-crash.ts",
+    "test:sharing": "node scripts/run.mjs tsx scripts/sharing-integration.ts",
+    "test:proof-web": "node scripts/run.mjs tsx scripts/proof-browser.ts"
   },
   "devDependencies": {
     "@playwright/test": "1.63.0",

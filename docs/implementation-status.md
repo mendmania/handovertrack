@@ -14,17 +14,19 @@ in-progress test instructions.
 | 05 | Existing-k3s preflight and private trial deployment | implemented-awaiting-validation | [Handoff](progress/05-k3s-trial.md); HTTPS and full-batch backup/application restore pass; native fault scenarios and independent recovery readiness remain open |
 | 06 | Required-photo checklists and offline conflicts | implemented-awaiting-validation | [Handoff](progress/06-checklists.md); local PostgreSQL/SQLite/HTTP/browser checks pass; isolated Release simulator built/installed/launched; native offline save/cold reopen/concurrent conflict/resolution now PASS; photo/account-scope UI follow-ups remain open |
 | 07 | Proof composition and immutable reports | complete locally | [Handoff](progress/07-proof-reports.md); frozen snapshots, private PDF worker/crash recovery and visual/browser/regression checks PASS; no live release |
-| 08 | Scoped sharing and customer decisions | planned | [Prepared prompt](prompts/08-sharing-and-decisions.md); not started |
-| 09 | Whole-trial reliability and recovery | planned | Depends on 08 |
+| 08 | Scoped sharing and customer decisions | implemented locally; PR validation pending | [Handoff](progress/08-sharing-and-decisions.md); expiring/revocable exact-revision sharing, customer decisions and manager review; local checks PASS |
+| 09 | Whole-trial reliability and recovery | planned | [Prepared prompt](prompts/09-reliability-and-recovery.md); not started |
 | 10 | Optional S3/Kafka/Temporal expansion | deferred | Separate selection after 09 |
 
-Tasks 06 and 07 were explicitly assigned for independent local development.
-Task 06 adds frozen checklist runs, a durable SQLite answer outbox, conflicts and
-completion enforcement. Task 07 adds manager proof composition and consistently
-frozen, immutable private PDFs using separate PostgreSQL jobs and fenced workers.
-PostgreSQL 005–006 and SQLite v5 remain **local only**. Existing uncommitted work
-and data are preserved on `codex/checklists`; no push, merge, deployment or
-activation of automation occurred. Stop before Task 08.
+Tasks 06–08 were explicitly assigned. Task 08 adds hash-only, expiring/revocable
+sharing of immutable report revisions and append-only customer accept/correction
+and manager review. Customer decisions remain separate from project completion.
+The Task 06/07 source was checkpointed in `ac26f74` before Task 08 code. Current
+main was merged in `bd2f5f3` on `codex/sharing-and-decisions`, preserving workflows.
+PostgreSQL 005–007 and SQLite v5 remain **local only**. The owner authorized feature
+branch commits/push/PR; no merge to main, deployment or automation activation is
+authorized. Full PR scope includes Tasks 06–08. See Task 08's handoff for final
+publication/CI status. Stop before Task 09.
 
 Task 07 first resumed the retained Task 06 simulator. Native offline answer save,
 termination/cold reopen, competing server edit, reconnect and explicit resolution

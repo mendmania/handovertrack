@@ -3,7 +3,7 @@ import {readFile} from 'node:fs/promises';
 import {randomUUID,createHash} from 'node:crypto';
 test('manager edits versioned proof, resolves concurrent composition, retries lost replies and downloads immutable private PDF',async({page})=>{
  test.skip(process.env.TASK07_ISOLATED!=='true','Requires retained isolated report integration fixture');
- const f=JSON.parse(await readFile('.local/task07/fixture.json','utf8')),org=f.scope.organizationId,project=f.projectId;
+ const f=JSON.parse(await readFile(`${process.env.REPORT_TEST_OUTPUT??'.local/task07'}/fixture.json`,'utf8')),org=f.scope.organizationId,project=f.projectId;
  await page.goto('/sign-in');await page.getByLabel('Email',{exact:true}).fill('manager.north@example.test');await page.getByLabel('Password',{exact:true}).fill(process.env.SEED_PASSWORD!);await page.getByRole('button',{name:'Sign in',exact:true}).click();await expect(page.getByRole('heading',{name:/Projects/})).toBeVisible();
  const origin0=new URL(page.url()).origin,proofPath=`/bff/v1/organizations/${org}/projects/${project}/proof`;const initial=await(await page.request.get(proofPath)).json();const expectedRevision=(initial.reports[0]?.revision??0)+1;expect((await page.request.post(proofPath,{headers:{origin:origin0,'idempotency-key':randomUUID()},data:{baseVersion:initial.composition.version,notes:[{id:randomUUID(),text:'Initial web proof',visibility:'report'}],annotations:[],pairs:[]}})).ok()).toBe(true);
  await page.goto(`/org/${org}/projects/${project}`);const panel=page.locator('.proof-panel');await expect(panel.getByRole('heading',{name:'Proof composition & reports'})).toBeVisible();
@@ -23,5 +23,5 @@ test('manager edits versioned proof, resolves concurrent composition, retries lo
  await panel.getByRole('button',{name:'Create immutable completion PDF'}).click();await expect(panel.getByRole('button',{name:'Retry frozen report request'})).toBeVisible();await panel.getByRole('button',{name:'Retry frozen report request'}).click();await expect(panel.getByRole('button',{name:'Create immutable completion PDF'})).toBeEnabled();expect(reportKeys.length).toBe(2);expect(reportKeys[0]).toBe(reportKeys[1]);await page.unroute(`**${reportPath}`);
  await expect(panel.getByText(`Report r${expectedRevision} · ready`,{exact:true})).toBeVisible({timeout:25000});
  const download=await page.request.get(`/bff/v1/organizations/${org}/projects/${project}/reports/${f.reportId}/pdf`);expect(download.ok()).toBe(true);expect(download.headers()['cache-control']).toBe('private, no-store');expect(download.headers()['content-type']).toContain('application/pdf');expect(download.headers()['content-disposition']).toContain('attachment;');expect(createHash('sha256').update(await download.body()).digest('hex')).toBe(f.report.sha256);
- await panel.screenshot({path:'.local/task07/proof-workspace.png'});
+ await panel.screenshot({path:`${process.env.REPORT_TEST_OUTPUT??'.local/task07'}/proof-workspace.png`});
 });

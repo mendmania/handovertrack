@@ -1,5 +1,15 @@
 import createClient from 'openapi-fetch';
 import type { paths, components } from './generated';
+export type ShareMetadata = components['schemas']['ShareMetadata'];
+export type ReportShare = components['schemas']['ReportShare'];
+export type ShareInput = components['schemas']['ShareInput'];
+export type CreatedShare = components['schemas']['CreatedShare'];
+export type DecisionInput = components['schemas']['DecisionInput'];
+export type CustomerDecision = components['schemas']['CustomerDecision'];
+export type DecisionReview = components['schemas']['DecisionReview'];
+export type ShareWorkspace = components['schemas']['ShareWorkspace'];
+export type GuestReport = components['schemas']['GuestReport'];
+export type ReviewInput = components['schemas']['ReviewInput'];
 export type ProofNote = components['schemas']['ProofNote'];
 export type ProofMark = components['schemas']['ProofMark'];
 export type ProofAnnotation = components['schemas']['ProofAnnotation'];
@@ -42,6 +52,10 @@ export function createApi(options: { baseUrl: string; fetch?: typeof fetch; head
     return result.data;
   }
   return {
+    async sharing(scope:Scope, projectId:string, reportId:string, signal?:AbortSignal){return unwrap(await client.GET('/v1/organizations/{organizationId}/projects/{projectId}/reports/{reportId}/sharing',{params:{path:{...scope,projectId,reportId}},signal}));},
+    async createShare(scope:Scope, projectId:string, reportId:string, input:ShareInput, key:string){return unwrap(await client.POST('/v1/organizations/{organizationId}/projects/{projectId}/reports/{reportId}/shares',{params:{path:{...scope,projectId,reportId},header:{'Idempotency-Key':key}},body:input}));},
+    async revokeShare(scope:Scope, projectId:string, reportId:string, shareId:string, key:string){return unwrap(await client.POST('/v1/organizations/{organizationId}/projects/{projectId}/reports/{reportId}/shares/{shareId}/revoke',{params:{path:{...scope,projectId,reportId,shareId},header:{'Idempotency-Key':key}}}));},
+    async reviewDecision(scope:Scope, projectId:string, reportId:string, input:ReviewInput, key:string){return unwrap(await client.POST('/v1/organizations/{organizationId}/projects/{projectId}/reports/{reportId}/review',{params:{path:{...scope,projectId,reportId},header:{'Idempotency-Key':key}},body:input}));},
     async proof(scope: Scope, projectId: string, signal?: AbortSignal) {
       return unwrap(await client.GET('/v1/organizations/{organizationId}/projects/{projectId}/proof', { params: { path: { ...scope, projectId } }, signal }));
     },
@@ -129,4 +143,15 @@ export function assertCompleteSnapshot(value: ProjectSnapshot, scope: Scope): vo
         typeof project.address !== 'string' || project.address.length > 500 || !['active', 'complete'].includes(project.status) || !Number.isFinite(Date.parse(project.updatedAt))) throw new Error('Invalid snapshot project');
     seen.add(project.id);
   }
+}
+// This client has no cookie/session authority. Keep its capability in component
+// memory only, outside Query keys/data, persistence, navigation and logging.
+export function createGuestApi(shareId:string,token:string){
+ const client=createClient<paths>({baseUrl:'',cache:'no-store',credentials:'omit',referrerPolicy:'no-referrer',headers:{authorization:'Bearer '+token}});
+ function unwrap<T>(r:{data?:T;error?:ApiFailure;response:Response}):T{if(!r.response.ok||r.data===undefined)throw new ApiError(r.response.status,r.error?.code??'REQUEST_FAILED');return r.data;}
+ return {
+  async read(signal:AbortSignal){return unwrap(await client.GET('/guest/v1/shares/{shareId}',{params:{path:{shareId}},signal}));},
+  async decide(input:DecisionInput,key:string,signal:AbortSignal){return unwrap(await client.POST('/guest/v1/shares/{shareId}/decisions',{params:{path:{shareId},header:{'Idempotency-Key':key}},body:input,signal}));},
+  async pdf(signal:AbortSignal){return unwrap(await client.GET('/guest/v1/shares/{shareId}/pdf',{params:{path:{shareId}},parseAs:'arrayBuffer',signal}));},
+ };
 }

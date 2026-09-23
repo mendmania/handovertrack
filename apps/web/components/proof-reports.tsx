@@ -1,4 +1,5 @@
 'use client';
+import { ReportSharing } from './report-sharing';
 import { useState } from 'react';
 import { useQuery, useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { scopeKey } from '@handovertrack/query';
@@ -11,6 +12,7 @@ export function ProofReports({scope,project}:{scope:Scope;project:Project}){
  const photos=useInfiniteQuery({queryKey:[...scopeKey(scope),'api','media',project.id],initialPageParam:undefined as string|undefined,queryFn:({signal,pageParam})=>fenced(s=>api.media(scope,project.id,s,pageParam))(signal),getNextPageParam:p=>p.next??undefined,refetchInterval:5000});
  const [draft,setDraft]=useState<Composition>();const [conflict,setConflict]=useState(false);const [error,setError]=useState('');const [busy,setBusy]=useState(false);
  const [pending,setPending]=useState<{kind:'save';body:CompositionInput;key:string}|{kind:'report';body:ReportInput;key:string}|{kind:'retry';id:string;key:string}>();
+ const [sharing,setSharing]=useState<string>();
  const [selection,setSelection]=useState<string[]|null>(null),[image,setImage]=useState('');
  const value=draft??query.data?.composition??{version:0,notes:[],annotations:[],pairs:[]};
  const media=photos.data?.pages.flatMap(p=>p.media)??[];
@@ -47,7 +49,7 @@ export function ProofReports({scope,project}:{scope:Scope;project:Project}){
   {photos.error&&<p role="alert">Evidence unavailable: {photos.error.message}</p>}{checklist.error&&<p role="alert">Checklist unavailable: {checklist.error.message}</p>}
   <button disabled={busy||!!draft||conflict||project.status!=='complete'||!checklist.data?.run||(pending&&pending.kind!=='report')} onClick={()=>void send({kind:'report',body:{projectVersion:project.version,checklistVersion:checklist.data!.run!.version,compositionVersion:query.data!.composition.version,mediaIds:chosen},key:crypto.randomUUID()})}>{pending?.kind==='report'?'Retry frozen report request':'Create immutable completion PDF'}</button>
   <p>Save your composition and complete the checklist first. Changes after a snapshot require a new report revision.</p>
-  <h3>Private report revisions</h3><p>Latest 100 revisions.</p>{query.data.reports.map(r=><article key={r.id} className="report-row"><strong>Report r{r.revision} · {r.state}</strong><p>{new Date(r.createdAt).toLocaleString()}{r.error?` · ${r.error}`:''}</p>{r.state==='ready'?<><a href={`/bff/v1/organizations/${scope.organizationId}/projects/${project.id}/reports/${r.id}/pdf`}>Download private PDF r{r.revision}</a><p className="footnote">{r.pages} pages · SHA-256 {r.sha256}</p></>:r.state==='failed'?<button disabled={busy||!!pending} onClick={()=>void send({kind:'retry',id:r.id,key:crypto.randomUUID()})}>Retry report r{r.revision}</button>:<p>Queued for local rendering.</p>}</article>)}
+  <h3>Private report revisions</h3><p>Latest 100 revisions.</p>{query.data.reports.map(r=><article key={r.id} className="report-row"><strong>Report r{r.revision} · {r.state}</strong><p>{new Date(r.createdAt).toLocaleString()}{r.error?` · ${r.error}`:''}</p>{r.state==='ready'?<><a href={`/bff/v1/organizations/${scope.organizationId}/projects/${project.id}/reports/${r.id}/pdf`}>Download private PDF r{r.revision}</a><p className="footnote">{r.pages} pages · SHA-256 {r.sha256}</p><button onClick={()=>setSharing(sharing===r.id?undefined:r.id)}>Sharing & decisions for r{r.revision}</button>{sharing===r.id&&<ReportSharing key={`${scope.accountId}:${scope.organizationId}:${r.id}`} scope={scope} projectId={project.id} report={r}/>}</>:r.state==='failed'?<button disabled={busy||!!pending} onClick={()=>void send({kind:'retry',id:r.id,key:crypto.randomUUID()})}>Retry report r{r.revision}</button>:<p>Queued for local rendering.</p>}</article>)}
   {pending?.kind==='retry'&&<button disabled={busy} onClick={()=>void send(pending)}>Retry frozen redrive</button>}
  </section>;
 }

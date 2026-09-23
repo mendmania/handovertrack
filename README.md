@@ -404,3 +404,23 @@ state/retry contracts, isolated commands, native follow-up and validation eviden
 A future live upgrade needs compatible clients/services, resource validation and
 backup/restore coverage for report tables and files. Existing Task 05 backup and
 phone/recovery gates remain open. No live upgrade is included here.
+
+## Scoped report sharing and customer decisions (Task 08, local only)
+
+In a ready report row choose **Sharing & decisions**, set its expiry and create a
+private link. Copy it once; keep it private. The server retains only its hash.
+If delivery/display is lost, retry recovers the share record without its secret:
+explicitly revoke it and create a replacement. Revoke any listed share to close
+future access; previously downloaded copies cannot be recalled.
+
+Recipients open the complete link, download that exact PDF and confirm acceptance
+or request corrections. A typed name is unverified. The first decision across a
+report's links wins and is immutable. Managers record an internal review; corrections
+require a new report revision. Neither project completion nor a later report inherits
+customer acceptance. Old links continue to identify only their historical PDF.
+
+Guest pages use a separate, memory-only TanStack Query scope and omit account
+cookies. Refresh/return requires reopening the original complete link. SQL 007 is
+additive; the phone/live service remains unchanged. See [Task 08's handoff](docs/progress/08-sharing-and-decisions.md)
+for secret delivery, API boundaries, rate budgets, validation and release gates.
+The [Task 09 prompt](docs/prompts/09-reliability-and-recovery.md) is prepared only.

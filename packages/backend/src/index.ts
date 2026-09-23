@@ -14,3 +14,4 @@ export * from './modules/checklists/domain/checklist';
 export * from './modules/checklists/ports/checklists';
 export * from './modules/reports/domain/proof';
 export * from './modules/reports/ports/proof';
+export * from './modules/sharing/domain/sharing';
