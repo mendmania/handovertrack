@@ -35,7 +35,19 @@
     ".local/task08/mobile-check.log": "2e6abff079bd2c323a8ce98ddfb47339d674ec2f4450963275d998432f81d442",
     ".local/task08/mobile-export.log": "f8d589dc7a7ad46e95c4e1d9391b71ace78d7a82cf68b95a8309a5ece72fcb2a",
     ".local/task08/bundle-secrets.log": "030bf7e60f7134b1655302cb5f6fc3d0aefcb2849676a5adddf2eeee4492c423",
-    ".local/task08/lockfile.log": "896f279c6be55602dadce84b275bfba230f77f8c67e14a708097738979c95539"
+    ".local/task08/lockfile.log": "896f279c6be55602dadce84b275bfba230f77f8c67e14a708097738979c95539",
+    ".local/task08/browser-reviewed.log": "47d5e8beb814442e7d5603469c26c8fdbd7217bc541b57f1ddb5632dd73b6e77"
   },
-  "preservation": "Saved environment files and SQL 001\u2013006 hashes unchanged; no prior tracked/untracked source was removed; recovery/live resources untouched"
+  "preservation": "Saved environment files and SQL 001\u2013006 hashes unchanged; no prior tracked/untracked source was removed; recovery/live resources untouched",
+  "publication": {
+    "branch": "codex/sharing-and-decisions",
+    "implementationCommit": "aa4ac239f855e237fabdad8576c40b398dad7449",
+    "pr": "https://github.com/mendmania/handovertrack/pull/7",
+    "ciRun": "https://github.com/mendmania/handovertrack/actions/runs/35860553770",
+    "validate": "PASS",
+    "publish": "SKIPPED",
+    "merged": false,
+    "deployed": false,
+    "autoMerge": false
+  }
 }

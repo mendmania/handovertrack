@@ -1,6 +1,6 @@
 # Task 08 — scoped sharing and customer decisions
 
-**Implemented locally. Publication and CI are recorded below. No live release.**
+**Implemented locally; PR #7 open. CI validation PASS. No live release.**
 Updated 2026-09-23. Stop before Task 09. Tasks 03–06 retain the native/recovery
 gates described in their handoffs and Task 07's superseding simulator results.
 
@@ -169,3 +169,30 @@ Task 05 backups predate these schemas and do not establish report/sharing recove
 There is no email delivery, notification automation or paid service.
 
 Continue only after explicit assignment of [Task 09](../prompts/09-reliability-and-recovery.md).
+
+### Publication result
+
+Pushed `codex/sharing-and-decisions` and opened
+[PR #7 — Tasks 06–08](https://github.com/mendmania/handovertrack/pull/7) against main;
+attached it to the Codex task. Implementation commit: **aa4ac23**, following
+**ac26f74** (dependencies) and **bd2f5f3** (main reconciliation). Current main was
+fetched again before push; no additional reconciliation was needed.
+
+[CI run 35860553770](https://github.com/mendmania/handovertrack/actions/runs/35860553770)
+validated implementation commit `aa4ac239f855e237fabdad8576c40b398dad7449`:
+**validate PASS; publish SKIPPED**. This includes the added report/sharing/checklist
+regressions and the existing checks, browser suites and mobile export. No CI bypass
+or attributable CI fix was required. The closing documentation commit only records
+these results; current PR checks remain visible on the PR.
+
+All ten local browser journeys passed. Saved environment files and SQL 001–006
+were hash-checked again; the final source/contract/test/docs staging scan found no
+configured credentials or private/generated data. API/web/worker processes started
+for this task and the Task 07/08 isolated PostgreSQL containers are stopped; volumes,
+fixtures and evidence remain retained. Do not run a general media worker against
+the proof test DB after checklist tests: those synthetic checklist originals live
+in their separately retained temporary media directory.
+
+No merge, auto-merge, deployment, live schema change, automation activation, paid
+service, phone mutation or Task 09 work occurred. The unresolved native/recovery
+checks above remain release blockers, not reasons to erase data or defer this PR.

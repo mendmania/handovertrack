@@ -14,7 +14,7 @@ in-progress test instructions.
 | 05 | Existing-k3s preflight and private trial deployment | implemented-awaiting-validation | [Handoff](progress/05-k3s-trial.md); HTTPS and full-batch backup/application restore pass; native fault scenarios and independent recovery readiness remain open |
 | 06 | Required-photo checklists and offline conflicts | implemented-awaiting-validation | [Handoff](progress/06-checklists.md); local PostgreSQL/SQLite/HTTP/browser checks pass; isolated Release simulator built/installed/launched; native offline save/cold reopen/concurrent conflict/resolution now PASS; photo/account-scope UI follow-ups remain open |
 | 07 | Proof composition and immutable reports | complete locally | [Handoff](progress/07-proof-reports.md); frozen snapshots, private PDF worker/crash recovery and visual/browser/regression checks PASS; no live release |
-| 08 | Scoped sharing and customer decisions | implemented locally; PR validation pending | [Handoff](progress/08-sharing-and-decisions.md); expiring/revocable exact-revision sharing, customer decisions and manager review; local checks PASS |
+| 08 | Scoped sharing and customer decisions | complete locally; PR open | [Handoff](progress/08-sharing-and-decisions.md); [PR #7](https://github.com/mendmania/handovertrack/pull/7) includes Tasks 06–08; local validation and implementation CI PASS; no live release |
 | 09 | Whole-trial reliability and recovery | planned | [Prepared prompt](prompts/09-reliability-and-recovery.md); not started |
 | 10 | Optional S3/Kafka/Temporal expansion | deferred | Separate selection after 09 |
 
@@ -25,8 +25,9 @@ The Task 06/07 source was checkpointed in `ac26f74` before Task 08 code. Current
 main was merged in `bd2f5f3` on `codex/sharing-and-decisions`, preserving workflows.
 PostgreSQL 005–007 and SQLite v5 remain **local only**. The owner authorized feature
 branch commits/push/PR; no merge to main, deployment or automation activation is
-authorized. Full PR scope includes Tasks 06–08. See Task 08's handoff for final
-publication/CI status. Stop before Task 09.
+authorized. Full PR scope includes Tasks 06–08. PR #7 is open and attached; implementation `aa4ac23` passed CI validation
+([run](https://github.com/mendmania/handovertrack/actions/runs/35860553770)); image
+publication was skipped. See Task 08's handoff for exact results. Stop before Task 09.
 
 Task 07 first resumed the retained Task 06 simulator. Native offline answer save,
 termination/cold reopen, competing server edit, reconnect and explicit resolution
@@ -94,7 +95,7 @@ Runtime source remains `ba2ecc8d8040eda6e5d57bf73d6d17e90a4d2337`, immutable ima
 DNS-only origin HTTPS, local configuration, credentials, migrations, source PVCs,
 all original photos, previous recovery resources and Rrugë remain preserved.
 No live runtime/schema release, bootstrap/seed or image import occurred.
-Tasks 06 and 07 now exist locally only. See the handoff and evidence manifests for exact backup hashes/resources.
+Tasks 06–08 are published for source review, with schemas/runtime still local only. See the handoffs and evidence manifests for exact backup hashes/resources.
 
 Task 04 publication follow-up: codex/upload-and-preview, based on origin/main
 at 8063d1e after the foundation PR merged. The owner requested a dedicated
