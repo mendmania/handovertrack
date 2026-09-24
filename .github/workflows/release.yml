@@ -42,6 +42,9 @@ jobs:
           REPORT_TEST_OUTPUT: .local/task08
         run: pnpm test:reports && pnpm test:report-worker && pnpm test:sharing && pnpm test:proof-web && pnpm test:checklists
         timeout-minutes: 10
+      - name: Isolated current-schema recovery and bounded reliability rehearsal
+        run: pnpm test:recovery
+        timeout-minutes: 8
       - run: pnpm mobile:check && pnpm mobile:export && pnpm check:client-bundles
       # Never upload .env, database/media fixtures, screenshots or raw service logs.
   publish:

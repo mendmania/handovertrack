@@ -1,6 +1,6 @@
 # Implementation status
 
-Updated 2026-09-23. Profile: `selfhosted-trial`; HTTPS is live at
+Updated 2026-09-24. Profile: `selfhosted-trial`; HTTPS is live at
 [handovertrack.com](https://handovertrack.com). Disposable data only. The current
 [Task 05 checkpoint](progress/05-k3s-trial.md) supersedes historical rollout and
 in-progress test instructions.
@@ -12,28 +12,36 @@ in-progress test instructions.
 | 03 | Durable offline camera capture | implemented-awaiting-validation | [Handoff](progress/03-offline-capture.md); physical twenty-photo capture, permissions, offline reopen and scope preservation pass; shared native/recovery gates remain open |
 | 04 | Verified uploads, durable jobs and previews | implemented-awaiting-validation | [Handoff](progress/04-upload-and-preview.md); all 21 new native assets/63 variants and worker restart pass; native interruption/retry/lost response NOT RUN |
 | 05 | Existing-k3s preflight and private trial deployment | implemented-awaiting-validation | [Handoff](progress/05-k3s-trial.md); HTTPS and full-batch backup/application restore pass; native fault scenarios and independent recovery readiness remain open |
-| 06 | Required-photo checklists and offline conflicts | implemented-awaiting-validation | [Handoff](progress/06-checklists.md); local PostgreSQL/SQLite/HTTP/browser checks pass; isolated Release simulator built/installed/launched; native offline save/cold reopen/concurrent conflict/resolution now PASS; photo/account-scope UI follow-ups remain open |
+| 06 | Required-photo checklists and offline conflicts | implemented-awaiting-validation | [Handoff](progress/06-checklists.md); local PostgreSQL/SQLite/HTTP/browser checks pass; isolated Release simulator built/installed/launched; native offline save/cold reopen/concurrent conflict/resolution PASS; Task 09 photo/account/org/tombstone simulator follow-ups now PASS; shared physical/recovery gates remain open |
 | 07 | Proof composition and immutable reports | complete locally | [Handoff](progress/07-proof-reports.md); frozen snapshots, private PDF worker/crash recovery and visual/browser/regression checks PASS; no live release |
-| 08 | Scoped sharing and customer decisions | complete locally; PR open | [Handoff](progress/08-sharing-and-decisions.md); [PR #7](https://github.com/mendmania/handovertrack/pull/7) includes Tasks 06–08; local validation and implementation CI PASS; no live release |
-| 09 | Whole-trial reliability and recovery | planned | [Prepared prompt](prompts/09-reliability-and-recovery.md); not started |
+| 08 | Scoped sharing and customer decisions | complete locally; merged | [Handoff](progress/08-sharing-and-decisions.md); [PR #7](https://github.com/mendmania/handovertrack/pull/7) includes Tasks 06–08; local validation and implementation CI PASS; no live release |
+| 09 | Whole-trial reliability and recovery | implemented-awaiting-validation | [Handoff](progress/09-reliability-and-recovery.md); [PR #8](https://github.com/mendmania/handovertrack/pull/8); local journey/restore/hold/load regressions, physical/native/independent recovery gates still open |
 | 10 | Optional S3/Kafka/Temporal expansion | deferred | Separate selection after 09 |
 
-Tasks 06–08 were explicitly assigned. Task 08 adds hash-only, expiring/revocable
-sharing of immutable report revisions and append-only customer accept/correction
-and manager review. Customer decisions remain separate from project completion.
-The Task 06/07 source was checkpointed in `ac26f74` before Task 08 code. Current
-main was merged in `bd2f5f3` on `codex/sharing-and-decisions`, preserving workflows.
-PostgreSQL 005–007 and SQLite v5 remain **local only**. The owner authorized feature
-branch commits/push/PR; no merge to main, deployment or automation activation is
-authorized. Full PR scope includes Tasks 06–08. PR #7 is open and attached; implementation `aa4ac23` passed CI validation
-([run](https://github.com/mendmania/handovertrack/actions/runs/35860553770)); image
-publication was skipped. See Task 08's handoff for exact results. Stop before Task 09.
+Tasks 06–08 are merged through [PR #7](https://github.com/mendmania/handovertrack/pull/7),
+main `6ff5f38314621247ab7b082dfa3030fc9f704e96`. Main validation and image publication
+[passed](https://github.com/mendmania/handovertrack/actions/runs/35972037481).
+This does not imply a live deployment: read-only Task 09 inspection still found the
+retained004 runtime,25 originals and75 variants. PostgreSQL 005–008 and SQLite v5
+remain isolated development/test changes. Task 09 uses a new feature branch/PR;
+commits, push and PR creation are authorized; merge, deployment, auto-merge and
+automation activation are not. Task 10 stays deferred.
+
+Task 09 adds inode-pressure intake protection, operator-only restore holds, typed
+fail-closed503 responses, read-only reliability signals and a current-schema
+backup/restore/load regression. See the [Task 09 handoff](progress/09-reliability-and-recovery.md)
+and [operational quickstart](../infra/kubernetes/RELIABILITY.md). Same-Mac technical
+restoration and local tests do not close trial readiness. The owner deferred
+independent backup/key/operator arrangements. The owner unlocked the Mac; remaining v5 simulator photo/account/org/tombstone UI
+checks now PASS. Confirmed offline phone interaction and a fresh complete baseline
+remain prerequisites for the outstanding physical fault checks.
 
 Task 07 first resumed the retained Task 06 simulator. Native offline answer save,
 termination/cold reopen, competing server edit, reconnect and explicit resolution
 PASS. This found and fixed rejection of React Native's GET cache-buster parameter.
-The Mac locked again before additional photo/account/org retention UI checks;
-those remain NOT RUN. SQL/outbox ownership/retention regressions still pass.
+Task 07 initially stopped at a locked Mac; Task 09 later completed the additional
+photo/account/org/tombstone UI checks after owner unlock. SQL/outbox
+ownership/retention regressions still pass.
 
 Task 07's report authorization, idempotency/lost responses, concurrent revisions,
 completion revalidation, immutable snapshot/artifact, actual worker SIGKILL and
@@ -95,7 +103,7 @@ Runtime source remains `ba2ecc8d8040eda6e5d57bf73d6d17e90a4d2337`, immutable ima
 DNS-only origin HTTPS, local configuration, credentials, migrations, source PVCs,
 all original photos, previous recovery resources and Rrugë remain preserved.
 No live runtime/schema release, bootstrap/seed or image import occurred.
-Tasks 06–08 are published for source review, with schemas/runtime still local only. See the handoffs and evidence manifests for exact backup hashes/resources.
+Tasks 06–08 are merged; their new schemas/runtime and Task 09 remain isolated from the retained live 004 deployment. See the handoffs and evidence manifests for exact backup hashes/resources.
 
 Task 04 publication follow-up: codex/upload-and-preview, based on origin/main
 at 8063d1e after the foundation PR merged. The owner requested a dedicated

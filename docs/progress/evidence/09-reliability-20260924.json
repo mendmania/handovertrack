@@ -1,0 +1,207 @@
+{
+  "date": "2026-09-24",
+  "status": "implemented-awaiting-validation",
+  "trial": "disposable-only",
+  "baseMain": "6ff5f38314621247ab7b082dfa3030fc9f704e96",
+  "mainWorkflow": {
+    "id": 35972037481,
+    "validate": "PASS",
+    "publish": "PASS",
+    "liveDeploymentInferred": false
+  },
+  "localLoad": {
+    "result": "PASS",
+    "workload": {
+      "uploads": 9,
+      "jpegBytes": 1313223,
+      "uploadConcurrency": 3,
+      "pdfJobs": 6,
+      "managerReads": 100,
+      "guestConcurrentDownloads": 16
+    },
+    "durationMs": 3602,
+    "busyUploads": 5,
+    "operationLatencyMs": {
+      "p50": 5.629500000000007,
+      "p95": 135.03125,
+      "max": 316.02049999999997
+    },
+    "peakWorkerAndRenderChildRssKiB": 303296,
+    "mainMaxRssKiB": 334736,
+    "availableBytesBefore": 20112400384,
+    "availableBytesAfter": 20058296320,
+    "guestResults": {
+      "ok": 2,
+      "throttled": 14,
+      "revokedDenied": 8
+    },
+    "durationInterpretation": "Small synthetic local workload, not production capacity",
+    "unavailable": [
+      "live node pressure",
+      "physical radio",
+      "independent disk IOPS"
+    ]
+  },
+  "localRecovery": {
+    "source": "6ff5f38314621247ab7b082dfa3030fc9f704e96",
+    "startedAt": "2026-09-24T08:39:46.109Z",
+    "independentRecovery": "NOT RUN: owner deferred arrangements",
+    "nativeRadio": "NOT RUN by this harness",
+    "oldClientCompatibility": "PASS rejection confirmed: retained v4 client must not consume checklist feed",
+    "journey": "PASS capture / SQLite restart / lost completion reply / answer replay / completion / frozen PDF / exact share / decision replay / review",
+    "signals": {
+      "result": "PASS",
+      "detected": [
+        "TERMINAL_JOBS",
+        "RECOVERY_REQUIRED",
+        "WORKER_HEARTBEAT_STALE",
+        "BACKUP_STALE",
+        "QUEUE_OVERDUE",
+        "BACKUP_UNKNOWN"
+      ],
+      "disk": {
+        "availableBytes": 20167102464,
+        "freeInodes": 196944360
+      }
+    },
+    "databaseRestart": "PASS unavailable signal, actual owned PostgreSQL stop/start, durable recovery hold",
+    "recovery": {
+      "result": "PASS technical restore; HOLD remains required",
+      "tables": 32,
+      "files": 90,
+      "backupAt": "2026-09-24T08:39:48.257Z",
+      "knownGapThrough": "2026-09-24T08:39:49.336Z",
+      "restoreAndVerificationMs": 1761,
+      "manifestSha256": "08bb1faa513845d6f8fe30fa8319b9ef942179c4a7f8492fca295bb9b8069664",
+      "missingDecisionRecorded": true,
+      "sourceMembershipRevocationRecorded": true,
+      "allRestoredSharesInvalidated": true,
+      "restoredSessions": 0,
+      "holdSurvivesRestart": true,
+      "privatePendingJobsResumed": true,
+      "immutablePartialPublicationReused": true,
+      "nativeSQLite": 5,
+      "nativePending": 1,
+      "nativeAnswers": [
+        "pending",
+        "conflict"
+      ],
+      "automaticReopening": false
+    },
+    "durationMs": 5007,
+    "peakMainProcessRssBytes": 337264640
+  },
+  "native": {
+    "result": "PASS",
+    "track": "retained iOS26.5 Release schema-v5 simulator",
+    "camera": "one synthetic injected original via CaptureService; not physical camera",
+    "checks": [
+      "waiting photo selection and local answer",
+      "offline logout retains answer/photo/owner/hash",
+      "other account North and South show empty outbox/gallery",
+      "original owner rebootstrap retains unavailable-project intent",
+      "accepted photo unblocks answer",
+      "actual incremental tombstone retains blocked command and original",
+      "restored assignment + explicit same-command retry accepted",
+      "old accepted/resolved/conflict receipts unchanged"
+    ],
+    "server": {
+      "variants": 3,
+      "events": 2,
+      "state": "ready"
+    },
+    "phone": "unchanged v4; physical fault controls NOT RUN"
+  },
+  "physicalReadOnly": {
+    "schema": 4,
+    "integrity": "ok",
+    "originals": 23,
+    "queues": [
+      {
+        "state": "server_accepted",
+        "n": 23
+      }
+    ]
+  },
+  "preservation": {
+    "originalConfigurationAndMigrationHashes": "PASS",
+    "ownerPrompt": "unchanged",
+    "existingRecoveryFiles": 59
+  },
+  "remaining": {
+    "physicalFaults": "NOT RUN: offline confirmation and complete fresh baseline pending",
+    "independentBackupKeysOperator": "NOT RUN: owner deferred arrangements",
+    "restoredAuthorityDecisionReopening": "NOT RUN: held for reconciliation",
+    "liveReleaseAndTargetResourceValidation": "NOT RUN"
+  },
+  "localChecks": {
+    "lintAndBoundaries": "PASS",
+    "typecheck": "PASS",
+    "generatedContracts": "PASS",
+    "unit": {
+      "result": "PASS",
+      "tests": 59,
+      "files": 6
+    },
+    "operatorTests": {
+      "result": "PASS",
+      "tests": 24
+    },
+    "manifestGuards": "PASS",
+    "foundationAndSync": "PASS",
+    "mediaAndBuiltWorker": "PASS",
+    "checklistAuthorizationCompletionBypass": "PASS",
+    "reportsAndWorkerCrash": "PASS",
+    "sharing": "PASS",
+    "browser": {
+      "result": "PASS",
+      "journeys": 10
+    },
+    "productionBuild": "PASS",
+    "mobileCheckAndExport": "PASS",
+    "clientBundleSecretScan": {
+      "result": "PASS",
+      "artifacts": 45
+    },
+    "boundedTmpfsPressure": "PASS"
+  },
+  "publication": {
+    "pr": "https://github.com/mendmania/handovertrack/pull/8",
+    "implementationCommit": "02a4d947e9a4c70910d870710670ae74514b0ca6",
+    "finalCommitChecks": "https://github.com/mendmania/handovertrack/pull/8/checks",
+    "localEvidenceSource": "Uncommitted Task09 working tree on recorded base before implementation checkpoint",
+    "autoMerge": false,
+    "deployment": false
+  },
+  "ciCorrections": {
+    "initialRuns": [
+      {
+        "id": 35977394684,
+        "result": "FAIL",
+        "finding": "Worker ready emitted before signal handler registration"
+      },
+      {
+        "id": 35977549665,
+        "result": "FAIL",
+        "finding": "Recovery browser harness reused bundle compiled for another origin"
+      },
+      {
+        "id": 35978341880,
+        "result": "FAIL",
+        "finding": "Next build worker rejected forwarded --env-file flag; configuration moved to child environment"
+      }
+    ],
+    "localWorkerImmediateTermination": {
+      "result": "PASS",
+      "starts": 20,
+      "database": "empty owned schema008 database"
+    },
+    "lintAndTypesAfterFix": "PASS",
+    "finalHead": "See PR checks; earlier failed runs retained",
+    "localIsolatedBuildAndBrowserAfterFix": {
+      "result": "PASS",
+      "journeys": 10,
+      "fixtures": "fresh owned PostgreSQL browser-fix container, retained and stopped"
+    }
+  }
+}

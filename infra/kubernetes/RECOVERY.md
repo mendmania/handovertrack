@@ -1,5 +1,11 @@
 # Recovery rehearsal (technical application restore verified)
 
+**Current-schema safety override (Task09):** use [RELIABILITY.md](RELIABILITY.md)
+for 001–008 restores and authority/decision reconciliation. The dated 001–004
+session-reuse successes below are historical; do not reopen an old auth/share
+snapshot or decision intake without the new fail-closed quarantine procedure.
+The live-targeting `scripts/ops/backup.py` must not be used for local rehearsals.
+
 The active trial must contain disposable test evidence only. Source backups and
 restore rehearsal PVCs are retained until reviewed; no original cleanup/prune
 is part of this procedure. Never restore into the active database/PVCs.
