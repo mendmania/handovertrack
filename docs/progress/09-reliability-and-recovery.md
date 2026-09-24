@@ -55,6 +55,10 @@ track; no app was installed or test control armed.
   now install a redacted disconnect listener and explicitly close unused dialect
   pools; API/worker shutdown uses the common close method. The same API process
   reconnects after database restart and still enforces the durable hold.
+- Linux CI exposed a startup/shutdown race: the worker emitted readiness before
+  registering signal handlers. Readiness now follows drain-handler registration;
+  20 immediate SIGTERM-at-readiness starts passed against an empty owned schema008
+  database. The existing compiled-worker smoke test remains the CI regression.
 - Process heartbeat alone can look healthy while work stalls. A read-only operator
   command reports DB availability, due queue age, terminal jobs, heartbeat age,
   configured storage reserve, backup receipt age and recovery holds. Missing or
@@ -131,6 +135,16 @@ recovery is technical PASS; the intentional history gap remains held. Final-comm
 the publishing task verifies it after its final push. Feature-branch publication
 is skipped by the existing workflow guard. Existing
 schema-contract deployment rejection remains intentional.
+
+Initial PR CI runs **FAIL**, retained honestly: [35977394684](https://github.com/mendmania/handovertrack/actions/runs/35977394684)
+exposed the worker readiness/SIGTERM race; [35977549665](https://github.com/mendmania/handovertrack/actions/runs/35977549665)
+passed that smoke but failed the fresh recovery browser setup. The latter reused
+Next's previously compiled3300 auth origin at the isolated3390 server. The harness
+now builds the browser bundle with its own fixture origin before launching tests.
+Safe CI diagnostics expose only repository test location, outcome and duration;
+raw errors, screenshots, tokens and service logs stay private. Lint/types and the
+20-start worker regression passed after these fixes. Final-head CI remains
+verifiable through the PR checks above; earlier failures are not marked PASS.
 
 ## Readiness and precise continuation
 

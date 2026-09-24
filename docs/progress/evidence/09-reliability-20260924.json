@@ -172,5 +172,26 @@
     "localEvidenceSource": "Uncommitted Task09 working tree on recorded base before implementation checkpoint",
     "autoMerge": false,
     "deployment": false
+  },
+  "ciCorrections": {
+    "initialRuns": [
+      {
+        "id": 35977394684,
+        "result": "FAIL",
+        "finding": "Worker ready emitted before signal handler registration"
+      },
+      {
+        "id": 35977549665,
+        "result": "FAIL",
+        "finding": "Recovery browser harness reused bundle compiled for another origin"
+      }
+    ],
+    "localWorkerImmediateTermination": {
+      "result": "PASS",
+      "starts": 20,
+      "database": "empty owned schema008 database"
+    },
+    "lintAndTypesAfterFix": "PASS",
+    "finalHead": "See PR checks; earlier failed runs retained"
   }
 }

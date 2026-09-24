@@ -13,11 +13,9 @@ const owner = randomUUID();
 const report = (event: string, extra = {}) => console.log(JSON.stringify({ service: 'handovertrack-worker', event, ...extra }));
 await pool.query('SELECT 1');
 await sweepMediaScratch(pool,new MediaFiles(config.MEDIA_ROOT,0));
-report('ready', { profile: 'selfhosted-trial', handlers: ['image-v1', 'completion-v1'] });
 const markHeartbeat = () => {
   if (process.env.WORKER_HEARTBEAT_FILE) writeFileSync(process.env.WORKER_HEARTBEAT_FILE, String(Date.now()), { mode: 0o600 });
 };
-markHeartbeat();
 let closing = false; let running: Promise<void> | undefined;
 async function tick() {
   if (closing || running) return;
@@ -45,12 +43,16 @@ async function reportTick() {
   await reportRunning;
 }
 const reportTimer = setInterval(() => void reportTick(), config.WORKER_POLL_MS);
-void reportTick();
 const timer = setInterval(() => void tick(), config.WORKER_POLL_MS);
 const heartbeat = setInterval(() => { markHeartbeat(); report('heartbeat'); }, config.WORKER_HEARTBEAT_MS);
-void tick();
 for (const signal of ['SIGINT', 'SIGTERM']) process.once(signal, async () => {
   if (closing) return;
   closing = true; clearInterval(timer); clearInterval(heartbeat); clearInterval(reportTimer);
   await Promise.all([running, reportRunning]); await close(); report('stopped', { signal }); process.exit(0);
 });
+// A supervisor may signal immediately after observing readiness. Install the
+// drain handlers before publishing it or starting either dispatcher.
+markHeartbeat();
+report('ready', { profile: 'selfhosted-trial', handlers: ['image-v1', 'completion-v1'] });
+void reportTick();
+void tick();
