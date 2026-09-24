@@ -23,9 +23,13 @@ main `6ff5f38314621247ab7b082dfa3030fc9f704e96`. Main validation and image publi
 [passed](https://github.com/mendmania/handovertrack/actions/runs/35972037481).
 This does not imply a live deployment: read-only Task 09 inspection still found the
 retained004 runtime,25 originals and75 variants. PostgreSQL 005–008 and SQLite v5
-remain isolated development/test changes. Task 09 uses a new feature branch/PR;
-commits, push and PR creation are authorized; merge, deployment, auto-merge and
-automation activation are not. Task 10 stays deferred.
+remain isolated development/test changes. Task 09 PR #8 subsequently merged as
+`f12c5f227b2b199215a2f75ed89d0690ab428408`. Its main validation
+[failed at Expo compatibility](https://github.com/mendmania/handovertrack/actions/runs/35987196113)
+after new SDK 57 patch recommendations; a separate compatibility fix updates the
+three exact Expo pins and lockfile. Local mobile checks/export pass. Physical and
+independent recovery gates remain open. No deployment, auto-merge or automation
+activation is authorized by this correction. Task 10 stays deferred.
 
 Task 09 adds inode-pressure intake protection, operator-only restore holds, typed
 fail-closed503 responses, read-only reliability signals and a current-schema
