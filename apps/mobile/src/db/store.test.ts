@@ -46,7 +46,7 @@ async function database(legacy = false) {
 function queryClient() { const client = new QueryClient(); cleanups.push(() => client.clear()); return client; }
 function fakeApi(scope: Scope, remote: () => Promise<ProjectSnapshot>): Api {
   const unused = async (): Promise<never> => { throw new Error('unused command'); };
-  return { createUpload: unused, uploadStatus: unused, completeUpload: unused, media: unused, createProject: unused, updateProject: unused, workers: unused, assignments: unused, setAssignment: unused, me: async () => ({ accountId: scope.accountId, name: 'Worker', memberships: [{ organizationId: scope.organizationId, organizationName: 'Crew', role: 'field_worker', capabilities: ['project.read_assigned'] }] }), snapshot: remote, bootstrap: async () => ({ ...await remote(), assignments: [], cursor: 'bootstrap' }), pull: async (_scope: Scope, cursor: string) => ({ ...scope, fromCursor: cursor, cursor: 'next', hasMore: false, changes: [] }), list: async () => [], detail: async () => { throw new Error('unused'); } };
+  return { sharing: unused, createShare: unused, revokeShare: unused, reviewDecision: unused, proof: unused, saveProof: unused, requestReport: unused, reportStatus: unused, retryReport: unused, checklistTemplates: unused, publishChecklistTemplate: unused, checklist: unused, checklistCommand: unused, createUpload: unused, uploadStatus: unused, completeUpload: unused, media: unused, createProject: unused, updateProject: unused, workers: unused, assignments: unused, setAssignment: unused, me: async () => ({ accountId: scope.accountId, name: 'Worker', memberships: [{ organizationId: scope.organizationId, organizationName: 'Crew', role: 'field_worker', capabilities: ['project.read_assigned'] }] }), snapshot: remote, bootstrap: async () => ({ ...await remote(), assignments: [], cursor: 'bootstrap' }), pull: async (_scope: Scope, cursor: string) => ({ ...scope, fromCursor: cursor, cursor: 'next', hasMore: false, changes: [] }), list: async () => [], detail: async () => { throw new Error('unused'); } };
 }
 describe('durable read-only SQLite boundary', () => {
   it('migrates with WAL/FKs, persists across reopen, and reconstructs after Query cache loss', async () => {
@@ -147,7 +147,7 @@ function page(scope = a, fromCursor = 'cursor-0', cursor = 'cursor-1'): SyncPage
 describe('incremental SQLite protocol', () => {
   it('upgrades an existing Task 01 database in place without losing offline rows', async () => {
     const { store, db } = await database(true);
-    expect(db().prepare('PRAGMA user_version').get()?.user_version).toBe(4);
+    expect(db().prepare('PRAGMA user_version').get()?.user_version).toBe(5);
     expect((await store.list(a))[0]).toMatchObject({ name: 'Task 01 cached project', version: 1 });
     expect((await store.metadata(a))?.cursor).toBeNull();
     await store.bootstrap(a, bootstrap(), () => {});

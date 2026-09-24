@@ -6,15 +6,16 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "dev": "tsx src/main.ts",
-    "build": "tsup",
+    "build": "tsup && mkdir -p dist/assets && cp ../../packages/platform/src/reports/assets/* dist/assets/",
     "start": "node dist/main.js"
   },
   "dependencies": {
-    "@handovertrack/platform": "workspace:*",
     "@handovertrack/config": "workspace:*",
+    "@handovertrack/platform": "workspace:*",
     "kysely": "0.29.6",
+    "pdfkit": "0.17.2",
     "pg": "8.23.0",
-    "zod": "4.6.5",
-    "sharp": "0.35.4"
+    "sharp": "0.35.4",
+    "zod": "4.6.5"
   }
 }

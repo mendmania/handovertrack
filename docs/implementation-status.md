@@ -1,6 +1,6 @@
 # Implementation status
 
-Updated 2026-09-22. Profile: `selfhosted-trial`; HTTPS is live at
+Updated 2026-09-23. Profile: `selfhosted-trial`; HTTPS is live at
 [handovertrack.com](https://handovertrack.com). Disposable data only. The current
 [Task 05 checkpoint](progress/05-k3s-trial.md) supersedes historical rollout and
 in-progress test instructions.
@@ -12,11 +12,38 @@ in-progress test instructions.
 | 03 | Durable offline camera capture | implemented-awaiting-validation | [Handoff](progress/03-offline-capture.md); physical twenty-photo capture, permissions, offline reopen and scope preservation pass; shared native/recovery gates remain open |
 | 04 | Verified uploads, durable jobs and previews | implemented-awaiting-validation | [Handoff](progress/04-upload-and-preview.md); all 21 new native assets/63 variants and worker restart pass; native interruption/retry/lost response NOT RUN |
 | 05 | Existing-k3s preflight and private trial deployment | implemented-awaiting-validation | [Handoff](progress/05-k3s-trial.md); HTTPS and full-batch backup/application restore pass; native fault scenarios and independent recovery readiness remain open |
-| 06 | Required-photo checklists and offline conflicts | planned | [Prepared prompt](prompts/06-checklists.md); not started or assigned by Task 05 |
-| 07 | Proof composition and immutable reports | planned | Depends on 06 |
-| 08 | Scoped sharing and customer decisions | planned | Depends on 07 |
-| 09 | Whole-trial reliability and recovery | planned | Depends on 08 |
+| 06 | Required-photo checklists and offline conflicts | implemented-awaiting-validation | [Handoff](progress/06-checklists.md); local PostgreSQL/SQLite/HTTP/browser checks pass; isolated Release simulator built/installed/launched; native offline save/cold reopen/concurrent conflict/resolution now PASS; photo/account-scope UI follow-ups remain open |
+| 07 | Proof composition and immutable reports | complete locally | [Handoff](progress/07-proof-reports.md); frozen snapshots, private PDF worker/crash recovery and visual/browser/regression checks PASS; no live release |
+| 08 | Scoped sharing and customer decisions | complete locally; PR open | [Handoff](progress/08-sharing-and-decisions.md); [PR #7](https://github.com/mendmania/handovertrack/pull/7) includes Tasks 06–08; local validation and implementation CI PASS; no live release |
+| 09 | Whole-trial reliability and recovery | planned | [Prepared prompt](prompts/09-reliability-and-recovery.md); not started |
 | 10 | Optional S3/Kafka/Temporal expansion | deferred | Separate selection after 09 |
+
+Tasks 06–08 were explicitly assigned. Task 08 adds hash-only, expiring/revocable
+sharing of immutable report revisions and append-only customer accept/correction
+and manager review. Customer decisions remain separate from project completion.
+The Task 06/07 source was checkpointed in `ac26f74` before Task 08 code. Current
+main was merged in `bd2f5f3` on `codex/sharing-and-decisions`, preserving workflows.
+PostgreSQL 005–007 and SQLite v5 remain **local only**. The owner authorized feature
+branch commits/push/PR; no merge to main, deployment or automation activation is
+authorized. Full PR scope includes Tasks 06–08. PR #7 is open and attached; implementation `aa4ac23` passed CI validation
+([run](https://github.com/mendmania/handovertrack/actions/runs/35860553770)); image
+publication was skipped. See Task 08's handoff for exact results. Stop before Task 09.
+
+Task 07 first resumed the retained Task 06 simulator. Native offline answer save,
+termination/cold reopen, competing server edit, reconnect and explicit resolution
+PASS. This found and fixed rejection of React Native's GET cache-buster parameter.
+The Mac locked again before additional photo/account/org retention UI checks;
+those remain NOT RUN. SQL/outbox ownership/retention regressions still pass.
+
+Task 07's report authorization, idempotency/lost responses, concurrent revisions,
+completion revalidation, immutable snapshot/artifact, actual worker SIGKILL and
+post-link/pre-commit crash recovery checks PASS. Migration 006 preserved all 19
+pre-existing tables in the retained isolated Task 06 database. All 54 unit tests,
+report browser plus seven existing browser journeys, checklist/sync/media worker
+regressions and visual/text inspection of the actual 12-page PDF PASS. See the
+handoff for exact evidence and the remaining release/capacity checks. The existing
+HTTPS phone/live installation and retained recovery data are unchanged. Task 05's
+physical fault and operational recovery gates remain unresolved.
 
 Automatic release follow-up: the owner requested build, publication and deployment
 on pushes to main. [PR #5](https://github.com/mendmania/handovertrack/pull/5) is
@@ -33,7 +60,8 @@ all three physical cases and their owner observations remain NOT RUN. No new
 photo IDs were created. Refreshed USB/server hashes preserve the existing totals,
 and all 59 recovery files plus three stopped rehearsals remain intact. The owner's
 “xontinue” reply confirms none of the requested recovery arrangements. Normal
-source/configuration is restored, no control is armed and Task 06 is not started.
+source/configuration was restored and no Task 05 control is armed. That checkpoint
+predates the separately assigned local Task 06 work.
 See [the exact preparation evidence](progress/evidence/05-native-fault-preparation-20260922.json).
 
 The physical phone preserves 23 originals and accepted receipts, with 22 belonging
@@ -66,8 +94,8 @@ Runtime source remains `ba2ecc8d8040eda6e5d57bf73d6d17e90a4d2337`, immutable ima
 `handovertrack.local/runtime@sha256:125cd8a42f0bb92bf87251d40c4cc14c561ab27e0f00911205e000856d66d7cc`.
 DNS-only origin HTTPS, local configuration, credentials, migrations, source PVCs,
 all original photos, previous recovery resources and Rrugë remain preserved.
-No runtime/schema release, bootstrap/seed, image import or Task 06 implementation
-occurred. See the handoff and evidence manifests for exact backup hashes/resources.
+No live runtime/schema release, bootstrap/seed or image import occurred.
+Tasks 06–08 are published for source review, with schemas/runtime still local only. See the handoffs and evidence manifests for exact backup hashes/resources.
 
 Task 04 publication follow-up: codex/upload-and-preview, based on origin/main
 at 8063d1e after the foundation PR merged. The owner requested a dedicated

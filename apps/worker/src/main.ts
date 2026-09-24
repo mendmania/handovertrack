@@ -1,3 +1,4 @@
+import { createReportJobs, ReportFiles } from '@handovertrack/platform/reports';
 import { randomUUID } from 'node:crypto';
 import { writeFileSync } from 'node:fs';
 import { createDatabase } from '@handovertrack/platform/database';
@@ -7,11 +8,12 @@ const config = readServerConfig(process.env);
 const { db, pool } = createDatabase(config.DATABASE_URL);
 const files = new MediaFiles(config.MEDIA_ROOT, config.MEDIA_RESERVE_BYTES);
 const jobs = createMediaJobs(pool, files, config.WORKER_LEASE_MS);
+const reports = createReportJobs(pool, new ReportFiles(config.MEDIA_ROOT, config.MEDIA_RESERVE_BYTES), config.MEDIA_ROOT, config.WORKER_LEASE_MS);
 const owner = randomUUID();
 const report = (event: string, extra = {}) => console.log(JSON.stringify({ service: 'handovertrack-worker', event, ...extra }));
 await pool.query('SELECT 1');
 await sweepMediaScratch(pool,new MediaFiles(config.MEDIA_ROOT,0));
-report('ready', { profile: 'selfhosted-trial', handlers: ['image-v1'] });
+report('ready', { profile: 'selfhosted-trial', handlers: ['image-v1', 'completion-v1'] });
 const markHeartbeat = () => {
   if (process.env.WORKER_HEARTBEAT_FILE) writeFileSync(process.env.WORKER_HEARTBEAT_FILE, String(Date.now()), { mode: 0o600 });
 };
@@ -29,11 +31,26 @@ async function tick() {
   })().catch(() => { report('database_unavailable'); }).finally(() => { running = undefined; });
   await running;
 }
+// Separate one-at-a-time dispatchers: rendering runs in a bounded child process.
+let reportRunning: Promise<void> | undefined;
+async function reportTick() {
+  if (closing || reportRunning) return;
+  reportRunning = (async () => {
+    const job = await reports.claim(owner); if (!job) return;
+    const renewal = setInterval(() => { void reports.renew(job).catch(() => false); }, Math.max(250, config.WORKER_LEASE_MS / 3));
+    try { await reports.process(job); report('report_ready', { reportId: job.report_id }); }
+    catch { await reports.fail(job); report('report_failed', { reportId: job.report_id }); }
+    finally { clearInterval(renewal); }
+  })().catch(() => report('report_database_unavailable')).finally(() => { reportRunning = undefined; });
+  await reportRunning;
+}
+const reportTimer = setInterval(() => void reportTick(), config.WORKER_POLL_MS);
+void reportTick();
 const timer = setInterval(() => void tick(), config.WORKER_POLL_MS);
 const heartbeat = setInterval(() => { markHeartbeat(); report('heartbeat'); }, config.WORKER_HEARTBEAT_MS);
 void tick();
 for (const signal of ['SIGINT', 'SIGTERM']) process.once(signal, async () => {
   if (closing) return;
-  closing = true; clearInterval(timer); clearInterval(heartbeat);
-  await running; await db.destroy(); report('stopped', { signal }); process.exit(0);
+  closing = true; clearInterval(timer); clearInterval(heartbeat); clearInterval(reportTimer);
+  await Promise.all([running, reportRunning]); await db.destroy(); report('stopped', { signal }); process.exit(0);
 });

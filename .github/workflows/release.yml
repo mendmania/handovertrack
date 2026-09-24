@@ -35,6 +35,13 @@ jobs:
         timeout-minutes: 8
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm test:web
+      - name: Checklist, immutable report and scoped-sharing regressions
+        env:
+          TASK07_ISOLATED: 'true'
+          TASK08_ISOLATED: 'true'
+          REPORT_TEST_OUTPUT: .local/task08
+        run: pnpm test:reports && pnpm test:report-worker && pnpm test:sharing && pnpm test:proof-web && pnpm test:checklists
+        timeout-minutes: 10
       - run: pnpm mobile:check && pnpm mobile:export && pnpm check:client-bundles
       # Never upload .env, database/media fixtures, screenshots or raw service logs.
   publish:

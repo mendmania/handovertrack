@@ -50,7 +50,11 @@ async function fixture(legacy = false) {
   };
   if (legacy) { db.exec(migrationV1); db.exec(migrationV2); }
   const store = new SnapshotStore(adapter);
-  if (legacy) await store.bootstrap(a, bootstrap(), () => {});
+  if (legacy) {
+    const snapshot=bootstrap();const p=snapshot.projects[0]!;
+    db.prepare('INSERT INTO cache_scopes(account_id,organization_id,revision,validated_at,cursor) VALUES(?,?,1,?,?)').run(a.accountId,a.organizationId,snapshot.generatedAt,snapshot.cursor);
+    db.prepare('INSERT INTO cached_projects(account_id,organization_id,id,name,description,address,status,updated_at,version) VALUES(?,?,?,?,?,?,?,?,?)').run(a.accountId,a.organizationId,p.id,p.name,p.description,p.address,p.status,p.updatedAt,p.version);
+  }
   await store.migrate(); await store.migrate();
   if (!legacy) await store.bootstrap(a, bootstrap(), () => {});
   const full = (relative: string) => { if (!relative.startsWith('captures/') || relative.split('/').some((part) => part === '..' || part === '.')) throw new Error('Invalid file path'); return join(root, relative); };
@@ -93,8 +97,9 @@ async function fixture(legacy = false) {
 }
 describe('durable local capture, real SQLite and filesystem boundary', () => {
   it('upgrades Task02 in place and reserves owner + blocked intent before camera use', async () => {
-    const f = await fixture(true); expect(f.db().prepare('PRAGMA user_version').get()?.user_version).toBe(4);
-    expect((await f.store.metadata(a))?.cursor).toBe('durable-task02-cursor'); expect((await f.store.list(a))[0]?.version).toBe(3);
+    const f = await fixture(true); expect(f.db().prepare('PRAGMA user_version').get()?.user_version).toBe(5);
+    expect((await f.store.metadata(a))?.cursor).toBeNull(); // v5 requests a checklist-aware bootstrap; cached project survives.
+    expect((await f.store.list(a))[0]?.version).toBe(3);
     const ticket = await f.service.reserve(a, projectId, () => {});
     expect(f.db().prepare('SELECT state FROM media_local').get()?.state).toBe('staging');
     expect(f.db().prepare('SELECT state FROM media_queue').get()?.state).toBe('blocked');

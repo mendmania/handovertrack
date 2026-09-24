@@ -10,3 +10,8 @@ export * from './modules/projects/application/read-projects';
 export * from './modules/projects/domain/management';
 export * from './modules/projects/ports/project-management';
 export * from './modules/projects/application/manage-projects';
+export * from './modules/checklists/domain/checklist';
+export * from './modules/checklists/ports/checklists';
+export * from './modules/reports/domain/proof';
+export * from './modules/reports/ports/proof';
+export * from './modules/sharing/domain/sharing';

@@ -7,17 +7,20 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@better-auth/expo": "1.7.5",
     "@handovertrack/backend": "workspace:*",
     "@handovertrack/config": "workspace:*",
     "better-auth": "1.7.5",
-    "@better-auth/expo": "1.7.5",
-    "pg": "8.23.0",
     "kysely": "0.29.6",
+    "pdfkit": "0.17.2",
+    "pg": "8.23.0",
     "sharp": "0.35.4"
   },
   "exports": {
     ".": "./src/index.ts",
     "./database": "./src/database.ts",
-    "./media": "./src/media/index.ts"
+    "./media": "./src/media/index.ts",
+    "./reports": "./src/reports/index.ts",
+    "./sharing": "./src/sharing/service.ts"
   }
 }

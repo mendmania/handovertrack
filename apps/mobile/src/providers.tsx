@@ -1,3 +1,6 @@
+import { localCommitted } from '@handovertrack/query';
+import { ChecklistStore, ChecklistExecutor } from './checklists/store';
+import { checklistTransport } from './checklists/native-transport';
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
 import { AppState } from 'react-native';
 import * as Network from 'expo-network';
@@ -17,7 +20,7 @@ import { SnapshotCoordinator, type SnapshotState } from './snapshot/coordinator'
 export type LocalIdentity = { scope: Scope; name: string; organizationName: string; validatedAt: number };
 interface SessionContext {
   ready: boolean; busy: boolean; identity: LocalIdentity | null; memberships: Me['memberships']; online: boolean;
-  status: SnapshotState; error: string; coordinator?: SnapshotCoordinator; captures?: CaptureService; mediaWarning: string;
+  checklists?: ChecklistStore; status: SnapshotState; error: string; coordinator?: SnapshotCoordinator; captures?: CaptureService; mediaWarning: string;
   retryUploads(): Promise<void>;
   reconcileCaptures(): Promise<void>;
   signIn(email: string, password: string): Promise<void>; logout(): Promise<void>;
@@ -31,6 +34,7 @@ export function Providers({ children }: { children: ReactNode }) {
   const identityRef = useRef<LocalIdentity | null>(null); const [memberships, setMemberships] = useState<Me['memberships']>([]);
   const [status, setStatus] = useState<SnapshotState>('cached'); const [error, setError] = useState(''); const [online, setOnline] = useState(false);
   const [coordinator, setCoordinator] = useState<SnapshotCoordinator>();
+  const [checklists,setChecklists] = useState<ChecklistStore>();
   const [captures, setCaptures] = useState<CaptureService>();
   const [mediaWarning, setMediaWarning] = useState('');
   const [busy, setBusy] = useState(false); const busyRef = useRef(false);
@@ -51,7 +55,7 @@ export function Providers({ children }: { children: ReactNode }) {
         if (result.errors || result.quarantined) setMediaWarning('Local photo storage needs attention. Recovery can be retried after signing in.');
       } catch { setMediaWarning('Photo recovery could not finish. Free storage if needed and retry from Saved photos.'); }
       if (!alive) return;
-      setCaptures(media);
+      setCaptures(media); setChecklists(new ChecklistStore(store));
       const runner = new SnapshotCoordinator(store, client, api, setStatus, async (scope, me) => {
         const active = identityRef.current;
         if (!active || active.scope.accountId !== scope.accountId || active.scope.organizationId !== scope.organizationId) return;
@@ -135,6 +139,25 @@ export function Providers({ children }: { children: ReactNode }) {
     void tick();
     return () => { alive = false; clearInterval(timer); state.remove(); uploadAbort.current?.abort(); };
   }, [captures,coordinator,client,online,identity?.scope.accountId,identity?.scope.organizationId]);
+  useEffect(() => {
+    if (!checklists || !coordinator || !identity || !online) return;
+    const scope = identity.scope; const epoch = transition.current;
+    const executor = new ChecklistExecutor(checklists,s => localCommitted(client,s));
+    let alive = true; let running: AbortController | undefined;
+    const current = () => { const active = identityRef.current; if (!alive || epoch !== transition.current || active?.scope.accountId !== scope.accountId || active.scope.organizationId !== scope.organizationId) throw new Error('Scope changed'); };
+    const tick = async () => {
+      if (!alive || running || AppState.currentState !== 'active') return;
+      const controller = new AbortController(); running = controller;
+      const timeout = setTimeout(() => controller.abort(),15000);
+      try { current(); const transport = await checklistTransport(); current(); await executor.run(scope,transport,controller.signal,current); }
+      catch { /* Durable command remains pending/blocked; UI exposes state and explicit retry. */ }
+      finally { clearTimeout(timeout); if (running === controller) running = undefined; }
+    };
+    const timer = setInterval(() => void tick(),5000);
+    const listener = AppState.addEventListener('change',state => { if (state !== 'active') running?.abort(); else void tick(); });
+    void tick();
+    return () => { alive=false;clearInterval(timer);listener.remove();running?.abort(); };
+  },[checklists,coordinator,client,online,identity?.scope.accountId,identity?.scope.organizationId]);
   async function retryUploads() {
     const active = identityRef.current;
     if (!active || !captures || !coordinator) return;
@@ -206,5 +229,5 @@ export function Providers({ children }: { children: ReactNode }) {
       await capturesCommitted(client);
     } catch { setMediaWarning('Photo recovery could not finish. Free storage if needed and try again.'); }
   }
-  return <QueryClientProvider client={client}><Context.Provider value={{ ready, busy, identity, memberships, status, error, online, coordinator, captures, mediaWarning, retryUploads, reconcileCaptures, signIn, logout, selectOrganization, refresh: () => coordinator?.refresh() ?? Promise.resolve() }}>{children}</Context.Provider></QueryClientProvider>;
+  return <QueryClientProvider client={client}><Context.Provider value={{ ready, busy, identity, memberships, status, error, online, coordinator, checklists, captures, mediaWarning, retryUploads, reconcileCaptures, signIn, logout, selectOrganization, refresh: () => coordinator?.refresh() ?? Promise.resolve() }}>{children}</Context.Provider></QueryClientProvider>;
 }

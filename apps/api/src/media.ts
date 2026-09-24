@@ -46,7 +46,7 @@ export async function registerMedia(app: FastifyInstance, pool: Pool, config: Se
     });
   });
   app.get<{ Params: { organizationId: string; projectId: string }; Querystring: { after?: string } }>('/v1/organizations/:organizationId/projects/:projectId/media', {
-    schema: { params: orgProject, querystring: { type: 'object', additionalProperties: false, properties: { after: uuid } } },
+    schema: { params: orgProject, querystring: { type: 'object', additionalProperties: false, properties: { after: uuid, _: { type: 'string', maxLength: 64 } } } },
   }, async (req) => media.list((await accountFor(req.headers)).id, req.params.organizationId, req.params.projectId, req.query.after));
   app.get<{ Params: { organizationId: string; mediaId: string; variant: string } }>('/media/organizations/:organizationId/assets/:mediaId/:variant', {
     schema: { params: { ...params(['organizationId','mediaId']), required: ['organizationId','mediaId','variant'], properties: { organizationId: uuid, mediaId: uuid, variant: { type: 'string', enum: ['original','thumb','preview','report'] } } } },

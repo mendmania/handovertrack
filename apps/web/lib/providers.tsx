@@ -1,4 +1,5 @@
 'use client';
+import { usePathname } from 'next/navigation';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useEffect, useState, type ReactNode } from 'react';
 import { clearProtectedQueries } from '@handovertrack/query';
@@ -6,6 +7,11 @@ import { fence } from './browser';
 import { AUTH_CHANGE_KEY } from './auth-change';
 export function makeQueryClient() { return new QueryClient({ defaultOptions: { queries: { staleTime: 30_000, retry: false } } }); }
 export function Providers({ children }: { children: ReactNode }) {
+  const pathname=usePathname();
+  if(pathname.startsWith('/share/'))return <>{children}</>;
+  return <ManagerProviders>{children}</ManagerProviders>;
+}
+function ManagerProviders({children}:{children:ReactNode}){
   const [client] = useState(makeQueryClient);
   const [switching, setSwitching] = useState(false);
   useEffect(() => {
@@ -17,7 +23,7 @@ export function Providers({ children }: { children: ReactNode }) {
     window.addEventListener('storage', onChange);
     const onRestore = (event: PageTransitionEvent) => { if (event.persisted) { setSwitching(true); void clearProtectedQueries(client, fence).then(() => window.location.reload()); } };
     window.addEventListener('pageshow', onRestore);
-    return () => { window.removeEventListener('storage', onChange); window.removeEventListener('pageshow', onRestore); };
+    return () => { window.removeEventListener('storage', onChange); window.removeEventListener('pageshow', onRestore); void clearProtectedQueries(client, fence); };
   }, [client]);
   if (switching) return <p role="status">Account changed. Closing this session…</p>;
   return <QueryClientProvider client={client}>{children}</QueryClientProvider>;

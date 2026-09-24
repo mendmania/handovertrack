@@ -1,11 +1,12 @@
+import { checklistFor, requireCompletion } from './checklists';
 import { createHash, createHmac, randomUUID, timingSafeEqual } from 'node:crypto';
 import type { Pool, PoolClient } from 'pg';
-import { AccessError, SNAPSHOT_CAP, type Assignment, type Project, type ProjectInput, type ProjectManagement, type Role, type SyncChange } from '@handovertrack/backend';
+import { AccessError, SNAPSHOT_CAP, type ChecklistRun, type ChecklistTemplate, type Assignment, type Project, type ProjectInput, type ProjectManagement, type Role, type SyncChange } from '@handovertrack/backend';
 
 interface ProjectRow { id: string; organization_id: string; name: string; description: string; address: string; status: 'active' | 'complete'; version: number; updated_at: Date }
 interface AssignmentRow { organization_id: string; project_id: string; account_id: string; active: boolean; version: number; updated_at: Date }
 interface MembershipRow { role: Role; created_at: Date }
-interface FeedRow { revision: string; ordinal: number; entity: 'project' | 'assignment'; operation: 'upsert' | 'remove'; project_id: string; account_id: string | null; payload: Project | Assignment | null }
+interface FeedRow { revision: string; ordinal: number; entity: 'project' | 'assignment' | 'checklist' | 'template'; operation: 'upsert' | 'remove'; project_id: string; account_id: string | null; payload: Project | Assignment | ChecklistRun | ChecklistTemplate | null }
 interface Cursor { v: 1; a: string; o: string; e: string; r: string; n: number; exp: number }
 const END_ORDINAL = 2147483647;
 export const CURSOR_TTL_MS = 7 * 24 * 60 * 60 * 1000;
@@ -64,7 +65,7 @@ export function createProjectManagement(pool: Pool, secret: string, now: () => n
       const revision = (await c.query<{ revision: string }>('UPDATE organization_sync_state SET revision=revision+1 WHERE organization_id=$1 RETURNING revision', [org])).rows[0]!.revision;
       for (let index = 0; index < events.length; index++) {
         const event = events[index]!;
-        await c.query('INSERT INTO sync_changes(organization_id,revision,ordinal,entity,operation,project_id,account_id,payload) VALUES($1,$2,$3,$4,$5,$6,$7,$8)', [org, revision, index + 1, event.entity, event.operation, event.projectId, event.accountId ?? null, event.project ?? event.assignment ?? null]);
+        await c.query('INSERT INTO sync_changes(organization_id,revision,ordinal,entity,operation,project_id,account_id,payload) VALUES($1,$2,$3,$4,$5,$6,$7,$8)', [org, revision, index + 1, event.entity, event.operation, event.projectId, event.accountId ?? null, event.project ?? event.assignment ?? event.checklist ?? event.template ?? null]);
       }
       await c.query('INSERT INTO audit_records(id,organization_id,actor_account_id,action,project_id,account_id,revision,before_state,after_state) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9)', [randomUUID(), org, actor, operation, projectId, accountId ?? null, revision, before, result]);
       await c.query('INSERT INTO command_receipts(organization_id,actor_account_id,idempotency_key,request_hash,response,operation) VALUES($1,$2,$3,$4,$5,$6)', [org, actor, key, hash, result, operation]);
@@ -75,6 +76,7 @@ export function createProjectManagement(pool: Pool, secret: string, now: () => n
   return {
     create(actor, org, input, key) {
       return command(actor, org, key, 'project.create', normalized(input), async (c) => {
+        if (input.status === 'complete') throw new AccessError('COMPLETION_REQUIRED', 422);
         const result = projectDto((await c.query<ProjectRow>('INSERT INTO projects(organization_id,id,name,description,address,status) VALUES($1,$2,$3,$4,$5,$6) RETURNING *', [org, randomUUID(), input.name, input.description, input.address, input.status])).rows[0]!);
         return { result, before: null, projectId: result.id, events: [{ entity: 'project', operation: 'upsert', projectId: result.id, project: result }] };
       });
@@ -84,6 +86,7 @@ export function createProjectManagement(pool: Pool, secret: string, now: () => n
         const row = (await c.query<ProjectRow>('SELECT * FROM projects WHERE organization_id=$1 AND id=$2 FOR UPDATE', [org, id])).rows[0];
         if (!row) throw new AccessError('NOT_FOUND', 404);
         const before = projectDto(row); if (before.version !== input.baseVersion) throw new AccessError('VERSION_CONFLICT', 409, before);
+        if (input.status === 'complete') await requireCompletion(c, org, id);
         const result = projectDto((await c.query<ProjectRow>('UPDATE projects SET name=$3,description=$4,address=$5,status=$6,version=version+1,updated_at=clock_timestamp() WHERE organization_id=$1 AND id=$2 RETURNING *', [org, id, input.name, input.description, input.address, input.status])).rows[0]!);
         return { result, before, projectId: id, events: [{ entity: 'project', operation: 'upsert', projectId: id, project: result }] };
       });
@@ -109,6 +112,7 @@ export function createProjectManagement(pool: Pool, secret: string, now: () => n
         const events: Omit<SyncChange, 'revision' | 'ordinal'>[] = input.active
           ? [{ entity: 'project', operation: 'upsert', projectId: project, accountId: account, project: projectDto(p) }, { entity: 'assignment', operation: 'upsert', projectId: project, accountId: account, assignment: result }]
           : [{ entity: 'project', operation: 'remove', projectId: project, accountId: account }, { entity: 'assignment', operation: 'remove', projectId: project, accountId: account }];
+        if (input.active) { const checklist = await checklistFor(c, org, project); if (checklist) events.push({ entity: 'checklist', operation: 'upsert', projectId: project, accountId: account, checklist }); }
         return { result, before, projectId: project, accountId: account, events };
       });
     },
@@ -119,7 +123,11 @@ export function createProjectManagement(pool: Pool, secret: string, now: () => n
       const state = (await c.query<{ revision: string }>('SELECT revision FROM organization_sync_state WHERE organization_id=$1', [org])).rows[0];
       const assignments = (await c.query<AssignmentRow>(`SELECT * FROM assignments WHERE organization_id=$1 AND active AND ($3::boolean OR account_id=$2) ORDER BY project_id,account_id LIMIT 5001`, [org, actor, m.role === 'manager'])).rows.map(assignmentDto);
       if (assignments.length > 5000) throw new AccessError('SNAPSHOT_TOO_LARGE', 413);
-      return { accountId: actor, organizationId: org, complete: true, generatedAt: new Date(now()).toISOString(), projects, assignments, cursor: encode({ v: 1, a: actor, o: org, e: epoch(m), r: state?.revision ?? '0', n: END_ORDINAL, exp: now() + CURSOR_TTL_MS }) };
+      const checklists: ChecklistRun[] = [];
+      for (const project of projects) { const run = await checklistFor(c,org,project.id); if (run) checklists.push(run); }
+      const templates = m.role === 'manager' ? (await c.query<ChecklistTemplate>('SELECT id,organization_id AS "organizationId",version,title,questions FROM checklist_templates WHERE organization_id=$1 ORDER BY id,version LIMIT 501',[org])).rows : [];
+      if (templates.length > 500) throw new AccessError('SNAPSHOT_TOO_LARGE',413);
+      return { checklists, templates, accountId: actor, organizationId: org, complete: true, generatedAt: new Date(now()).toISOString(), projects, assignments, cursor: encode({ v: 1, a: actor, o: org, e: epoch(m), r: state?.revision ?? '0', n: END_ORDINAL, exp: now() + CURSOR_TTL_MS }) };
     }, true),
     pull: (actor, org, fromCursor, limit) => transaction(async (c) => {
       const m = await member(c, actor, org);
@@ -132,13 +140,13 @@ export function createProjectManagement(pool: Pool, secret: string, now: () => n
       const changes: SyncChange[] = [];
       for (const row of rows) {
         const owns = row.account_id === actor;
-        const visible = row.entity === 'project'
+        const visible = row.entity === 'template' ? m.role === 'manager' : row.entity === 'checklist' ? (m.role === 'manager' || permitted.has(row.project_id)) && (!row.account_id || owns || m.role === 'manager') : row.entity === 'project'
           ? row.operation === 'remove' ? owns && m.role === 'field_worker' : (m.role === 'manager' || permitted.has(row.project_id)) && (!row.account_id || owns || m.role === 'manager')
           : (m.role === 'manager' || owns) && (row.operation === 'remove' || m.role === 'manager' || permitted.has(row.project_id));
         if (!visible) continue;
         changes.push({ revision: row.revision, ordinal: row.ordinal, entity: row.entity, operation: row.operation, projectId: row.project_id,
           ...(row.account_id ? { accountId: row.account_id } : {}),
-          ...(row.operation === 'upsert' ? row.entity === 'project' ? { project: row.payload as Project } : { assignment: row.payload as Assignment } : {}) });
+          ...(row.operation === 'upsert' ? row.entity === 'project' ? { project: row.payload as Project } : row.entity === 'checklist' ? { checklist: row.payload as ChecklistRun } : row.entity === 'template' ? { template: row.payload as ChecklistTemplate } : { assignment: row.payload as Assignment } : {}) });
       }
       const last = rows.at(-1);
       const next = { ...cursor, r: last?.revision ?? state.revision, n: last?.ordinal ?? END_ORDINAL };

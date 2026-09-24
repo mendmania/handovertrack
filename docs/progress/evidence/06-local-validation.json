@@ -1,0 +1,155 @@
+{
+  "task": "06-checklists",
+  "date": "2026-09-23",
+  "status": "implemented-awaiting-validation",
+  "starting_commit": "d9a1ef5",
+  "branch": "codex/checklists",
+  "git_changes": "uncommitted; no push, merge, deployment or automation activation",
+  "validation": {
+    "lint": "PASS",
+    "typecheck": "PASS",
+    "contracts": "PASS",
+    "unit": {
+      "result": "PASS",
+      "tests": 54,
+      "sqlite_outbox_tests": 8
+    },
+    "postgresql_upgrade": {
+      "result": "PASS",
+      "from": "004",
+      "to": "005",
+      "unchanged_existing_data_tables": 17
+    },
+    "http_checklist_command_completion_authorization_matrix": "PASS",
+    "transaction_fault_rollback": "PASS",
+    "foundation_sync_media_regressions": "PASS",
+    "browser": {
+      "result": "PASS",
+      "journeys": 7,
+      "final_changed_ui_recheck": 2
+    },
+    "builds_smoke_export_secret_scan": "PASS",
+    "native_release_build_install_launch": "PASS",
+    "native_sqlite": {
+      "scope": "new isolated simulator only",
+      "user_version": 5,
+      "integrity_check": "ok",
+      "outbox_rows": 0,
+      "media_rows": 0
+    },
+    "native_interactive_offline_restart_conflict_scope_flow": {
+      "result": "NOT RUN",
+      "reason": "Mac locked; automatic UI unlock failed before interaction"
+    },
+    "physical_phone": "NOT RUN; preserved existing HTTPS installation",
+    "live_task06_schema_or_release": "NOT RUN; not authorized",
+    "task05_independent_recovery_decisions": "NOT RUN / unconfirmed; unchanged"
+  },
+  "preservation": {
+    "env_compose_migrations_001_004_hashes_and_modes": "PASS; unchanged",
+    "existing_media_queues_originals": "No operations against existing data; populated synthetic upgrade tests passed",
+    "phone_live_recovery": "Not accessed or modified; prior Task05 counts inherited, not revalidated"
+  },
+  "retained_isolation": {
+    "containers_volumes": [
+      "handovertrack-task06-postgres",
+      "handovertrack-task06-regression"
+    ],
+    "ports": [
+      55546,
+      55547,
+      3360,
+      3361
+    ],
+    "services": "stopped; databases and media retained",
+    "simulator": "DE92B94F-367A-491F-89B4-1FD5386D04E1",
+    "simulator_state": "shutdown; data retained"
+  },
+  "local_evidence": {
+    "lint": {
+      "path": ".local/task06/lint-final-source.log",
+      "sha256": "c8e251dcb71476e5e9c0b51b676c862e28796a07cdf78b021495ce768120238f"
+    },
+    "typecheck": {
+      "path": ".local/task06/typecheck-final-source.log",
+      "sha256": "1a8a9a90383c70c515559c65257df37a297c98c5e99d82c68445ece718c12ea5"
+    },
+    "contracts": {
+      "path": ".local/task06/contracts-final.log",
+      "sha256": "beef352aa74e100935f2665acdfaf53354c5a256db23bd008a011c480b03ebdd"
+    },
+    "unit_54": {
+      "path": ".local/task06/unit-final-source.log",
+      "sha256": "90e10d412af73ce60565e716423bb8860208e9e4fbc75fe697d726ee81ff3340"
+    },
+    "postgres_upgrade": {
+      "path": ".local/task06/migration.log",
+      "sha256": "7bdf256e89e0b5e48162911ad145f35424aa0b8765b984ae3e851c45c4d27665"
+    },
+    "checklist_http": {
+      "path": ".local/task06/checklist-server-verified.log",
+      "sha256": "86fc5f8a3c9c36a2d448df7daf07c16e9b5cbe0b239a01520cad9dc114ab4e2d"
+    },
+    "foundation": {
+      "path": ".local/task06/foundation-final.log",
+      "sha256": "ae49f17aab7e7e4f2f8cdcc8d7ee1539ee6b46d287ed94ac68c744b639348efb"
+    },
+    "sync": {
+      "path": ".local/task06/sync.log",
+      "sha256": "ce4aecfb38212cfb2270c5172c220ff6d3cf071997b2a1d985c355dcc81a49cd"
+    },
+    "media": {
+      "path": ".local/task06/media-final.log",
+      "sha256": "dab3e24aeefddccf7a278e81690aba9355964027f0f85d3fce8f0d262422c5ad"
+    },
+    "build": {
+      "path": ".local/task06/build-final.log",
+      "sha256": "2809a8f09600a6f8eb674171f628ac716f9e288e63e9b4a03a82cb98bccdf1dd"
+    },
+    "api_build_final": {
+      "path": ".local/task06/api-final-source.log",
+      "sha256": "fd059faba75c173acd39b8f1b2e5251ecf3fb7db42b585770438cafcd4c098d3"
+    },
+    "web_build_final": {
+      "path": ".local/task06/web-final-source.log",
+      "sha256": "2ac02436fe75b96415e20c50d51ec48df358aac4b9a3795452560920ebcba6fa"
+    },
+    "browser_7": {
+      "path": ".local/task06/browser-final.log",
+      "sha256": "de0c33554f428a8d3376c39882ad8d9faa6a54b0ea2f9f724c5b4e82bb33b889"
+    },
+    "browser_final_checklist_gallery": {
+      "path": ".local/task06/browser-final-source.log",
+      "sha256": "5aa19ec2e4ee2393cfcad4107acf7f3585519a7fbeb45a2953da3c9ddb7c3346"
+    },
+    "api_smoke": {
+      "path": ".local/task06/api-smoke-final-source.log",
+      "sha256": "b4d67c0016687ec303a0e502a0ee668ccce61ecfe93ace9e19c6dc7e01463a69"
+    },
+    "worker_smoke": {
+      "path": ".local/task06/worker-smoke.log",
+      "sha256": "8c7b6d3f29f7efd39ff603148e2996f46d9c287230574bc999ea9a40ab9eead8"
+    },
+    "expo_dependencies": {
+      "path": ".local/task06/mobile-check.log",
+      "sha256": "2e6abff079bd2c323a8ce98ddfb47339d674ec2f4450963275d998432f81d442"
+    },
+    "expo_export_final": {
+      "path": ".local/task06/mobile-final-source.log",
+      "sha256": "9f399c0c5a8e2ec3e253f37539e3f7ef9c7fd0f48b25d6093661703478b49593"
+    },
+    "native_release_final": {
+      "path": ".local/task06/simulator-final-source.log",
+      "sha256": "5fe69ad834be7d66493be7fd9015cd34fbeacb486838d5af5463f6ac9961715d"
+    },
+    "client_secret_scan": {
+      "path": ".local/task06/client-bundles-final-source.log",
+      "sha256": "6fab7d4e0a55a8ee67c34e543f11884c2dd4baf483431a89746fbf5e07b9d124"
+    },
+    "simulator_sqlite": {
+      "path": ".local/task06/simulator-sqlite.json",
+      "sha256": "e2a254f4f5ffedb9eb62f7f5e703ff1fe32a6fa1355e8e4c3a74c9a216402219"
+    }
+  },
+  "next_task": "07-proof-reports prompt prepared only; implementation not started"
+}
