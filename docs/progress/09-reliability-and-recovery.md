@@ -180,3 +180,21 @@ owner said it will be set up later. Task 09 and the trial are not declared compl
    Preserve current release guards and obtain separate live authorization.
 6. Review the new Task 09 PR and final-commit CI. No merge/auto-merge/deployment is
    authorized here. Keep Task 10 deferred and retain all prior recovery resources.
+
+## Post-merge Expo compatibility correction — 2026-09-24
+
+PR #8 merged as `f12c5f227b2b199215a2f75ed89d0690ab428408`. Its earlier
+feature-head validation remains PASS, but main
+[run35987196113](https://github.com/mendmania/handovertrack/actions/runs/35987196113)
+**FAIL**ed at Expo's online compatibility check after newer SDK 57 patch versions
+became recommended. Update exact pins to `expo@57.0.25`,
+`expo-linking@57.0.11` and `expo-router@57.0.23`, with the matching pnpm lockfile.
+The online check remains enabled; no CI gate is bypassed.
+
+Frozen-lockfile install, Expo compatibility check, iOS export, mobile typecheck,
+lint/boundary checks, 59 unit tests and 45-artifact secret scan **PASS locally**.
+The new patch versions have **NOT RUN** on a physical device or rebuilt native
+simulator installation. Existing v4 phone, retained v5 simulator, signing data,
+configuration, databases and recovery resources remain untouched. This narrow CI
+correction does not close the Task09 physical or independent recovery gates.
+The owner's uncommitted validation-closeout prompt is preserved separately.
