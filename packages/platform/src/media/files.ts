@@ -1,3 +1,4 @@
+import { assertStorageCapacity } from './capacity';
 import { constants } from 'node:fs';
 import { mkdir, lstat, open, link, unlink, statfs } from 'node:fs/promises';
 import { dirname, resolve, parse, join } from 'node:path';
@@ -35,7 +36,7 @@ export class MediaFiles {
   async capacity(bytes: number) {
     await this.directory('00000000-0000-4000-8000-000000000000');
     const info = await statfs(this.root);
-    if (info.bavail * info.bsize < this.reserveBytes + bytes) throw new AccessError('STORAGE_FULL', 507);
+    assertStorageCapacity(info, bytes, this.reserveBytes);
   }
   async inspect(path: string): Promise<ExpectedImage> {
     const file = await open(path, constants.O_RDONLY | constants.O_NOFOLLOW);

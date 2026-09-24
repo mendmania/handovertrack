@@ -7,8 +7,8 @@ import { SnapshotStore, type SqlConnection, type SqlDatabase } from '../apps/mob
 import { CaptureService } from '../apps/mobile/src/media/service';
 import type { CaptureFiles } from '../apps/mobile/src/media/types';
 
-export async function captureFixture(root: string) {
-  const path = join(root,'mobile.sqlite'); let db = new DatabaseSync(path);
+export async function captureFixture(root: string, databaseName = 'mobile.sqlite') {
+  const path = join(root,databaseName); let db = new DatabaseSync(path);
   function connection(value: DatabaseSync): SqlConnection {
     return {
       async execAsync(sql) { value.exec(sql); },

@@ -474,7 +474,7 @@ export interface components {
     schemas: {
         Error: {
             /** @enum {string} */
-            code: "UNAUTHENTICATED" | "NOT_FOUND" | "SNAPSHOT_TOO_LARGE" | "INVALID_REQUEST" | "INTERNAL_ERROR" | "VERSION_CONFLICT" | "IDEMPOTENCY_CONFLICT" | "CURSOR_EXPIRED" | "INVALID_CURSOR" | "FORBIDDEN_ORIGIN" | "ACCESS_CHANGED" | "UPLOAD_BUSY" | "UPLOAD_INCOMPLETE" | "IMAGE_MISMATCH" | "INVALID_IMAGE" | "STORAGE_FULL" | "STALE_LEASE" | "COMPLETION_REQUIRED" | "PROJECT_COMPLETE" | "MEDIA_NOT_READY" | "REPORT_NOT_READY" | "RATE_LIMITED" | "DECISION_RECORDED";
+            code: "UNAUTHENTICATED" | "NOT_FOUND" | "SNAPSHOT_TOO_LARGE" | "INVALID_REQUEST" | "INTERNAL_ERROR" | "VERSION_CONFLICT" | "IDEMPOTENCY_CONFLICT" | "CURSOR_EXPIRED" | "INVALID_CURSOR" | "FORBIDDEN_ORIGIN" | "ACCESS_CHANGED" | "UPLOAD_BUSY" | "UPLOAD_INCOMPLETE" | "IMAGE_MISMATCH" | "INVALID_IMAGE" | "STORAGE_FULL" | "STALE_LEASE" | "COMPLETION_REQUIRED" | "PROJECT_COMPLETE" | "MEDIA_NOT_READY" | "REPORT_NOT_READY" | "RATE_LIMITED" | "DECISION_RECORDED" | "RECOVERY_REQUIRED";
             message: string;
             requestId: string;
             current?: components["schemas"]["Project"] | components["schemas"]["Assignment"] | components["schemas"]["ChecklistTemplate"] | components["schemas"]["ChecklistRun"] | components["schemas"]["Composition"] | components["schemas"]["MediaAvailability"];
@@ -908,7 +908,17 @@ export interface components {
             } | null;
         };
     };
-    responses: never;
+    responses: {
+        /** @description Restored authority and decision history require operator reconciliation; no protected serving */
+        RecoveryRequired: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["Error"];
+            };
+        };
+    };
     parameters: never;
     requestBodies: never;
     headers: never;
@@ -979,6 +989,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            503: components["responses"]["RecoveryRequired"];
         };
     };
     listProjects: {
@@ -1046,6 +1057,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            503: components["responses"]["RecoveryRequired"];
         };
     };
     createProject: {
@@ -1146,6 +1158,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            503: components["responses"]["RecoveryRequired"];
         };
     };
     getProjectSnapshot: {
@@ -1213,6 +1226,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            503: components["responses"]["RecoveryRequired"];
         };
     };
     getProject: {
@@ -1281,6 +1295,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            503: components["responses"]["RecoveryRequired"];
         };
     };
     updateProject: {
@@ -1382,6 +1397,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            503: components["responses"]["RecoveryRequired"];
         };
     };
     listWorkers: {
@@ -1476,6 +1492,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            503: components["responses"]["RecoveryRequired"];
         };
     };
     listAssignments: {
@@ -1571,6 +1588,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            503: components["responses"]["RecoveryRequired"];
         };
     };
     setAssignment: {
@@ -1673,6 +1691,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            503: components["responses"]["RecoveryRequired"];
         };
     };
     bootstrapSync: {
@@ -1767,6 +1786,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            503: components["responses"]["RecoveryRequired"];
         };
     };
     pullSync: {
@@ -1866,6 +1886,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            503: components["responses"]["RecoveryRequired"];
         };
     };
     createUpload: {
@@ -1947,6 +1968,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            503: components["responses"]["RecoveryRequired"];
             /** @description Storage reserve exhausted */
             507: {
                 headers: {
@@ -2033,6 +2055,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            503: components["responses"]["RecoveryRequired"];
             /** @description Storage reserve exhausted */
             507: {
                 headers: {
@@ -2119,6 +2142,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            503: components["responses"]["RecoveryRequired"];
             /** @description Storage reserve exhausted */
             507: {
                 headers: {
@@ -2209,6 +2233,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            503: components["responses"]["RecoveryRequired"];
             /** @description Storage reserve exhausted */
             507: {
                 headers: {
@@ -2301,6 +2326,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            503: components["responses"]["RecoveryRequired"];
             /** @description Storage reserve exhausted */
             507: {
                 headers: {
@@ -2389,6 +2415,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            503: components["responses"]["RecoveryRequired"];
             /** @description Storage reserve exhausted */
             507: {
                 headers: {
@@ -2483,6 +2510,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            503: components["responses"]["RecoveryRequired"];
         };
     };
     publishChecklistTemplate: {
@@ -2574,6 +2602,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            503: components["responses"]["RecoveryRequired"];
         };
     };
     readChecklist: {
@@ -2660,6 +2689,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            503: components["responses"]["RecoveryRequired"];
         };
     };
     checklistCommand: {
@@ -2752,6 +2782,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            503: components["responses"]["RecoveryRequired"];
         };
     };
     getProof: {
@@ -2838,6 +2869,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            503: components["responses"]["RecoveryRequired"];
         };
     };
     saveProof: {
@@ -2930,6 +2962,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            503: components["responses"]["RecoveryRequired"];
         };
     };
     requestReport: {
@@ -3022,6 +3055,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            503: components["responses"]["RecoveryRequired"];
         };
     };
     reportStatus: {
@@ -3109,6 +3143,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            503: components["responses"]["RecoveryRequired"];
         };
     };
     retryReport: {
@@ -3198,6 +3233,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            503: components["responses"]["RecoveryRequired"];
         };
     };
     downloadReport: {
@@ -3285,6 +3321,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            503: components["responses"]["RecoveryRequired"];
         };
     };
     sharing: {
@@ -3381,6 +3418,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            503: components["responses"]["RecoveryRequired"];
         };
     };
     createShare: {
@@ -3483,6 +3521,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            503: components["responses"]["RecoveryRequired"];
         };
     };
     revokeShare: {
@@ -3582,6 +3621,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            503: components["responses"]["RecoveryRequired"];
         };
     };
     reviewDecision: {
@@ -3684,6 +3724,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            503: components["responses"]["RecoveryRequired"];
         };
     };
     guestReport: {
@@ -3778,6 +3819,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            503: components["responses"]["RecoveryRequired"];
         };
     };
     guestDecision: {
@@ -3878,6 +3920,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            503: components["responses"]["RecoveryRequired"];
         };
     };
     guestPdf: {
@@ -3972,6 +4015,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            503: components["responses"]["RecoveryRequired"];
         };
     };
 }

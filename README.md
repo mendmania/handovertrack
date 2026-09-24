@@ -424,3 +424,15 @@ cookies. Refresh/return requires reopening the original complete link. SQL 007 i
 additive; the phone/live service remains unchanged. See [Task 08's handoff](docs/progress/08-sharing-and-decisions.md)
 for secret delivery, API boundaries, rate budgets, validation and release gates.
 The [Task 09 prompt](docs/prompts/09-reliability-and-recovery.md) is prepared only.
+
+## Task 09 reliability and recovery
+
+Tasks 06–08 are merged; Task 09 remains **implemented-awaiting-validation** and the
+trial remains disposable-only. The retained live 004 runtime and physical v4 phone
+are unchanged. See the [Task 09 acceptance matrix](docs/progress/09-reliability-and-recovery.md)
+and [operator quickstart](infra/kubernetes/RELIABILITY.md) for current-schema
+restore quarantine, unreconciled decision/authority history, diagnostic signals
+and coordinated release stopping points. `pnpm test:recovery` creates fresh
+loopback-only synthetic services and retains their backups/data; it refuses reuse
+of existing Task 09 names. It requires built API/worker and Playwright Chromium.
+Independent recovery arrangements and physical/native gates remain open.

@@ -5,7 +5,7 @@ import { createDatabase } from '@handovertrack/platform/database';
 import { createMediaJobs, MediaFiles, sweepMediaScratch } from '@handovertrack/platform/media';
 import { readServerConfig } from '@handovertrack/config/server';
 const config = readServerConfig(process.env);
-const { db, pool } = createDatabase(config.DATABASE_URL);
+const { pool, close } = createDatabase(config.DATABASE_URL);
 const files = new MediaFiles(config.MEDIA_ROOT, config.MEDIA_RESERVE_BYTES);
 const jobs = createMediaJobs(pool, files, config.WORKER_LEASE_MS);
 const reports = createReportJobs(pool, new ReportFiles(config.MEDIA_ROOT, config.MEDIA_RESERVE_BYTES), config.MEDIA_ROOT, config.WORKER_LEASE_MS);
@@ -52,5 +52,5 @@ void tick();
 for (const signal of ['SIGINT', 'SIGTERM']) process.once(signal, async () => {
   if (closing) return;
   closing = true; clearInterval(timer); clearInterval(heartbeat); clearInterval(reportTimer);
-  await Promise.all([running, reportRunning]); await db.destroy(); report('stopped', { signal }); process.exit(0);
+  await Promise.all([running, reportRunning]); await close(); report('stopped', { signal }); process.exit(0);
 });

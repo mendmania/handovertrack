@@ -75,6 +75,9 @@
                 }
               }
             }
+          },
+          "503": {
+            "$ref": "#/components/responses/RecoveryRequired"
           }
         }
       }
@@ -158,6 +161,9 @@
                 }
               }
             }
+          },
+          "503": {
+            "$ref": "#/components/responses/RecoveryRequired"
           }
         }
       },
@@ -289,6 +295,9 @@
                 }
               }
             }
+          },
+          "503": {
+            "$ref": "#/components/responses/RecoveryRequired"
           }
         }
       }
@@ -372,6 +381,9 @@
                 }
               }
             }
+          },
+          "503": {
+            "$ref": "#/components/responses/RecoveryRequired"
           }
         }
       }
@@ -464,6 +476,9 @@
                 }
               }
             }
+          },
+          "503": {
+            "$ref": "#/components/responses/RecoveryRequired"
           }
         }
       },
@@ -604,6 +619,9 @@
                 }
               }
             }
+          },
+          "503": {
+            "$ref": "#/components/responses/RecoveryRequired"
           }
         }
       }
@@ -717,6 +735,9 @@
                 }
               }
             }
+          },
+          "503": {
+            "$ref": "#/components/responses/RecoveryRequired"
           }
         }
       }
@@ -839,6 +860,9 @@
                 }
               }
             }
+          },
+          "503": {
+            "$ref": "#/components/responses/RecoveryRequired"
           }
         }
       }
@@ -990,6 +1014,9 @@
                 }
               }
             }
+          },
+          "503": {
+            "$ref": "#/components/responses/RecoveryRequired"
           }
         }
       }
@@ -1103,6 +1130,9 @@
                 }
               }
             }
+          },
+          "503": {
+            "$ref": "#/components/responses/RecoveryRequired"
           }
         }
       }
@@ -1245,6 +1275,9 @@
                 }
               }
             }
+          },
+          "503": {
+            "$ref": "#/components/responses/RecoveryRequired"
           }
         }
       }
@@ -1352,6 +1385,9 @@
                 }
               }
             }
+          },
+          "503": {
+            "$ref": "#/components/responses/RecoveryRequired"
           }
         },
         "requestBody": {
@@ -1470,6 +1506,9 @@
                 }
               }
             }
+          },
+          "503": {
+            "$ref": "#/components/responses/RecoveryRequired"
           }
         },
         "description": " Writes require WEB_ORIGIN or absent Origin plus expo-origin: handovertrack://. Replays always reauthorize the original capture owner. Conflicting metadata returns 409; unknown or inaccessible IDs return 404. An accepted response identifies the existing immutable original; it does not replace its bytes."
@@ -1578,6 +1617,9 @@
                 }
               }
             }
+          },
+          "503": {
+            "$ref": "#/components/responses/RecoveryRequired"
           }
         },
         "description": " Writes require WEB_ORIGIN or absent Origin plus expo-origin: handovertrack://. Replays always reauthorize the original capture owner. Conflicting metadata returns 409; unknown or inaccessible IDs return 404. An accepted response identifies the existing immutable original; it does not replace its bytes."
@@ -1704,6 +1746,9 @@
                 }
               }
             }
+          },
+          "503": {
+            "$ref": "#/components/responses/RecoveryRequired"
           }
         }
       }
@@ -1821,6 +1866,9 @@
                 }
               }
             }
+          },
+          "503": {
+            "$ref": "#/components/responses/RecoveryRequired"
           }
         },
         "description": "Authenticated JPEG stream, exact Content-Length required, maximum 50 MiB; outside BFF. Stable upload ID, non-replacing staging. Upload ID and immutable metadata are the idempotency identity. Writes require WEB_ORIGIN or absent Origin plus expo-origin: handovertrack://. Replays always reauthorize the original capture owner. Conflicting metadata returns 409; unknown or inaccessible IDs return 404. An accepted response identifies the existing immutable original; it does not replace its bytes.",
@@ -1961,6 +2009,9 @@
                 }
               }
             }
+          },
+          "503": {
+            "$ref": "#/components/responses/RecoveryRequired"
           }
         }
       }
@@ -2064,6 +2115,9 @@
                 }
               }
             }
+          },
+          "503": {
+            "$ref": "#/components/responses/RecoveryRequired"
           }
         }
       },
@@ -2175,6 +2229,9 @@
                 }
               }
             }
+          },
+          "503": {
+            "$ref": "#/components/responses/RecoveryRequired"
           }
         },
         "requestBody": {
@@ -2297,6 +2354,9 @@
                 }
               }
             }
+          },
+          "503": {
+            "$ref": "#/components/responses/RecoveryRequired"
           }
         }
       },
@@ -2417,6 +2477,9 @@
                 }
               }
             }
+          },
+          "503": {
+            "$ref": "#/components/responses/RecoveryRequired"
           }
         },
         "requestBody": {
@@ -2534,6 +2597,9 @@
                 }
               }
             }
+          },
+          "503": {
+            "$ref": "#/components/responses/RecoveryRequired"
           }
         }
       },
@@ -2649,6 +2715,9 @@
                 }
               }
             }
+          },
+          "503": {
+            "$ref": "#/components/responses/RecoveryRequired"
           }
         },
         "requestBody": {
@@ -2776,6 +2845,9 @@
                 }
               }
             }
+          },
+          "503": {
+            "$ref": "#/components/responses/RecoveryRequired"
           }
         },
         "requestBody": {
@@ -2902,6 +2974,9 @@
                 }
               }
             }
+          },
+          "503": {
+            "$ref": "#/components/responses/RecoveryRequired"
           }
         }
       }
@@ -3028,6 +3103,9 @@
                 }
               }
             }
+          },
+          "503": {
+            "$ref": "#/components/responses/RecoveryRequired"
           }
         }
       }
@@ -3145,6 +3223,9 @@
                 }
               }
             }
+          },
+          "503": {
+            "$ref": "#/components/responses/RecoveryRequired"
           }
         }
       }
@@ -3271,6 +3352,9 @@
                 }
               }
             }
+          },
+          "503": {
+            "$ref": "#/components/responses/RecoveryRequired"
           }
         },
         "security": [
@@ -3412,6 +3496,9 @@
                 }
               }
             }
+          },
+          "503": {
+            "$ref": "#/components/responses/RecoveryRequired"
           }
         },
         "security": [
@@ -3572,6 +3659,9 @@
                 }
               }
             }
+          },
+          "503": {
+            "$ref": "#/components/responses/RecoveryRequired"
           }
         },
         "security": [
@@ -3713,6 +3803,9 @@
                 }
               }
             }
+          },
+          "503": {
+            "$ref": "#/components/responses/RecoveryRequired"
           }
         },
         "security": [
@@ -3836,6 +3929,9 @@
                 }
               }
             }
+          },
+          "503": {
+            "$ref": "#/components/responses/RecoveryRequired"
           }
         },
         "security": [
@@ -3959,6 +4055,9 @@
                 }
               }
             }
+          },
+          "503": {
+            "$ref": "#/components/responses/RecoveryRequired"
           }
         },
         "security": [
@@ -4083,6 +4182,9 @@
                 }
               }
             }
+          },
+          "503": {
+            "$ref": "#/components/responses/RecoveryRequired"
           }
         },
         "security": [
@@ -4129,7 +4231,8 @@
               "MEDIA_NOT_READY",
               "REPORT_NOT_READY",
               "RATE_LIMITED",
-              "DECISION_RECORDED"
+              "DECISION_RECORDED",
+              "RECOVERY_REQUIRED"
             ]
           },
           "message": {
@@ -5940,6 +6043,18 @@
         "type": "http",
         "scheme": "bearer",
         "description": "One-time displayed 256-bit capability; never use cookie authority or put it in a URL request."
+      }
+    },
+    "responses": {
+      "RecoveryRequired": {
+        "description": "Restored authority and decision history require operator reconciliation; no protected serving",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
       }
     }
   }

@@ -37,7 +37,9 @@
     "test:reports": "node scripts/run.mjs tsx scripts/report-integration.ts",
     "test:report-worker": "node scripts/run.mjs tsx scripts/report-worker-crash.ts",
     "test:sharing": "node scripts/run.mjs tsx scripts/sharing-integration.ts",
-    "test:proof-web": "node scripts/run.mjs tsx scripts/proof-browser.ts"
+    "test:proof-web": "node scripts/run.mjs tsx scripts/proof-browser.ts",
+    "test:recovery": "node scripts/reliability-run.mjs",
+    "ops:signals": "node scripts/run.mjs tsx scripts/reliability-signals.ts"
   },
   "devDependencies": {
     "@playwright/test": "1.63.0",

@@ -10,6 +10,15 @@ export interface Database {
 }
 export function createDatabase(url: string) {
   const pool = new pg.Pool({ connectionString: url, max: 8, connectionTimeoutMillis: 5000 });
+  // pg removes failed idle clients itself; an error listener prevents a normal
+  // database restart from crashing API/worker with an unhandled EventEmitter error.
+  pool.on('error', () => { console.error(JSON.stringify({ service: 'handovertrack-database', event: 'idle_connection_lost' })); });
   const db = new Kysely<Database>({ dialect: new PostgresDialect({ pool }) });
-  return { db, pool };
+  async function close() {
+    await db.destroy();
+    // Kysely does not end an uninitialized dialect pool. Auth/raw-SQL-only
+    // instances (including restore-held APIs) still own a real pg pool.
+    if (!pool.ended) await pool.end();
+  }
+  return { db, pool, close };
 }

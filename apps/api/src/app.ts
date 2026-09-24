@@ -13,21 +13,29 @@ import { registerMedia } from './media';
 
 const uuid = { type: 'string', format: 'uuid' };
 export function createApp(config: ServerConfig, logging = true) {
-  const { db, pool } = createDatabase(config.DATABASE_URL);
+  const { db, pool, close } = createDatabase(config.DATABASE_URL);
   const auth = createAuth(pool, config);
   const readers = createReaders(db);
   const projects = projectReads(readers.projects, readers.memberships);
   const management = projectManagement(createProjectManagement(pool, config.AUTH_SECRET));
   const app = Fastify({ ajv: { customOptions: { removeAdditional: false } }, logger: logging ? { redact: ['req.headers.cookie', 'req.headers.authorization', 'res.headers.set-cookie'], serializers: { req: (req) => ({ method: req.method, url: req.url?.startsWith('/guest/') ? '/guest/[redacted]' : req.url?.split('?')[0], id: req.id }) } } : false, bodyLimit: 16_384 });
-  app.addHook('onClose', async () => { await db.destroy(); });
+  app.addHook('onClose', close);
   app.addHook('onSend', async (_req, reply) => { reply.header('cache-control', 'private, no-store'); });
   app.setNotFoundHandler(async () => { throw new AccessError('NOT_FOUND', 404); });
   app.setErrorHandler((error, req, reply) => {
     const transport = error as FastifyError;
     const invalid = transport.validation || (transport.statusCode !== undefined && transport.statusCode >= 400 && transport.statusCode < 500);
-    const failure = error instanceof AccessError ? error : new AccessError(invalid ? 'INVALID_REQUEST' : 'INTERNAL_ERROR', invalid ? 400 : 500);
+    const storage = ['ENOSPC', 'EDQUOT'].includes((error as NodeJS.ErrnoException).code ?? '');
+    const failure = storage ? new AccessError('STORAGE_FULL', 507) : error instanceof AccessError ? error : new AccessError(invalid ? 'INVALID_REQUEST' : 'INTERNAL_ERROR', invalid ? 400 : 500);
     if (failure.status === 500) req.log.error({ err: error }, 'Request failed');
     reply.status(failure.status).send({ code: failure.code, message: failure.code === 'NOT_FOUND' ? 'Resource unavailable' : failure.code, requestId: req.id, ...(failure.current !== undefined ? { current: failure.current } : {}) });
+  });
+  // Read on every request: no cached permission can outlive a restore hold.
+  // Operators stop/drain writers before quarantine; this also fences accidental
+  // startup of a restored API, including auth, guest reads and receipt replays.
+  app.addHook('onRequest', async (req) => {
+    if (req.url.split('?')[0] === '/health/live') return;
+    if ((await pool.query('SELECT 1 FROM recovery_holds h WHERE NOT EXISTS (SELECT 1 FROM recovery_reconciliations r WHERE r.hold_id=h.id) LIMIT 1')).rowCount) throw new AccessError('RECOVERY_REQUIRED', 503);
   });
   app.get('/health/live', async () => ({ status: 'ok' }));
   app.get('/health/ready', async () => { await pool.query('SELECT 1'); return { status: 'ok' }; });

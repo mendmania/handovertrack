@@ -12,7 +12,7 @@ try{
  const api=start('api',['apps/api/dist/main.js']);await ready(env.API_INTERNAL_URL!+'/health/ready',api);
  const web=start('web',['apps/web/node_modules/next/dist/bin/next','start','apps/web','--hostname','127.0.0.1','--port',new URL(env.WEB_ORIGIN!).port||'3300'],{NODE_ENV:'production'});await ready(env.WEB_ORIGIN!+'/sign-in',web);
  start('worker',['apps/worker/dist/main.js']);
- const test=start('browser',['node_modules/@playwright/test/cli.js','test','--config','scripts/playwright-task08.config.ts','tests/web/reports.spec.ts','tests/web/sharing.spec.ts']);
+ const test=start('browser',['node_modules/@playwright/test/cli.js','test','--config','scripts/playwright-task08.config.ts',...(env.TASK09_ISOLATED==='true'?[]:['tests/web/reports.spec.ts','tests/web/sharing.spec.ts'])]);
  const code=await new Promise(r=>test.once('exit',r));if(code!==0)throw Error('Proof/sharing browser checks failed; inspect private ci-browser.log');console.log('PASS isolated report + sharing browser journeys');
 }finally{
  for(const c of children)if(c.exitCode===null&&c.signalCode===null)c.kill('SIGTERM');
