@@ -1,7 +1,9 @@
 # Task 09 — whole-trial reliability and recovery
 
 **Status: implemented-awaiting-validation. Trial: disposable-only.**
-Updated 2026-09-24. Local implementation can be reviewed; physical/native and
+Updated 2026-09-24. [Task 09 PR #8](https://github.com/mendmania/handovertrack/pull/8),
+implementation checkpoint `02a4d947e9a4c70910d870710670ae74514b0ca6`.
+Local implementation can be reviewed; physical/native and
 independent recovery gates remain open. No Task 10 work, merge, deployment,
 auto-merge, automation activation, registry change or paid service was performed.
 
@@ -93,7 +95,9 @@ harness attempts were retained (startup readiness, import/argument wiring, cache
 fixture status and cleanup errors). The database restart failure identified the
 real pool defect fixed above; none is represented as a passing native/production check.
 
-The private `.local/task09/recovery-validation.json` records the exact recovery
+Local results were captured from the uncommitted Task 09 working tree before
+checkpoint `02a4d94`; its recorded source SHA is the base, not a live runtime
+identity. The private `.local/task09/recovery-validation.json` records the exact recovery
 point, known post-backup interval, verified manifest hash, elapsed restore and
 native state. `.local/task09/load-validation.json` records measured latency/RSS/
 disk counters; raw tokens, customer fixtures, PDFs, screenshots and dumps remain
@@ -123,8 +127,9 @@ maximum 316.02ms); observed worker plus renderer RSS peaked at 303,296KiB. These
 are mixed-operation local samples, not throughput/availability promises. The
 32-table/90-file restore and verification took 1.761s; recovery point
 08:39:48.257Z to known post-backup commits 08:39:49.336Z on 2026-09-24. SQL/file
-recovery is technical PASS; the intentional history gap remains held. Final PR CI must be checked
-against the final pushed commit, with feature-branch publication skipped. Existing
+recovery is technical PASS; the intentional history gap remains held. Final-commit CI is tracked in [PR #8 checks](https://github.com/mendmania/handovertrack/pull/8/checks);
+the publishing task verifies it after its final push. Feature-branch publication
+is skipped by the existing workflow guard. Existing
 schema-contract deployment rejection remains intentional.
 
 ## Readiness and precise continuation

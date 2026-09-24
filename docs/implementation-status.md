@@ -15,7 +15,7 @@ in-progress test instructions.
 | 06 | Required-photo checklists and offline conflicts | implemented-awaiting-validation | [Handoff](progress/06-checklists.md); local PostgreSQL/SQLite/HTTP/browser checks pass; isolated Release simulator built/installed/launched; native offline save/cold reopen/concurrent conflict/resolution PASS; Task 09 photo/account/org/tombstone simulator follow-ups now PASS; shared physical/recovery gates remain open |
 | 07 | Proof composition and immutable reports | complete locally | [Handoff](progress/07-proof-reports.md); frozen snapshots, private PDF worker/crash recovery and visual/browser/regression checks PASS; no live release |
 | 08 | Scoped sharing and customer decisions | complete locally; merged | [Handoff](progress/08-sharing-and-decisions.md); [PR #7](https://github.com/mendmania/handovertrack/pull/7) includes Tasks 06–08; local validation and implementation CI PASS; no live release |
-| 09 | Whole-trial reliability and recovery | implemented-awaiting-validation | [Handoff](progress/09-reliability-and-recovery.md); local journey/restore/hold/load regressions, physical/native/independent recovery gates still open |
+| 09 | Whole-trial reliability and recovery | implemented-awaiting-validation | [Handoff](progress/09-reliability-and-recovery.md); [PR #8](https://github.com/mendmania/handovertrack/pull/8); local journey/restore/hold/load regressions, physical/native/independent recovery gates still open |
 | 10 | Optional S3/Kafka/Temporal expansion | deferred | Separate selection after 09 |
 
 Tasks 06–08 are merged through [PR #7](https://github.com/mendmania/handovertrack/pull/7),

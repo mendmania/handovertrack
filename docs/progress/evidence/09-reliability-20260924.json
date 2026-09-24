@@ -163,7 +163,14 @@
       "result": "PASS",
       "artifacts": 45
     },
-    "boundedTmpfsPressure": "PASS",
-    "finalCommitCI": "pending publication"
+    "boundedTmpfsPressure": "PASS"
+  },
+  "publication": {
+    "pr": "https://github.com/mendmania/handovertrack/pull/8",
+    "implementationCommit": "02a4d947e9a4c70910d870710670ae74514b0ca6",
+    "finalCommitChecks": "https://github.com/mendmania/handovertrack/pull/8/checks",
+    "localEvidenceSource": "Uncommitted Task09 working tree on recorded base before implementation checkpoint",
+    "autoMerge": false,
+    "deployment": false
   }
 }
