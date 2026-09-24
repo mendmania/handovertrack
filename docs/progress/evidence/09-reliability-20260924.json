@@ -184,6 +184,11 @@
         "id": 35977549665,
         "result": "FAIL",
         "finding": "Recovery browser harness reused bundle compiled for another origin"
+      },
+      {
+        "id": 35978341880,
+        "result": "FAIL",
+        "finding": "Next build worker rejected forwarded --env-file flag; configuration moved to child environment"
       }
     ],
     "localWorkerImmediateTermination": {
@@ -192,6 +197,11 @@
       "database": "empty owned schema008 database"
     },
     "lintAndTypesAfterFix": "PASS",
-    "finalHead": "See PR checks; earlier failed runs retained"
+    "finalHead": "See PR checks; earlier failed runs retained",
+    "localIsolatedBuildAndBrowserAfterFix": {
+      "result": "PASS",
+      "journeys": 10,
+      "fixtures": "fresh owned PostgreSQL browser-fix container, retained and stopped"
+    }
   }
 }

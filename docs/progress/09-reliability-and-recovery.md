@@ -142,8 +142,14 @@ passed that smoke but failed the fresh recovery browser setup. The latter reused
 Next's previously compiled3300 auth origin at the isolated3390 server. The harness
 now builds the browser bundle with its own fixture origin before launching tests.
 Safe CI diagnostics expose only repository test location, outcome and duration;
-raw errors, screenshots, tokens and service logs stay private. Lint/types and the
-20-start worker regression passed after these fixes. Final-head CI remains
+raw errors, screenshots, tokens and service logs stay private.
+[Run35978341880](https://github.com/mendmania/handovertrack/actions/runs/35978341880)
+then **FAIL**ed because Next forwards Node's `--env-file` exec argument to build
+workers, which reject it. The harness now supplies configuration through the
+child environment without private command arguments. That exact production build,
+a fresh isolated report fixture and all10 Chromium journeys subsequently **PASS**
+locally; its new container/data are retained and stopped. Lint/types and the
+20-start worker regression also passed after the fixes. Final-head CI remains
 verifiable through the PR checks above; earlier failures are not marked PASS.
 
 ## Readiness and precise continuation
